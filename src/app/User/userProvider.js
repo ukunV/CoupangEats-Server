@@ -1,58 +1,61 @@
 const { pool } = require("../../../config/database");
+const { errResponse } = require("../../../config/response");
 const { logger } = require("../../../config/winston");
 
 const userDao = require("./userDao");
 
+const user_ctrl = require("../../../controllers/user_ctrl");
+const { USER_ID_NOT_MATCH } = require("../../../config/baseResponseStatus");
+
 // Provider: Read 비즈니스 로직 처리
 
-exports.retrieveUserList = async function (email) {
-  if (!email) {
+// 이메일 존재 여부 확인
+exports.checkEmailExists = async function (email) {
+  try {
     const connection = await pool.getConnection(async (conn) => conn);
-    const userListResult = await userDao.selectUser(connection);
+
+    const result = await userDao.checkEmailExists(connection, email);
     connection.release();
 
-    return userListResult;
-
-  } else {
-    const connection = await pool.getConnection(async (conn) => conn);
-    const userListResult = await userDao.selectUserEmail(connection, email);
-    connection.release();
-
-    return userListResult;
+    return result;
+  } catch (err) {
+    logger.error(`User-checkEmailExists Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
   }
 };
 
-exports.retrieveUser = async function (userId) {
-  const connection = await pool.getConnection(async (conn) => conn);
-  const userResult = await userDao.selectUserId(connection, userId);
+// 전화번호 존재 여부 확인
+exports.checkPhoneNumExists = async function (phoneNum) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
 
-  connection.release();
+    const result = await userDao.checkPhoneNumExists(connection, phoneNum);
+    connection.release();
 
-  return userResult[0];
+    return result;
+  } catch (err) {
+    logger.error(`User-checkPhoneNumExists Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
 };
 
-exports.emailCheck = async function (email) {
-  const connection = await pool.getConnection(async (conn) => conn);
-  const emailCheckResult = await userDao.selectUserEmail(connection, email);
-  connection.release();
+// 비밀번호 확인
+exports.checkPassword = async function (email, password) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
 
-  return emailCheckResult;
-};
+    const salt = await userDao.getSalt(connection, email);
 
-exports.passwordCheck = async function (selectUserPasswordParams) {
-  const connection = await pool.getConnection(async (conn) => conn);
-  const passwordCheckResult = await userDao.selectUserPassword(
-      connection,
-      selectUserPasswordParams
-  );
-  connection.release();
-  return passwordCheckResult[0];
-};
+    const hashedPassword = await user_ctrl.makePasswordHashed(salt, password);
 
-exports.accountCheck = async function (email) {
-  const connection = await pool.getConnection(async (conn) => conn);
-  const userAccountResult = await userDao.selectUserAccount(connection, email);
-  connection.release();
+    const params = [email, hashedPassword];
+    const result = await userDao.checkPassword(connection, params);
 
-  return userAccountResult;
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-checkPassword Provider error: ${err.message}`);
+    return -1;
+  }
 };

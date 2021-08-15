@@ -30,31 +30,43 @@ module.exports = {
     code: 2002,
     message: "이메일은 30자리 미만으로 입력해주세요.",
   },
-  SIGNUP_EMAIL_ERROR_TYPE: {
+  SIGNUP_EMAIL_TYPE: {
     isSuccess: false,
     code: 2003,
-    message: "이메일을 형식을 정확하게 입력해주세요.",
+    message: "이메일 형식이 올바르지 않습니다.",
   },
   SIGNUP_PASSWORD_EMPTY: {
     isSuccess: false,
     code: 2004,
-    message: "비밀번호를 입력 해주세요.",
+    message: "비밀번호를 입력해주세요.",
   },
   SIGNUP_PASSWORD_LENGTH: {
     isSuccess: false,
     code: 2005,
-    message: "비밀번호는 6~20자리를 입력해주세요.",
+    message: "비밀번호는 8~20자리를 입력해주세요.",
   },
-  SIGNUP_NICKNAME_EMPTY: {
+  SIGNUP_NAME_EMPTY: {
     isSuccess: false,
     code: 2006,
-    message: "닉네임을 입력 해주세요.",
+    message: "이름을 입력해주세요.",
   },
-  SIGNUP_NICKNAME_LENGTH: {
+  SIGNUP_NAME_LENGTH: {
     isSuccess: false,
     code: 2007,
-    message: "닉네임은 최대 20자리를 입력해주세요.",
+    message: "이름은 최대 10자리입니다.",
   },
+  SIGNUP_PHONENUM_EMPTY: {
+    isSuccess: false,
+    code: 2008,
+    message: "전화번호를 입력해주세요.",
+  },
+  SIGNUP_PHONENUM_TYPE: {
+    isSuccess: false,
+    code: 2009,
+    message: "전화번호의 형식이 올바르지 않습니다.",
+  },
+
+  // made by note
 
   SIGNIN_EMAIL_EMPTY: {
     isSuccess: false,
@@ -121,22 +133,23 @@ module.exports = {
     code: 3001,
     message: "중복된 이메일입니다.",
   },
-  SIGNUP_REDUNDANT_NICKNAME: {
+  SIGNUP_REDUNDANT_PHONENUM: {
     isSuccess: false,
     code: 3002,
-    message: "중복된 닉네임입니다.",
+    message: "중복된 전화번호입니다.",
   },
-
-  SIGNIN_EMAIL_WRONG: {
+  SIGNIN_EMAIL_NOT_EXISTS: {
     isSuccess: false,
     code: 3003,
-    message: "아이디가 잘못 되었습니다.",
+    message: "존재하지 않는 이메일입니다.",
   },
   SIGNIN_PASSWORD_WRONG: {
     isSuccess: false,
     code: 3004,
-    message: "비밀번호가 잘못 되었습니다.",
+    message: "비밀번호가 올바르지 않습니다.",
   },
+  // made by note
+
   SIGNIN_INACTIVE_ACCOUNT: {
     isSuccess: false,
     code: 3005,
