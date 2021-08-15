@@ -109,15 +109,7 @@ exports.createUsers = async function (req, res) {
  * [POST] /users/sign-in
  */
 
-<<<<<<< Updated upstream
-exports.postUsers = async function (req, res) {
-=======
-<<<<<<< Updated upstream
-exports.getUsers = async function (req, res) {
-=======
 exports.userLogIn = async function (req, res) {
->>>>>>> Stashed changes
->>>>>>> Stashed changes
   const { email, password } = req.body;
 
   // Request Error Start
