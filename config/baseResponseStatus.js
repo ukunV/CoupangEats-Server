@@ -65,6 +65,31 @@ module.exports = {
     code: 2009,
     message: "전화번호의 형식이 올바르지 않습니다.",
   },
+  USER_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2010,
+    message: "userId값이 입력되지 않았습니다.",
+  },
+  USER_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 2011,
+    message: "해당 유저는 존재하지 않습니다.",
+  },
+  USER_ID_NOT_MATCH: {
+    isSuccess: false,
+    code: 2012,
+    message: "userId가 적절하지 않습니다.",
+  },
+  LATITUDE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2013,
+    message: "유효하지 않은 위도입니다.",
+  },
+  LONGTITUDE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2014,
+    message: "유효하지 않은 경도입니다.",
+  },
 
   // made by note
 
@@ -147,6 +172,11 @@ module.exports = {
     isSuccess: false,
     code: 3004,
     message: "비밀번호가 올바르지 않습니다.",
+  },
+  CATEGORY_NOT_EXISTS: {
+    isSuccess: false,
+    code: 3005,
+    message: "존재하지 않는 카테고리입니다.",
   },
   // made by note
 
