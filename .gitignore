@@ -1,7 +1,5 @@
 .idea/*
-node_modules/*
+node_modules
 package-lock.json
-log/*
+log
 .DS_Store
-config/secret.js
-config/database.js
