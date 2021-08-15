@@ -9,8 +9,7 @@ const jwt = require("jsonwebtoken");
 const regexEmail = require("regex-email");
 const { emit } = require("nodemon");
 
-const createHashedPassword =
-  require("../../../controllers/user_ctrl").createHashedPassword;
+const user_ctrl = require("../../../controllers/user_ctrl");
 
 // regex
 // const regexName = /^[가-힣]+$/;
@@ -71,7 +70,9 @@ exports.createUsers = async function (req, res) {
   // Response Error End
 
   // 비밀번호 암호화
-  const { hashedPassword, salt } = await createHashedPassword(password);
+  const { hashedPassword, salt } = await user_ctrl.createHashedPassword(
+    password
+  );
 
   const result = await userService.createUser(
     email,
@@ -102,6 +103,52 @@ exports.createUsers = async function (req, res) {
  * API Name : 로그인 API
  * [GET] /users/sign-in
  */
+
+exports.getUsers = async function (req, res) {
+  const { email, password } = req.body;
+
+  // Request Error Start
+  if (!email) return res.send(response(baseResponse.SIGNUP_EMAIL_EMPTY)); // 2001
+
+  if (email.length > 30)
+    return res.send(response(baseResponse.SIGNUP_EMAIL_LENGTH)); // 2002
+
+  if (!regexEmail.test(email))
+    return res.send(response(baseResponse.SIGNUP_EMAIL_TYPE)); // 2003
+
+  if (!password) return res.send(response(baseResponse.SIGNUP_PASSWORD_EMPTY)); // 2004
+
+  if (password.length < 8 || password.length > 20)
+    return res.send(response(baseResponse.SIGNUP_PASSWORD_LENGTH)); // 2005
+  // Request Error End
+
+  // Response Error Start
+  const checkEmailExists = await userProvider.checkEmailExists(email);
+
+  if (checkEmailExists === 0)
+    return res.send(response(baseResponse.SIGNIN_EMAIL_NOT_EXISTS)); // 3003
+
+  const checkPassword = await userProvider.checkPassword(email, password);
+
+  if (checkPassword === -1)
+    return res.send(response(baseResponse.SIGNIN_PASSWORD_WRONG)); // 3004
+  // Response Error End
+
+  const token = await jwt.sign(
+    {
+      userId: checkPassword,
+    }, // 토큰의 내용(payload)
+    secret_config.jwtsecret, // 비밀키
+    {
+      expiresIn: "365d",
+      subject: "userInfo",
+    } // 유효 기간 365일
+  );
+
+  return res.send(
+    response(baseResponse.SUCCESS, { userId: checkPassword, jwt: token })
+  );
+};
 
 /**
  * API No. 3

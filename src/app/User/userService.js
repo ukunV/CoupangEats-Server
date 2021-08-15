@@ -35,7 +35,7 @@ exports.createUser = async function (
   } catch (err) {
     await connection.rollback();
     connection.release();
-    logger.error(`User-createUser Service error\n: ${err.message}`);
+    logger.error(`User-createUser Service error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };

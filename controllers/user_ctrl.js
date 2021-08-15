@@ -29,6 +29,16 @@ const createHashedPassword = (plainPassword) =>
     });
   });
 
+const makePasswordHashed = (salt, plainPassword) =>
+  new Promise(async (resolve, reject) => {
+    crypto.pbkdf2(plainPassword, salt, 9999, 64, "sha512", (err, key) => {
+      if (err) reject(err);
+
+      resolve(key.toString("base64"));
+    });
+  });
+
 module.exports = {
   createHashedPassword,
+  makePasswordHashed,
 };
