@@ -5,11 +5,16 @@ const baseResponse = require("../../../config/baseResponseStatus");
 const { response, errResponse } = require("../../../config/response");
 const secret_config = require("../../../config/secret");
 const jwt = require("jsonwebtoken");
+const axios = require("axios");
+const passport = require("passport");
 
 const regexEmail = require("regex-email");
 const { emit } = require("nodemon");
 
 const user_ctrl = require("../../../controllers/user_ctrl");
+
+const kakao_key = require("../../../config/kakao_config").sercetKey;
+const KakaoStrategy = require("passport-kakao").Strategy;
 
 // regex
 // const regexName = /^[가-힣]+$/;
@@ -104,7 +109,15 @@ exports.createUsers = async function (req, res) {
  * [POST] /users/sign-in
  */
 
+<<<<<<< Updated upstream
 exports.postUsers = async function (req, res) {
+=======
+<<<<<<< Updated upstream
+exports.getUsers = async function (req, res) {
+=======
+exports.userLogIn = async function (req, res) {
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
   const { email, password } = req.body;
 
   // Request Error Start
@@ -152,21 +165,108 @@ exports.postUsers = async function (req, res) {
 
 /**
  * API No. 3
- * API Name : 특정 유저 조회 API
- * [GET] /app/users/{userId}
+ * API Name : 로그아웃 API
+ * [GET] /users/sign-out
  */
+
+exports.userLogOut = async function (req, res) {};
 
 /**
  * API No. 4
- * API Name : 로그인 API
- * [POST] /app/login
- * body : email, passsword
+ * API Name : 홈 화면 조회 APi
+ * [GET] /users/home
+ * query string: lat, lng
  */
 
+exports.getHome = async function (req, res) {
+  const { address } = req.body;
+  const { lat, lng } = req.query;
+};
+
 /**
- * API No. 5
- * API Name : 회원 정보 수정 API + JWT + Validation
- * [PATCH] /app/users/:userId
- * path variable : userId
- * body : nickname
+ * API No.
+ * API Name : 카카오 로그인 API
+ *
  */
+
+// passport.use(
+//   "kakao-login",
+//   new KakaoStrategy(
+//     {
+//       clientID: kakao_key,
+//       callbackURL: "/auth/kakao/callback",
+//     },
+//     async (accessToken, refreshToken, profile, done) => {
+//       console.log(accessToken);
+//       console.log(profile);
+//     }
+//   )
+// );
+
+// exports.kakaoLogin = async function (req, res) {
+//   const { accessToken } = req.body;
+
+//   if (!accessToken)
+//     return res.send(errResponse(baseResponse.ACCESS_TOKEN_EMPTY)); // 2052 : accessToken을 입력해주세요.
+
+//   try {
+//     let kakao_profile;
+
+//     try {
+//       kakao_profile = await axios.get("https://kapi.kakao.com/v2/user/me", {
+//         headers: {
+//           Authorization: `Bearer ${accessToken}`,
+//           "Content-Type": "application/json",
+//         },
+//       });
+//     } catch (err) {
+//       return res.send(errResponse(baseResponse.ACCESS_TOKEN)); // 2053 : 유효하지 않는 엑세스 토큰입니다.
+//     }
+
+//     const data = kakao_profile.data.kakao_account;
+//     const name = data.profile.nickname;
+//     const email = data.email;
+
+//     const emailCheckResult = await userProvider.emailCheck(email);
+
+//     if (emailCheckResult[0].exist === 1) {
+//       const userInfoRow = await userProvider.getUserInfo(email);
+
+//       let token = await jwt.sign(
+//         {
+//           userIdx: userInfoRow.userIdx,
+//         },
+//         secret_config.jwtsecret,
+//         {
+//           expiresIn: "365d",
+//           subject: "userInfo",
+//         }
+//       );
+//       return res.send(
+//         response(baseResponse.SUCCESS, {
+//           userIdx: userInfoRow.userIdx,
+//           jwt: token,
+//           message: "소셜로그인에 성공하셨습니다.",
+//         })
+//       );
+//     } else {
+//       const result = {
+//         name: name,
+//         email: email,
+//       };
+//       return res.send(
+//         response(baseResponse.SUCCESS, {
+//           message: "회원가입이 가능합니다.",
+//           result,
+//         })
+//       );
+//     }
+//   } catch (err) {
+//     logger.error(
+//       `App - postSignIn Service error\n: ${err.message} \n${JSON.stringify(
+//         err
+//       )}`
+//     );
+//     return errResponse(baseResponse.DB_ERROR);
+//   }
+// };
