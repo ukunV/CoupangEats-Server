@@ -5,7 +5,6 @@ const { logger } = require("../../../config/winston");
 const userDao = require("./userDao");
 
 const user_ctrl = require("../../../controllers/user_ctrl");
-const { USER_ID_NOT_MATCH } = require("../../../config/baseResponseStatus");
 
 // Provider: Read 비즈니스 로직 처리
 
