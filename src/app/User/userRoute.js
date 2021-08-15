@@ -9,5 +9,5 @@ module.exports = function (app) {
   app.post("/users/sign-up", user.createUsers);
 
   // 2. 로그인 API
-  app.get("/users/sign-in", user.getUsers);
+  app.post("/users/sign-in", user.postUsers);
 };

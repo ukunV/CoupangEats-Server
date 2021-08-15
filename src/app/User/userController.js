@@ -101,10 +101,10 @@ exports.createUsers = async function (req, res) {
 /**
  * API No. 2
  * API Name : 로그인 API
- * [GET] /users/sign-in
+ * [POST] /users/sign-in
  */
 
-exports.getUsers = async function (req, res) {
+exports.postUsers = async function (req, res) {
   const { email, password } = req.body;
 
   // Request Error Start
