@@ -143,13 +143,13 @@ module.exports = {
     code: 3003,
     message: "존재하지 않는 이메일입니다.",
   },
-  // made by note
-
   SIGNIN_PASSWORD_WRONG: {
     isSuccess: false,
     code: 3004,
-    message: "비밀번호가 잘못 되었습니다.",
+    message: "비밀번호가 올바르지 않습니다.",
   },
+  // made by note
+
   SIGNIN_INACTIVE_ACCOUNT: {
     isSuccess: false,
     code: 3005,
