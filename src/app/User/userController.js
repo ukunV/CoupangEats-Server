@@ -165,13 +165,50 @@ exports.userLogOut = async function (req, res) {};
 
 /**
  * API No. 4
+ * API Name : 유저 주소 변경 API
+ * [PATCH] /users/address
+ */
+
+exports.changeAddress = async function (req, res) {
+  const { userId } = req.verifiedToken;
+  const { bodyId } = req.body;
+  const { lat, lng } = req.body;
+
+  //Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  const checkUserExist = userProvider.checkUserExists(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
+
+  if (userId !== bodyId)
+    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2012
+
+  // 위도 범위
+  if ((lat < 33) | (lat > 43))
+    return res.send(errResponse(baseResponse.LATITUDE_IS_NOT_VALID)); // 2013
+
+  // 경도 범위
+  if ((lng < 124) | (lng > 132))
+    return res.send(errResponse(baseResponse.LONGTITUDE_IS_NOT_VALID)); // 2014
+
+  //Request Error End
+
+  const result = await userService.updateAddress(lat, lng, userId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No.
  * API Name : 홈 화면 조회 APi
  * [GET] /users/home
  * query string: lat, lng
  */
 
 exports.getHome = async function (req, res) {
-  const { address } = req.body;
   const { lat, lng } = req.query;
 };
 

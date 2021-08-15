@@ -9,13 +9,12 @@ module.exports = function (app) {
   app.post("/users/sign-up", user.createUsers);
 
   // 2. 로그인 API
-<<<<<<< Updated upstream
-  app.post("/users/sign-in", user.postUsers);
-=======
-<<<<<<< Updated upstream
-  app.get("/users/sign-in", user.getUsers);
-=======
   app.post("/users/sign-in", user.userLogIn);
+
+  // 3. 로그아웃 API
+
+  // 4. 유저 주소 변경 API
+  app.patch("/users/address", jwtMiddleware, user.changeAddress);
 
   // // API No 6. 카카오 로그인 API
   // app.post("/users/kakao-login", user.kakaoLogin);
@@ -30,6 +29,4 @@ module.exports = function (app) {
   //     res.redirect("/");
   //   }
   // );
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 };

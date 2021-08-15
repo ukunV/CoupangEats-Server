@@ -58,3 +58,18 @@ exports.checkPassword = async function (email, password) {
     return -1;
   }
 };
+
+// 유저 존재 여부 확인
+exports.checkUserExists = async function (userId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.checkUserExists(connection, userId);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-checkUserExists Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

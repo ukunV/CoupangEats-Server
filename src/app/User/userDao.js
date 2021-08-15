@@ -60,10 +60,36 @@ async function checkPassword(connection, params) {
   return row[0][0]["id"];
 }
 
+// 유저 존재 여부 확인
+async function checkUserExists(connection, userId) {
+  const query = `
+    select exists(select id from User where id = ?) as exist;
+    `;
+
+  const row = await connection.query(query, userId);
+
+  return row[0][0]["exist"];
+}
+
+// 유저 주소 변경
+async function updateAddress(connection, params) {
+  const query = `
+                update User
+                set userLatitude = ?, userLongtitude = ?
+                where id = ?;
+                `;
+
+  const row = await connection.query(query, params);
+
+  return row[0].info;
+}
+
 module.exports = {
   checkEmailExists,
   checkPhoneNumExists,
   createUser,
   getSalt,
   checkPassword,
+  checkUserExists,
+  updateAddress,
 };

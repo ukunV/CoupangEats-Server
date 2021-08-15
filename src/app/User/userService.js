@@ -39,3 +39,24 @@ exports.createUser = async function (
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 유저 주소 변경
+exports.updateAddress = async function (lat, lng, userId) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  try {
+    await connection.beginTransaction();
+
+    const params = [lat, lng, userId];
+    const result = await userDao.updateAddress(connection, params);
+
+    await connection.commit();
+
+    connection.release();
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    logger.error(`User-updateAddress Service error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
