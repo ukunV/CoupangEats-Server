@@ -3,5 +3,3 @@ node_modules
 package-lock.json
 log
 .DS_Store
-config/secret.js
-config/database.js
