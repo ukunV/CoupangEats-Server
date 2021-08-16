@@ -75,11 +75,11 @@ module.exports = {
     code: 2011,
     message: "해당 유저는 존재하지 않습니다.",
   },
-  USER_ID_NOT_MATCH: {
-    isSuccess: false,
-    code: 2012,
-    message: "userId가 적절하지 않습니다.",
-  },
+  // USER_ID_NOT_MATCH: {
+  //   isSuccess: false,
+  //   code: 2012,
+  //   message: "userId가 적절하지 않습니다.",
+  // },
   LATITUDE_IS_NOT_VALID: {
     isSuccess: false,
     code: 2013,

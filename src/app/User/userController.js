@@ -38,6 +38,7 @@ exports.createUsers = async function (req, res) {
   const { email, password, name, phoneNum } = req.body;
 
   // Request Error Start
+
   if (!email) return res.send(response(baseResponse.SIGNUP_EMAIL_EMPTY)); // 2001
 
   if (email.length > 30)
@@ -60,9 +61,11 @@ exports.createUsers = async function (req, res) {
 
   if (!regPhoneNum.test(phoneNum))
     return res.send(response(baseResponse.SIGNUP_PHONENUM_TYPE)); // 2009
+
   // Request Error End
 
   // Response Error Start
+
   const checkEmailExist = await userProvider.checkEmailExist(email);
 
   if (checkEmailExist === 1)
@@ -72,6 +75,7 @@ exports.createUsers = async function (req, res) {
 
   if (checkPhoneNumExist === 1)
     return res.send(response(baseResponse.SIGNUP_REDUNDANT_PHONENUM)); // 3002
+
   // Response Error End
 
   // 비밀번호 암호화
@@ -113,6 +117,7 @@ exports.userLogIn = async function (req, res) {
   const { email, password } = req.body;
 
   // Request Error Start
+
   if (!email) return res.send(response(baseResponse.SIGNUP_EMAIL_EMPTY)); // 2001
 
   if (email.length > 30)
@@ -125,9 +130,11 @@ exports.userLogIn = async function (req, res) {
 
   if (password.length < 8 || password.length > 20)
     return res.send(response(baseResponse.SIGNUP_PASSWORD_LENGTH)); // 2005
+
   // Request Error End
 
   // Response Error Start
+
   const checkEmailExist = await userProvider.checkEmailExist(email);
 
   if (checkEmailExist === 0)
@@ -137,6 +144,7 @@ exports.userLogIn = async function (req, res) {
 
   if (checkPassword === -1)
     return res.send(response(baseResponse.SIGNIN_PASSWORD_WRONG)); // 3004
+
   // Response Error End
 
   const token = await jwt.sign(
@@ -163,7 +171,6 @@ exports.userLogIn = async function (req, res) {
 
 exports.userLogOut = async function (req, res) {
   const { userId } = req.verifiedToken;
-  const { bodyId } = req.body;
 
   //Request Error Start
 
@@ -173,9 +180,6 @@ exports.userLogOut = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
-
-  if (userId !== bodyId)
-    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2012
 
   //Request Error End
 
@@ -192,7 +196,6 @@ exports.userLogOut = async function (req, res) {
 
 exports.changeAddress = async function (req, res) {
   const { userId } = req.verifiedToken;
-  const { bodyId } = req.body;
   const { lat, lng } = req.body;
 
   //Request Error Start
@@ -203,9 +206,6 @@ exports.changeAddress = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
-
-  if (userId !== bodyId)
-    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2012
 
   // 위도 범위
   if ((lat < 33) | (lat > 43))

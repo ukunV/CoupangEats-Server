@@ -19,8 +19,6 @@ const kakaoMap = require("../../../controllers/kakao_ctrl").getAddressInfo;
 exports.createAddresses = async function (req, res) {
   const { userId } = req.verifiedToken;
 
-  const { bodyId } = req.body;
-
   const { type, nickname, buildingName, address, detailAddress, information } =
     req.body;
 
@@ -32,9 +30,6 @@ exports.createAddresses = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
-
-  if (userId !== bodyId)
-    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2012
 
   if (!address) return res.send(errResponse(baseResponse.ADDRESS_IS_EMPTY)); // 2015
 
@@ -65,8 +60,6 @@ exports.createAddresses = async function (req, res) {
 exports.modifyAddresses = async function (req, res) {
   const { userId } = req.verifiedToken;
 
-  const { bodyId } = req.body;
-
   const { addressId } = req.params;
 
   const { type, nickname, buildingName, address, detailAddress, information } =
@@ -80,9 +73,6 @@ exports.modifyAddresses = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
-
-  if (userId !== bodyId)
-    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2012
 
   const checkAddressExist = await addressProvider.checkAddressExist(addressId);
 
@@ -118,8 +108,6 @@ exports.modifyAddresses = async function (req, res) {
 exports.deleteAddresses = async function (req, res) {
   const { userId } = req.verifiedToken;
 
-  const { bodyId } = req.body;
-
   const { addressId } = req.params;
 
   // Request Error Start
@@ -130,9 +118,6 @@ exports.deleteAddresses = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
-
-  if (userId !== bodyId)
-    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2012
 
   const checkAddressExist = await addressProvider.checkAddressExist(addressId);
 
@@ -154,8 +139,6 @@ exports.deleteAddresses = async function (req, res) {
 exports.selectAddresses = async function (req, res) {
   const { userId } = req.verifiedToken;
 
-  const { bodyId } = req.body;
-
   // Request Error Start
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
@@ -164,9 +147,6 @@ exports.selectAddresses = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
-
-  if (userId !== bodyId)
-    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2012
 
   // Request Error End
 
