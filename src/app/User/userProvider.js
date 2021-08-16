@@ -5,36 +5,35 @@ const { logger } = require("../../../config/winston");
 const userDao = require("./userDao");
 
 const user_ctrl = require("../../../controllers/user_ctrl");
-const { USER_ID_NOT_MATCH } = require("../../../config/baseResponseStatus");
 
 // Provider: Read 비즈니스 로직 처리
 
 // 이메일 존재 여부 확인
-exports.checkEmailExists = async function (email) {
+exports.checkEmailExist = async function (email) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await userDao.checkEmailExists(connection, email);
+    const result = await userDao.checkEmailExist(connection, email);
     connection.release();
 
     return result;
   } catch (err) {
-    logger.error(`User-checkEmailExists Provider error: ${err.message}`);
+    logger.error(`User-checkEmailExist Provider error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
 
 // 전화번호 존재 여부 확인
-exports.checkPhoneNumExists = async function (phoneNum) {
+exports.checkPhoneNumExist = async function (phoneNum) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await userDao.checkPhoneNumExists(connection, phoneNum);
+    const result = await userDao.checkPhoneNumExist(connection, phoneNum);
     connection.release();
 
     return result;
   } catch (err) {
-    logger.error(`User-checkPhoneNumExists Provider error: ${err.message}`);
+    logger.error(`User-checkPhoneNumExist Provider error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
@@ -57,5 +56,35 @@ exports.checkPassword = async function (email, password) {
   } catch (err) {
     logger.error(`User-checkPassword Provider error: ${err.message}`);
     return -1;
+  }
+};
+
+// 유저 존재 여부 확인
+exports.checkUserExist = async function (userId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.checkUserExist(connection, userId);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-checkUserExist Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 홈 화면 조회
+exports.selectHome = async function (userId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.selectHome(connection, userId);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-selectHome Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
   }
 };

@@ -65,6 +65,41 @@ module.exports = {
     code: 2009,
     message: "전화번호의 형식이 올바르지 않습니다.",
   },
+  USER_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2010,
+    message: "userId값이 입력되지 않았습니다.",
+  },
+  USER_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 2011,
+    message: "해당 유저는 존재하지 않습니다.",
+  },
+  // USER_ID_NOT_MATCH: {
+  //   isSuccess: false,
+  //   code: 2012,
+  //   message: "userId가 적절하지 않습니다.",
+  // },
+  LATITUDE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2013,
+    message: "유효하지 않은 위도입니다.",
+  },
+  LONGTITUDE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2014,
+    message: "유효하지 않은 경도입니다.",
+  },
+  ADDRESS_IS_EMPTY: {
+    isSuccess: false,
+    code: 2015,
+    message: "주소를 입력해주세요.",
+  },
+  ADDRESS_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 2016,
+    message: "존재하지 않는 주소입니다.",
+  },
 
   // made by note
 
@@ -82,11 +117,6 @@ module.exports = {
     isSuccess: false,
     code: 2010,
     message: "이메일을 형식을 정확하게 입력해주세요.",
-  },
-  SIGNIN_PASSWORD_EMPTY: {
-    isSuccess: false,
-    code: 2011,
-    message: "비밀번호를 입력 해주세요.",
   },
 
   USER_USERID_EMPTY: {
@@ -138,7 +168,7 @@ module.exports = {
     code: 3002,
     message: "중복된 전화번호입니다.",
   },
-  SIGNIN_EMAIL_NOT_EXISTS: {
+  SIGNIN_EMAIL_NOT_EXIST: {
     isSuccess: false,
     code: 3003,
     message: "존재하지 않는 이메일입니다.",
@@ -147,6 +177,11 @@ module.exports = {
     isSuccess: false,
     code: 3004,
     message: "비밀번호가 올바르지 않습니다.",
+  },
+  CATEGORY_NOT_EXIST: {
+    isSuccess: false,
+    code: 3005,
+    message: "존재하지 않는 카테고리입니다.",
   },
   // made by note
 

@@ -9,5 +9,28 @@ module.exports = function (app) {
   app.post("/users/sign-up", user.createUsers);
 
   // 2. 로그인 API
-  app.get("/users/sign-in", user.getUsers);
+  app.post("/users/sign-in", user.userLogIn);
+
+  // 3. 로그아웃 API
+  app.post("/users/sign-out", jwtMiddleware, user.userLogOut);
+
+  // 4. 유저 주소 변경 API
+  app.patch("/users/address", jwtMiddleware, user.changeAddress);
+
+  // 5. 홈 화면 조회 API
+  app.get("/users/home", jwtMiddleware, user.getHome);
+
+  // // API No 6. 카카오 로그인 API
+  // app.post("/users/kakao-login", user.kakaoLogin);
+  // app.get("/kakao", passport.authenticate("kakao-login"));
+  // app.get(
+  //   "/auth/kakao/callback",
+  //   passport.authenticate("kakao-login", {
+  //     successRedirect: "/",
+  //     failureRedirect: "/",
+  //   }),
+  //   (req, res) => {
+  //     res.redirect("/");
+  //   }
+  // );
 };
