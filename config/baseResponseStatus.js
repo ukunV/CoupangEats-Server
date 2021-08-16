@@ -90,6 +90,16 @@ module.exports = {
     code: 2014,
     message: "유효하지 않은 경도입니다.",
   },
+  ADDRESS_IS_EMPTY: {
+    isSuccess: false,
+    code: 2015,
+    message: "주소를 입력해주세요.",
+  },
+  ADDRESS_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 2016,
+    message: "존재하지 않는 주소입니다.",
+  },
 
   // made by note
 
@@ -107,11 +117,6 @@ module.exports = {
     isSuccess: false,
     code: 2010,
     message: "이메일을 형식을 정확하게 입력해주세요.",
-  },
-  SIGNIN_PASSWORD_EMPTY: {
-    isSuccess: false,
-    code: 2011,
-    message: "비밀번호를 입력 해주세요.",
   },
 
   USER_USERID_EMPTY: {
