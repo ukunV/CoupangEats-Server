@@ -114,11 +114,24 @@ async function selectHome(connection, userId) {
   const query3 = `
                   select s.storeName, smi.imageURL, ifnull(oc.count, 0) as orderCount,
                         ifnull(rc.count, 0) as reviewCount, round(ifnull(rc.point, 0.0), 1) as avgPoint,
-                        concat(format(getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude), 1), 'km') as distance
+                        concat(format(getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude), 1), 'km') as distance,
+                        case
+                            when sdp.price = 0
+                                then '무료배달'
+                            else
+                                concat('배달비 ', format(sdp.price, 0), '원')
+                        end as deliveryFee
                   from Store s
                       left join StoreMainImage smi on s.id = smi.storeId
-                      left join (select storeId, count(storeId) as count from OrderList where isDeleted = 1 group by storeId) as oc on s.id = oc.storeId
-                      left join (select storeId, count(storeId) as count, avg(point) as point from Review where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId,
+                      left join (select storeId, count(storeId) as count
+                                from OrderList
+                                where isDeleted = 1 group by storeId) as oc on s.id = oc.storeId
+                      left join (select storeId, count(storeId) as count, avg(point) as point
+                                from Review
+                                where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
+                      left join (select *, row_number() over (partition by storeId order by price) as rn
+                                from StoreDeliveryPrice
+                                where isDeleted = 1) as sdp on s.id = sdp.storeId,
                       User u
                   where u.id = ?
                   and getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude) <= 4
@@ -138,19 +151,23 @@ async function selectHome(connection, userId) {
                             else
                                 smi.imageURL
                         end as imageURL,
-                        concat(format(getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude), 1), 'km') as distance,
                         ifnull(oc.count, 0) as orderCount, ifnull(rc.count, 0) as reviewCount, round(ifnull(rc.point, 0.0), 1) as avgPoint,
+                        concat(format(getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude), 1), 'km') as distance,
                         case
                             when sdp.price = 0
                                 then '무료배달'
                             else
                                 concat('배달비 ', format(sdp.price, 0), '원')
-                        end as price
+                        end as deliveryFee
                   from Store s
                       left join StoreMainImage smi on s.id = smi.storeId
                       left join Franchise f on s.franchiseId = f.id
-                      left join (select storeId, count(storeId) as count from OrderList where isDeleted = 1 group by storeId) as oc on s.id = oc.storeId
-                      left join (select storeId, count(storeId) as count, avg(point) as point from Review where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
+                      left join (select storeId, count(storeId) as count
+                                from OrderList
+                                where isDeleted = 1 group by storeId) as oc on s.id = oc.storeId
+                      left join (select storeId, count(storeId) as count, avg(point) as point
+                                from Review
+                                where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
                       left join (select *, row_number() over (partition by storeId order by price) as rn
                                 from StoreDeliveryPrice
                                 where isDeleted = 1) as sdp on s.id = sdp.storeId,
@@ -168,33 +185,33 @@ async function selectHome(connection, userId) {
                   `;
 
   const query5 = `
-                    select smi.imageURL, s.storeName, ifnull(rc.count, 0) as reviewCount, round(ifnull(rc.point, 0.0), 1) as avgPoint,
-                          case
-                                when sdp.price = 0
-                                    then '무료배달'
-                                else
-                                    concat('배달비 ', format(sdp.price, 0), '원')
-                          end as price,
-                          concat(format(getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude), 1), 'km') as distance
-                    from Store s
-                        left join StoreMainImage smi on s.id = smi.storeId
-                        left join (select *, row_number() over (partition by storeId order by price) as rn
-                                  from StoreDeliveryPrice
-                                  where isDeleted = 1) as sdp on s.id = sdp.storeId
-                        left join (select storeId, count(storeId) as count, avg(point) as point
-                                  from Review
-                                  where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId,
-                        User u
-                    where u.id = ?
-                    and smi.isDeleted = 1
-                    and smi.number = 1
-                    and sdp.rn = 1
-                    and s.status = 1
-                    and s.isDeleted = 1
-                    and getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude) <= 4
-                    order by s.createdAt desc
-                    limit 10;
-                    `;
+                  select s.storeName, smi.imageURL, ifnull(rc.count, 0) as reviewCount, round(ifnull(rc.point, 0.0), 1) as avgPoint,
+                        concat(format(getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude), 1), 'km') as distance,
+                        case
+                            when sdp.price = 0
+                                then '무료배달'
+                            else
+                                concat('배달비 ', format(sdp.price, 0), '원')
+                        end as deliveryFee
+                  from Store s
+                      left join StoreMainImage smi on s.id = smi.storeId
+                      left join (select *, row_number() over (partition by storeId order by price) as rn
+                                from StoreDeliveryPrice
+                                where isDeleted = 1) as sdp on s.id = sdp.storeId
+                      left join (select storeId, count(storeId) as count, avg(point) as point
+                                from Review
+                                where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId,
+                      User u
+                  where u.id = ?
+                  and smi.isDeleted = 1
+                  and smi.number = 1
+                  and sdp.rn = 1
+                  and s.status = 1
+                  and s.isDeleted = 1
+                  and getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude) <= 4
+                  order by s.createdAt desc
+                  limit 10;
+                  `;
 
   const query6 = `
                 select count(*) as cheetahCount
