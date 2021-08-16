@@ -223,14 +223,28 @@ exports.changeAddress = async function (req, res) {
 };
 
 /**
- * API No.
- * API Name : 홈 화면 조회 APi
+ * API No. 5
+ * API Name : 홈 화면 조회 API
  * [GET] /users/home
- * query string: lat, lng
  */
 
 exports.getHome = async function (req, res) {
-  const { lat, lng } = req.query;
+  const { userId } = req.verifiedToken;
+
+  //Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  const checkUserExist = userProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
+
+  //Request Error End
+
+  const result = await userProvider.selectHome(userId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
 };
 
 /**

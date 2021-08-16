@@ -73,3 +73,18 @@ exports.checkUserExist = async function (userId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 홈 화면 조회
+exports.selectHome = async function (userId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.selectHome(connection, userId);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-selectHome Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
