@@ -33,7 +33,28 @@ exports.getStoresbyCategoryId = async function (req, res) {
   const { categoryId } = req.params;
   const { filter, cheetah, fee, min } = req.query;
 
-  const checkCategoryExists = await storeProvider.checkCategoryExists(
-    categoryId
-  );
+  // Response Error Start
+  const checkCategoryExist = await storeProvider.checkCategoryExist(categoryId);
+
+  if (checkCategoryExist === 0)
+    return res.send(response(baseResponse.CATEGORY_NOT_EXIST)); // 3005
+  // Response Error End
+
+  let filterCondition = "order by ";
+
+  switch (filter) {
+    case "1": // 가까운순
+      filterCondition += "";
+      break;
+    case "2": // 별점높은순
+      filterCondition += "";
+      break;
+    case "3": // 신규매장순
+      filterCondition += "";
+      break;
+    default:
+      // 주문많은순
+      filterCondition += "";
+      break;
+  }
 };

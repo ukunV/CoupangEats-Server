@@ -21,3 +21,19 @@ exports.getFoodCategory = async function () {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 카테고리 존재 여부 check
+exports.checkCategoryExist = async function (categoryId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await storeDao.checkCategoryExist(connection, categoryId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Store-checkCategoryExist Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
