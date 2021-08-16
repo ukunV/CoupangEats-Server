@@ -12,6 +12,7 @@ module.exports = function (app) {
   app.post("/users/sign-in", user.userLogIn);
 
   // 3. 로그아웃 API
+  app.post("/users/sign-out", jwtMiddleware, user.userLogOut);
 
   // 4. 유저 주소 변경 API
   app.patch("/users/address", jwtMiddleware, user.changeAddress);

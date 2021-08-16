@@ -63,14 +63,14 @@ exports.createUsers = async function (req, res) {
   // Request Error End
 
   // Response Error Start
-  const checkEmailExists = await userProvider.checkEmailExists(email);
+  const checkEmailExist = await userProvider.checkEmailExist(email);
 
-  if (checkEmailExists === 1)
+  if (checkEmailExist === 1)
     return res.send(response(baseResponse.SIGNUP_REDUNDANT_EMAIL)); // 3001
 
-  const checkPhoneNumExists = await userProvider.checkPhoneNumExists(phoneNum);
+  const checkPhoneNumExist = await userProvider.checkPhoneNumExist(phoneNum);
 
-  if (checkPhoneNumExists === 1)
+  if (checkPhoneNumExist === 1)
     return res.send(response(baseResponse.SIGNUP_REDUNDANT_PHONENUM)); // 3002
   // Response Error End
 
@@ -128,10 +128,10 @@ exports.userLogIn = async function (req, res) {
   // Request Error End
 
   // Response Error Start
-  const checkEmailExists = await userProvider.checkEmailExists(email);
+  const checkEmailExist = await userProvider.checkEmailExist(email);
 
-  if (checkEmailExists === 0)
-    return res.send(response(baseResponse.SIGNIN_EMAIL_NOT_EXISTS)); // 3003
+  if (checkEmailExist === 0)
+    return res.send(response(baseResponse.SIGNIN_EMAIL_NOT_EXIST)); // 3003
 
   const checkPassword = await userProvider.checkPassword(email, password);
 
@@ -158,10 +158,31 @@ exports.userLogIn = async function (req, res) {
 /**
  * API No. 3
  * API Name : 로그아웃 API
- * [GET] /users/sign-out
+ * [POST] /users/sign-out
  */
 
-exports.userLogOut = async function (req, res) {};
+exports.userLogOut = async function (req, res) {
+  const { userId } = req.verifiedToken;
+  const { bodyId } = req.body;
+
+  //Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  const checkUserExist = userProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
+
+  if (userId !== bodyId)
+    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2012
+
+  //Request Error End
+
+  res.clearCookie("x-access-token");
+
+  return res.send(response(baseResponse.SUCCESS, "Logout Successfully"));
+};
 
 /**
  * API No. 4
@@ -178,7 +199,7 @@ exports.changeAddress = async function (req, res) {
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
-  const checkUserExist = userProvider.checkUserExists(userId);
+  const checkUserExist = userProvider.checkUserExist(userId);
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011

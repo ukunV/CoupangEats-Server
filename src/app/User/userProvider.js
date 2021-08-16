@@ -9,31 +9,31 @@ const user_ctrl = require("../../../controllers/user_ctrl");
 // Provider: Read 비즈니스 로직 처리
 
 // 이메일 존재 여부 확인
-exports.checkEmailExists = async function (email) {
+exports.checkEmailExist = async function (email) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await userDao.checkEmailExists(connection, email);
+    const result = await userDao.checkEmailExist(connection, email);
     connection.release();
 
     return result;
   } catch (err) {
-    logger.error(`User-checkEmailExists Provider error: ${err.message}`);
+    logger.error(`User-checkEmailExist Provider error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
 
 // 전화번호 존재 여부 확인
-exports.checkPhoneNumExists = async function (phoneNum) {
+exports.checkPhoneNumExist = async function (phoneNum) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await userDao.checkPhoneNumExists(connection, phoneNum);
+    const result = await userDao.checkPhoneNumExist(connection, phoneNum);
     connection.release();
 
     return result;
   } catch (err) {
-    logger.error(`User-checkPhoneNumExists Provider error: ${err.message}`);
+    logger.error(`User-checkPhoneNumExist Provider error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
@@ -60,16 +60,16 @@ exports.checkPassword = async function (email, password) {
 };
 
 // 유저 존재 여부 확인
-exports.checkUserExists = async function (userId) {
+exports.checkUserExist = async function (userId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await userDao.checkUserExists(connection, userId);
+    const result = await userDao.checkUserExist(connection, userId);
     connection.release();
 
     return result;
   } catch (err) {
-    logger.error(`User-checkUserExists Provider error: ${err.message}`);
+    logger.error(`User-checkUserExist Provider error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };

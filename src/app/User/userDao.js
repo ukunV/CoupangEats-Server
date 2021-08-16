@@ -1,7 +1,7 @@
 const dist_ctrl = require("../../../controllers/dist_ctrl");
 
 // 이메일 존재 여부 확인
-async function checkEmailExists(connection, email) {
+async function checkEmailExist(connection, email) {
   const query = `
     select exists(select email from User where email = ?) as exist;
     `;
@@ -12,7 +12,7 @@ async function checkEmailExists(connection, email) {
 }
 
 // 전화번호 존재 여부 확인
-async function checkPhoneNumExists(connection, phoneNum) {
+async function checkPhoneNumExist(connection, phoneNum) {
   const query = `
     select exists(select phoneNum from User where phoneNum = ?) as exist;
     `;
@@ -61,7 +61,7 @@ async function checkPassword(connection, params) {
 }
 
 // 유저 존재 여부 확인
-async function checkUserExists(connection, userId) {
+async function checkUserExist(connection, userId) {
   const query = `
     select exists(select id from User where id = ?) as exist;
     `;
@@ -85,11 +85,11 @@ async function updateAddress(connection, params) {
 }
 
 module.exports = {
-  checkEmailExists,
-  checkPhoneNumExists,
+  checkEmailExist,
+  checkPhoneNumExist,
   createUser,
   getSalt,
   checkPassword,
-  checkUserExists,
+  checkUserExist,
   updateAddress,
 };

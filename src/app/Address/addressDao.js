@@ -66,9 +66,9 @@ async function deleteAddress(connection, addressId) {
 async function selectAddress(connection, userId) {
   const query = `
                 select case
-                          when nickname != ''
+                          when nickname != '' or nickname is not null
                               then nickname
-                          when buildingName != ''
+                          when buildingName != '' or buildingName is not null
                               then buildingName
                           else
                               address

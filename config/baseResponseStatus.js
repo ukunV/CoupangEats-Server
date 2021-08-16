@@ -168,7 +168,7 @@ module.exports = {
     code: 3002,
     message: "중복된 전화번호입니다.",
   },
-  SIGNIN_EMAIL_NOT_EXISTS: {
+  SIGNIN_EMAIL_NOT_EXIST: {
     isSuccess: false,
     code: 3003,
     message: "존재하지 않는 이메일입니다.",
@@ -178,7 +178,7 @@ module.exports = {
     code: 3004,
     message: "비밀번호가 올바르지 않습니다.",
   },
-  CATEGORY_NOT_EXISTS: {
+  CATEGORY_NOT_EXIST: {
     isSuccess: false,
     code: 3005,
     message: "존재하지 않는 카테고리입니다.",
