@@ -21,7 +21,8 @@ exports.createAddresses = async function (req, res) {
 
   const { bodyId } = req.body;
 
-  const { type, nickname, address, detailAddress, information } = req.body;
+  const { type, nickname, buildingName, address, detailAddress, information } =
+    req.body;
 
   // Request Error Start
 
@@ -45,6 +46,7 @@ exports.createAddresses = async function (req, res) {
     userId,
     type,
     nickname,
+    buildingName,
     address,
     detailAddress,
     information,
@@ -67,7 +69,8 @@ exports.modifyAddresses = async function (req, res) {
 
   const { addressId } = req.params;
 
-  const { type, nickname, address, detailAddress, information } = req.body;
+  const { type, nickname, buildingName, address, detailAddress, information } =
+    req.body;
 
   // Request Error Start
 
@@ -95,6 +98,7 @@ exports.modifyAddresses = async function (req, res) {
   const result = await addressService.updateAddress(
     type,
     nickname,
+    buildingName,
     address,
     detailAddress,
     information,
@@ -138,6 +142,35 @@ exports.deleteAddresses = async function (req, res) {
   // Request Error End
 
   const result = await addressService.deleteAddress(addressId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 8
+ * API Name : 주소 목록 조회 API
+ * [GET] /addresses
+ */
+exports.selectAddresses = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { bodyId } = req.body;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  const checkUserExist = addressProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
+
+  if (userId !== bodyId)
+    return res.send(errResponse(baseResponse.USER_ID_NOT_MATCH)); // 2012
+
+  // Request Error End
+
+  const result = await addressProvider.selectAddress(userId);
 
   return res.send(response(baseResponse.SUCCESS, result));
 };

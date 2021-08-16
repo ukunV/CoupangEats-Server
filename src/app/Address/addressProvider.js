@@ -37,3 +37,19 @@ exports.checkAddressExist = async function (addressId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 주소 목록 조회
+exports.selectAddress = async function (userId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await addressDao.selectAddress(connection, userId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Address-selectAddress Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

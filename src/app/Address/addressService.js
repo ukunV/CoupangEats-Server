@@ -18,6 +18,7 @@ exports.insertAddress = async function (
   userId,
   type,
   nickname,
+  buildingName,
   address,
   detailAddress,
   information,
@@ -32,6 +33,7 @@ exports.insertAddress = async function (
       userId,
       type,
       nickname,
+      buildingName,
       address,
       detailAddress,
       information,
@@ -57,6 +59,7 @@ exports.insertAddress = async function (
 exports.updateAddress = async function (
   type,
   nickname,
+  buildingName,
   address,
   detailAddress,
   information,
@@ -71,6 +74,7 @@ exports.updateAddress = async function (
     const params = [
       type,
       nickname,
+      buildingName,
       address,
       detailAddress,
       information,
