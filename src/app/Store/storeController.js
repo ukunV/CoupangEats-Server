@@ -11,6 +11,12 @@ const passport = require("passport");
 const regexEmail = require("regex-email");
 const { emit } = require("nodemon");
 
+// regular expression
+// 주의: 같은 변수 연속으로 쓰면 오류
+const regPage = /^[0-9]/g;
+const regSize = /^[0-9]/g;
+const regCategoryId = /^[0-9]/g;
+
 /**
  * API No. 10
  * API Name : 음식 카테고리 목록 조회 API
@@ -36,6 +42,9 @@ exports.getNewStore = async function (req, res) {
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
+  if (!regCategoryId.test(categoryId))
+    return res.send(response(baseResponse.CATEGORY_ID_NOT_VALID)); // 2016
+
   // Request Error End
 
   // Response Error Start
@@ -58,40 +67,103 @@ exports.getNewStore = async function (req, res) {
 };
 
 /**
- * API No. 1
- * API Name : 음식점 조회 API
+ * API No. 12
+ * API Name : 음식점 조회 by categoryId API
  * [GET] /stores/:categoryId/list
+ * categoryId: 0 = 골라먹는 맛집
  * path variable: categoryId
- * query string: filter, cheetah, fee, min
+ * query string: { page, size }, { filter, cheetah, deliveryFee, minPrice }
  */
-exports.getStoresbyCategoryId = async function (req, res) {
+exports.getStoresByCategoryId = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
   const { categoryId } = req.params;
-  const { filter, cheetah, fee, min } = req.query;
+
+  let { page, size } = req.query;
+
+  const { filter, cheetah, deliveryFee, minPrice } = req.query;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  if (!regCategoryId.test(categoryId))
+    return res.send(response(baseResponse.CATEGORY_ID_NOT_VALID)); // 2016
+
+  if (!page) return res.send(response(baseResponse.PAGE_IS_EMPTY)); // 2017
+
+  if (!regPage.test(page))
+    return res.send(response(baseResponse.PAGE_IS_NOT_VALID)); // 2018
+
+  if (!size) return res.send(response(baseResponse.SIZE_IS_EMPTY)); // 2019
+
+  if (!regSize.test(size))
+    return res.send(response(baseResponse.SIZE_IS_NOT_VALID)); // 2020
+
+  // Request Error End
+
+  page = size * (page - 1);
 
   // Response Error Start
 
   const checkCategoryExist = await storeProvider.checkCategoryExist(categoryId);
 
-  if (checkCategoryExist === 0)
+  if ((checkCategoryExist === 0) & (categoryId !== "0"))
     return res.send(response(baseResponse.CATEGORY_NOT_EXIST)); // 3005
 
   // Response Error End
 
+  // Set Query Order Condition Start
+
+  let categoryCondition = "";
+
+  if (categoryId === "0") categoryCondition = "";
+  else if (categoryId === "1")
+    categoryCondition = "and timestampdiff(day, s.createdAt, now()) <= 30";
+  else categoryCondition += `and s.categoryId = ${categoryId}`;
+
   let filterCondition = "order by ";
 
-  switch (filter) {
-    case "1": // 가까운순
-      filterCondition += "";
-      break;
-    case "2": // 별점높은순
-      filterCondition += "";
-      break;
-    case "3": // 신규매장순
-      filterCondition += "";
-      break;
-    default:
-      // 주문많은순
-      filterCondition += "";
-      break;
-  }
+  if (filter === "1") filterCondition += "oc.count desc";
+  else if (filter === "2") filterCondition += "reviewCount desc";
+  else if (filter === "3") filterCondition += "distance";
+  else if (filter === "4") filterCondition += "avgPoint desc";
+  else if (filter === "5") filterCondition += "s.createdAt desc";
+  else filterCondition += "oc.count desc";
+
+  let cheetahCondition = "and s.isCheetah = ";
+
+  if (!cheetah || cheetah === "0") cheetahCondition = "";
+  else cheetahCondition += "1";
+
+  let deliveryFeeCondition = "and sdp.price <= ";
+
+  if (deliveryFee === "3000") deliveryFeeCondition = "3000";
+  else if (deliveryFee === "2000") deliveryFeeCondition = "2000";
+  else if (deliveryFee === "1000") deliveryFeeCondition = "1000";
+  else if (deliveryFee === "0") deliveryFeeCondition = "and sdp.price = 0";
+  else deliveryFeeCondition = "";
+
+  let minPriceCondition = "and sdp.orderPrice <= ";
+
+  if (minPrice === "15000") minPriceCondition = "15000";
+  else if (minPrice === "12000") minPriceCondition = "12000";
+  else if (minPrice === "10000") minPriceCondition = "10000";
+  else if (minPrice === "5000") minPriceCondition = "5000";
+  else minPriceCondition = "";
+
+  // Set Query Order Condition End
+
+  const result = await storeProvider.selectStoresByCategoryId(
+    userId,
+    categoryCondition,
+    page,
+    size,
+    filterCondition,
+    cheetahCondition,
+    deliveryFeeCondition,
+    minPriceCondition
+  );
+
+  return res.send(response(baseResponse.SUCCESS, result));
 };

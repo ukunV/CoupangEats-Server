@@ -70,3 +70,40 @@ exports.selectNewStore = async function (userId, categoryId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 음식점 조회 by categoryId
+exports.selectStoresByCategoryId = async function (
+  userId,
+  categoryCondition,
+  page,
+  size,
+  filterCondition,
+  cheetahCondition,
+  deliveryFeeCondition,
+  minPriceCondition
+) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await storeDao.selectStoresByCategoryId(
+      connection,
+      userId,
+      categoryCondition,
+      page,
+      size,
+      filterCondition,
+      cheetahCondition,
+      deliveryFeeCondition,
+      minPriceCondition
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(
+      `Store-selectStoresByCategoryId Provider error: ${err.message}`
+    );
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

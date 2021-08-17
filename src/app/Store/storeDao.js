@@ -70,9 +70,71 @@ async function selectNewStore(connection, params) {
   return row[0];
 }
 
+// 음식점 조회 by categoryId
+async function selectStoresByCategoryId(
+  connection,
+  userId,
+  categoryCondition,
+  page,
+  size,
+  filterCondition,
+  cheetahCondition,
+  deliveryFeeCondition,
+  minPriceCondition
+) {
+  const query = `
+                select group_concat(smi.imageURL) as imageArray,
+                      s.storeName, concat(s.deliveryTime, '-', s.deliveryTime + 10, '분') as deliveryTime,
+                      round(ifnull(rc.point, 0.0), 1) as avgPoint, ifnull(rc.count, 0) as reviewCount,
+                      concat(format(getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude), 1), 'km') as distance,
+                      case
+                          when sdp.price = 0
+                              then '무료배달'
+                          else
+                              concat('배달비 ', format(sdp.price, 0), '원')
+                      end as deliveryFee,
+                      s.isCheetah,
+                      case
+                          when timestampdiff(day, s.createdAt, now()) <= 30
+                              then 1
+                          else
+                              0
+                      end as isNew
+                from Store s
+                    left join (select *, row_number() over (partition by storeId order by price) as rn
+                              from StoreDeliveryPrice
+                              where isDeleted = 1) as sdp on s.id = sdp.storeId
+                    left join (select storeId, count(storeId) as count, avg(point) as point
+                              from Review
+                              where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
+                    left join (select storeId, count(storeId) as count
+                              from OrderList
+                              where isDeleted = 1 group by storeId) as oc on s.id = oc.storeId
+                    left join StoreMainImage smi on s.id = smi.storeId,
+                    User u
+                where u.id = ?
+                ${categoryCondition}
+                and s.isDeleted = 1
+                and smi.isDeleted = 1
+                and sdp.rn = 1
+                and getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude) <= 4
+                ${cheetahCondition}
+                ${deliveryFeeCondition}
+                ${minPriceCondition}
+                group by s.id
+                ${filterCondition}
+                limit ${page}, ${size};
+                `;
+
+  const row = await connection.query(query, userId);
+
+  return row[0];
+}
+
 module.exports = {
   selectFoodCategory,
   checkUserExist,
   checkCategoryExist,
   selectNewStore,
+  selectStoresByCategoryId,
 };
