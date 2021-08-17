@@ -7,7 +7,7 @@ const storeDao = require("./storeDao");
 // Provider: Read 비즈니스 로직 처리
 
 // 음식 카테고리 조회
-exports.getFoodCategory = async function () {
+exports.selectFoodCategory = async function () {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
@@ -17,7 +17,23 @@ exports.getFoodCategory = async function () {
 
     return result;
   } catch (err) {
-    logger.error(`Store-getFoodCategory Provider error: ${err.message}`);
+    logger.error(`Store-selectFoodCategory Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 유저 존재 여부 check
+exports.checkUserExist = async function (userId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await storeDao.checkUserExist(connection, userId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Store-checkUserExist Provider error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
@@ -34,6 +50,23 @@ exports.checkCategoryExist = async function (categoryId) {
     return result;
   } catch (err) {
     logger.error(`Store-checkCategoryExist Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 새로 들어왔어요 목록 조회
+exports.selectNewStore = async function (userId, categoryId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const params = [userId, categoryId];
+    const result = await storeDao.selectNewStore(connection, params);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Store-selectNewStore Provider error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
