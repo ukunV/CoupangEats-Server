@@ -90,6 +90,31 @@ module.exports = {
     code: 2015,
     message: "주소를 입력해주세요.",
   },
+  CATEGORY_ID_NOT_VALID: {
+    isSuccess: false,
+    code: 2016,
+    message: "유효하지 않은 카테고리 아이디입니다.",
+  },
+  PAGE_IS_EMPTY: {
+    isSuccess: false,
+    code: 2017,
+    message: "page를 입력해주세요.",
+  },
+  PAGE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2018,
+    message: "page 형식이 올바르지 않습니다.",
+  },
+  SIZE_IS_EMPTY: {
+    isSuccess: false,
+    code: 2019,
+    message: "size를 입력해주세요.",
+  },
+  SIZE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2020,
+    message: "size 형식이 올바르지 않습니다.",
+  },
 
   // made by note
 
