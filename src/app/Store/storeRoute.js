@@ -14,4 +14,7 @@ module.exports = function (app) {
     jwtMiddleware,
     store.getStoresByCategoryId
   );
+
+  // 13. 음식점 상세페이지 조회 API
+  app.get("/stores/:storeId/store-detail", store.getStore);
 };

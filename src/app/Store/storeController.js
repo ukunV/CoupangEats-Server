@@ -14,7 +14,6 @@ const { emit } = require("nodemon");
 // regular expression
 const regPage = /^[0-9]/;
 const regSize = /^[0-9]/;
-const regCategoryId = /^[0-9]/;
 
 /**
  * API No. 10
@@ -40,9 +39,6 @@ exports.getNewStore = async function (req, res) {
   // Request Error Start
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
-
-  if (!regCategoryId.test(categoryId))
-    return res.send(response(baseResponse.CATEGORY_ID_NOT_VALID)); // 2016
 
   // Request Error End
 
@@ -71,7 +67,7 @@ exports.getNewStore = async function (req, res) {
  * [GET] /stores/:categoryId/list
  * categoryId: 0 = 골라먹는 맛집
  * path variable: categoryId
- * query string: { page, size }, { filter, cheetah, deliveryFee, minPrice }
+ * query string: ( page, size ), ( filter, cheetah, deliveryFee, minPrice )
  */
 exports.getStoresByCategoryId = async function (req, res) {
   const { userId } = req.verifiedToken;
@@ -85,9 +81,6 @@ exports.getStoresByCategoryId = async function (req, res) {
   // Request Error Start
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
-
-  if (!regCategoryId.test(categoryId))
-    return res.send(response(baseResponse.CATEGORY_ID_NOT_VALID)); // 2016
 
   if (!page) return res.send(response(baseResponse.PAGE_IS_EMPTY)); // 2017
 
@@ -163,6 +156,28 @@ exports.getStoresByCategoryId = async function (req, res) {
     deliveryFeeCondition,
     minPriceCondition
   );
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 13
+ * API Name : 음식점 상세페이지 조회 API
+ * [GET] /stores/:storeId/store-detail
+ */
+exports.getStore = async function (req, res) {
+  const { storeId } = req.params;
+
+  // Response Error Start
+
+  const checkStoreExist = await storeProvider.checkStoreExist(storeId);
+
+  if (checkStoreExist === 0)
+    return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3005
+
+  // Response Error End
+
+  const result = await storeProvider.selectStore(storeId);
 
   return res.send(response(baseResponse.SUCCESS, result));
 };

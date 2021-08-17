@@ -107,3 +107,35 @@ exports.selectStoresByCategoryId = async function (
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 음식점 존재 여부 check
+exports.checkStoreExist = async function (storeId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await storeDao.checkStoreExist(connection, storeId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Store-checkStoreExist Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 음식점 상세페이지 조회
+exports.selectStore = async function (storeId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await storeDao.selectStore(connection, storeId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Store-selectStore Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
