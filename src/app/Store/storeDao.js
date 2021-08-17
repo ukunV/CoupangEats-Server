@@ -162,8 +162,7 @@ async function selectStore(connection, storeId) {
                               where isDeleted = 1) as sdp on s.id = sdp.storeId
                       left join (select storeId, count(storeId) as count, avg(point) as point
                                 from Review
-                                where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId,
-                      User u
+                                where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
                   where s.id = ?
                   and sdp.rn = 1
                   and s.isDeleted = 1
