@@ -181,3 +181,47 @@ exports.getStore = async function (req, res) {
 
   return res.send(response(baseResponse.SUCCESS, result));
 };
+
+/**
+ * API No. 14
+ * API Name : 음식점 배달비 자세히 API
+ * [GET] /stores/:storeId/delivery-detail
+ */
+exports.getStoreDelivery = async function (req, res) {
+  const { storeId } = req.params;
+
+  // Response Error Start
+
+  const checkStoreExist = await storeProvider.checkStoreExist(storeId);
+
+  if (checkStoreExist === 0)
+    return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3005
+
+  // Response Error End
+
+  const result = await storeProvider.selectStoreDelivery(storeId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 15
+ * API Name : 음식점 매장/원산지 정보 조회 API
+ * [GET] /stores/:storeId/info-detail
+ */
+exports.getStoreInfo = async function (req, res) {
+  const { storeId } = req.params;
+
+  // Response Error Start
+
+  const checkStoreExist = await storeProvider.checkStoreExist(storeId);
+
+  if (checkStoreExist === 0)
+    return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3005
+
+  // Response Error End
+
+  const result = await storeProvider.selectStoreInfo(storeId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};

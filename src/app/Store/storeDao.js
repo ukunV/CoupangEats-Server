@@ -214,6 +214,45 @@ async function selectStore(connection, storeId) {
   return row;
 }
 
+// 음식점 배달비 자세히
+async function selectStoreDelivery(connection, storeId) {
+  const query = `
+                select concat(format(orderPrice, 0), '원') as minPrice,
+                      case
+                          when price = 0
+                              then '무료배달'
+                          else
+                              concat('배달비 ', format(price, 0), '원')
+                      end as deliveryFee
+                from StoreDeliveryPrice
+                where storeId = ?
+                order by minPrice;
+                `;
+
+  const row = await connection.query(query, storeId);
+
+  return row[0];
+}
+
+// 음식점 매장/원산지 정보 조회
+async function selectStoreInfo(connection, storeId) {
+  const query = `
+                select storeName,
+                      concat('전화번호: ', storePhoneNum) as phoneNum,
+                      concat('주소: ', storeAddress) as address,
+                      concat('대표자명: ', chiefName) as chief,
+                      concat('사업자등록번호: ', businessNum) as businessNumber,
+                      concat('상호명: ', businessName) as businessName,
+                      businessHours, storeIntro, notice, originInfo
+                from Store
+                where id = ?;
+                `;
+
+  const row = await connection.query(query, storeId);
+
+  return row[0];
+}
+
 module.exports = {
   selectFoodCategory,
   checkUserExist,
@@ -222,4 +261,6 @@ module.exports = {
   selectStoresByCategoryId,
   checkStoreExist,
   selectStore,
+  selectStoreDelivery,
+  selectStoreInfo,
 };

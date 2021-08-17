@@ -139,3 +139,35 @@ exports.selectStore = async function (storeId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 음식점 배달비 자세히
+exports.selectStoreDelivery = async function (storeId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await storeDao.selectStoreDelivery(connection, storeId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Store-selectStoreDelivery Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 음식점 매장/원산지 정보 조회
+exports.selectStoreInfo = async function (storeId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await storeDao.selectStoreInfo(connection, storeId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Store-selectStoreInfo Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

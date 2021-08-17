@@ -17,4 +17,10 @@ module.exports = function (app) {
 
   // 13. 음식점 상세페이지 조회 API
   app.get("/stores/:storeId/store-detail", store.getStore);
+
+  // 14. 음식점 배달비 자세히 API
+  app.get("/stores/:storeId/delivery-detail", store.getStoreDelivery);
+
+  // 15. 음식점 매장/원산지 정보 조회 API
+  app.get("/stores/:storeId/info-detail", store.getStoreInfo);
 };
