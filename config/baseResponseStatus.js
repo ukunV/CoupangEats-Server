@@ -155,7 +155,7 @@ module.exports = {
   STORE_IS_NOT_EXIST: {
     isSuccess: false,
     code: 3008,
-    message: "존재하지 않는 주소입니다.",
+    message: "존재하지 않는 음식점입니다.",
   },
   // made by note
 

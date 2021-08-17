@@ -171,29 +171,29 @@ async function selectStore(connection, storeId) {
                   `;
 
   const query2 = `
-                  select r.imageURL, r.point, r.createdAt,
+                  select imageURL, point,
                         case
-                            when length(r.contents) > 35
-                                then concat(left(r.contents, 35), '...')
+                            when length(contents) > 35
+                                then concat(left(contents, 35), '...')
                             else
-                                r.contents
+                                contents
                         end as contents
-                  from Review r
-                  where r.storeId = ?
-                  and r.isPhoto = 1
-                  and r.isDeleted = 1
+                  from Review
+                  where storeId = ?
+                  and isPhoto = 1
+                  and isDeleted = 1
                   order by createdAt desc
                   limit 3;
                   `;
 
   const query3 = `
-                  select menuCategoryName, menuCategoryNumber, menuNumber,
-                        sm.menuName, smi.imageURL, sm.description
+                  select sm.menuCategoryName, sm.menuCategoryNumber,
+                        sm.menuName, sm.menuNumber, smi.imageURL, sm.description
                   from StoreMenu sm
                       left join StoreMenuImage smi on sm.id = smi.menuId
                   where sm.storeId = ?
                   and smi.number = 1
-                  order by menuCategoryNumber, menuNumber;
+                  order by sm.menuCategoryNumber, sm.menuNumber;
                   `;
 
   const result1 = await connection.query(query1, storeId);

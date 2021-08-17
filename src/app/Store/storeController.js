@@ -173,7 +173,7 @@ exports.getStore = async function (req, res) {
   const checkStoreExist = await storeProvider.checkStoreExist(storeId);
 
   if (checkStoreExist === 0)
-    return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3005
+    return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
 
   // Response Error End
 
@@ -195,7 +195,7 @@ exports.getStoreDelivery = async function (req, res) {
   const checkStoreExist = await storeProvider.checkStoreExist(storeId);
 
   if (checkStoreExist === 0)
-    return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3005
+    return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
 
   // Response Error End
 
@@ -217,7 +217,7 @@ exports.getStoreInfo = async function (req, res) {
   const checkStoreExist = await storeProvider.checkStoreExist(storeId);
 
   if (checkStoreExist === 0)
-    return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3005
+    return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
 
   // Response Error End
 
