@@ -82,19 +82,6 @@ async function updateAddress(connection, params) {
   return row[0].info;
 }
 
-// 나의 당근 조회
-async function selectMyCarrot(connection, userId) {
-  const query = `
-                select photoURL, nickname, concat('#', id) as id
-                from User
-                where id = ?
-                `;
-
-  const row = await connection.query(query, userId);
-
-  return row[0];
-}
-
 // 홈 화면 조회
 async function selectHome(connection, userId) {
   const query1 = `
