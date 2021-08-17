@@ -176,12 +176,16 @@ exports.userLogOut = async function (req, res) {
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
-  const checkUserExist = userProvider.checkUserExist(userId);
+  //Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = addressProvider.checkUserExist(userId);
 
   if (checkUserExist === 0)
-    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
-  //Request Error End
+  // Response Error End
 
   res.clearCookie("x-access-token");
 
@@ -202,11 +206,6 @@ exports.changeAddress = async function (req, res) {
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
-  const checkUserExist = userProvider.checkUserExist(userId);
-
-  if (checkUserExist === 0)
-    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
-
   // 위도 범위
   if ((lat < 33) | (lat > 43))
     return res.send(errResponse(baseResponse.LATITUDE_IS_NOT_VALID)); // 2013
@@ -217,13 +216,22 @@ exports.changeAddress = async function (req, res) {
 
   //Request Error End
 
+  // Response Error Start
+
+  const checkUserExist = addressProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  // Response Error End
+
   const result = await userService.updateAddress(lat, lng, userId);
 
   return res.send(response(baseResponse.SUCCESS, result));
 };
 
 /**
- * API No. 5
+ * API No. 9
  * API Name : 홈 화면 조회 API
  * [GET] /users/home
  */
@@ -235,12 +243,16 @@ exports.getHome = async function (req, res) {
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
-  const checkUserExist = userProvider.checkUserExist(userId);
+  //Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = addressProvider.checkUserExist(userId);
 
   if (checkUserExist === 0)
-    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
-  //Request Error End
+  // Response Error End
 
   const result = await userProvider.selectHome(userId);
 

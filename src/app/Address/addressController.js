@@ -26,14 +26,18 @@ exports.createAddresses = async function (req, res) {
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
-  const checkUserExist = addressProvider.checkUserExist(userId);
-
-  if (checkUserExist === 0)
-    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
-
   if (!address) return res.send(errResponse(baseResponse.ADDRESS_IS_EMPTY)); // 2015
 
   // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = addressProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  // Response Error End
 
   const { lat, lng } = await kakaoMap(address);
 
@@ -69,19 +73,23 @@ exports.modifyAddresses = async function (req, res) {
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
+  if (!address) return res.send(errResponse(baseResponse.ADDRESS_IS_EMPTY)); // 2015
+
+  // Request Error End
+
+  // Response Error Start
+
   const checkUserExist = addressProvider.checkUserExist(userId);
 
   if (checkUserExist === 0)
-    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
   const checkAddressExist = await addressProvider.checkAddressExist(addressId);
 
   if (checkAddressExist === 0)
-    return res.send(errResponse(baseResponse.ADDRESS_IS_NOT_EXIST)); // 2016
+    return res.send(errResponse(baseResponse.ADDRESS_IS_NOT_EXIST)); // 3007
 
-  if (!address) return res.send(errResponse(baseResponse.ADDRESS_IS_EMPTY)); // 2015
-
-  // Request Error End
+  // Response Error End
 
   const { lat, lng } = await kakaoMap(address);
 
@@ -114,17 +122,21 @@ exports.deleteAddresses = async function (req, res) {
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
+  // Request Error End
+
+  // Response Error Start
+
   const checkUserExist = addressProvider.checkUserExist(userId);
 
   if (checkUserExist === 0)
-    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
   const checkAddressExist = await addressProvider.checkAddressExist(addressId);
 
   if (checkAddressExist === 0)
-    return res.send(errResponse(baseResponse.ADDRESS_IS_NOT_EXIST)); // 2016
+    return res.send(errResponse(baseResponse.ADDRESS_IS_NOT_EXIST)); // 3007
 
-  // Request Error End
+  // Response Error End
 
   const result = await addressService.deleteAddress(addressId);
 
@@ -143,12 +155,16 @@ exports.selectAddresses = async function (req, res) {
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
+  // Request Error End
+
+  // Response Error Start
+
   const checkUserExist = addressProvider.checkUserExist(userId);
 
   if (checkUserExist === 0)
-    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
-  // Request Error End
+  // Response Error End
 
   const result = await addressProvider.selectAddress(userId);
 
