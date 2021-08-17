@@ -1,5 +1,3 @@
-const dist_ctrl = require("../../../controllers/dist_ctrl");
-
 // 이메일 존재 여부 확인
 async function checkEmailExist(connection, email) {
   const query = `
