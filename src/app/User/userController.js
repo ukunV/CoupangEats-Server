@@ -180,7 +180,7 @@ exports.userLogOut = async function (req, res) {
 
   // Response Error Start
 
-  const checkUserExist = addressProvider.checkUserExist(userId);
+  const checkUserExist = userProvider.checkUserExist(userId);
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
@@ -218,7 +218,7 @@ exports.changeAddress = async function (req, res) {
 
   // Response Error Start
 
-  const checkUserExist = addressProvider.checkUserExist(userId);
+  const checkUserExist = userProvider.checkUserExist(userId);
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
@@ -247,7 +247,7 @@ exports.getHome = async function (req, res) {
 
   // Response Error Start
 
-  const checkUserExist = addressProvider.checkUserExist(userId);
+  const checkUserExist = userProvider.checkUserExist(userId);
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
