@@ -129,7 +129,7 @@ async function selectHome(connection, userId) {
                   `;
 
   const query4 = `
-                  select s.storeName, smi.imageURL, ifnull(oc.count, 0) as orderCount,
+                  select s.storeName, smi.imageURL,
                         ifnull(rc.count, 0) as reviewCount, round(ifnull(rc.point, 0.0), 1) as avgPoint,
                         concat(format(getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude), 1), 'km') as distance,
                         case
@@ -157,7 +157,7 @@ async function selectHome(connection, userId) {
                   and smi.isDeleted = 1
                   and smi.number = 1
                   group by s.id
-                  order by orderCount desc;
+                  order by oc.count desc;
                   `;
 
   const query5 = `
@@ -168,7 +168,7 @@ async function selectHome(connection, userId) {
                             else
                                 smi.imageURL
                         end as imageURL,
-                        ifnull(oc.count, 0) as orderCount, ifnull(rc.count, 0) as reviewCount, round(ifnull(rc.point, 0.0), 1) as avgPoint,
+                        ifnull(rc.count, 0) as reviewCount, round(ifnull(rc.point, 0.0), 1) as avgPoint,
                         concat(format(getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude), 1), 'km') as distance,
                         case
                             when sdp.price = 0
@@ -197,7 +197,7 @@ async function selectHome(connection, userId) {
                   and getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude) <= 4
                   and s.franchiseId != 0
                   group by s.id
-                  order by orderCount desc
+                  order by oc.count desc
                   limit 10;
                   `;
 
