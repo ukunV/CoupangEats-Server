@@ -66,13 +66,22 @@ async function deleteAddress(connection, addressId) {
 async function selectAddress(connection, userId) {
   const query = `
                 select case
-                          when nickname != '' or nickname is not null
-                              then nickname
-                          when buildingName != '' or buildingName is not null
-                              then buildingName
-                          else
-                              address
-                      end as nickname, address
+                      when nickname != '' and nickname is not null
+                          then nickname
+                      when buildingName != '' and nickname is not null
+                          then buildingName
+                      else
+                        address
+                      end as nickname, address, detailAddress, information,
+                      addressLatitude as lat, addressLongtitude as lng,
+                      case
+                        when type = 1
+                            then '집'
+                        when type = 2
+                            then '회사'
+                        when type = 3
+                            then '기타'
+                      end as type
                 from Address
                 where isDeleted = 1
                 and userId= ?;
