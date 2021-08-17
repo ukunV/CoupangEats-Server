@@ -156,6 +156,7 @@ async function selectHome(connection, userId) {
                   and s.status = 1
                   and smi.isDeleted = 1
                   and smi.number = 1
+                  and sdp.rn = 1
                   group by s.id
                   order by oc.count desc;
                   `;
@@ -196,6 +197,7 @@ async function selectHome(connection, userId) {
                   and smi.number = 1
                   and getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude) <= 4
                   and s.franchiseId != 0
+                  and sdp.rn = 1
                   group by s.id
                   order by oc.count desc
                   limit 10;
@@ -225,6 +227,7 @@ async function selectHome(connection, userId) {
                   and sdp.rn = 1
                   and s.status = 1
                   and s.isDeleted = 1
+                  and sdp.rn = 1
                   and getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude) <= 4
                   order by s.createdAt desc
                   limit 10;
