@@ -90,11 +90,11 @@ module.exports = {
     code: 2015,
     message: "주소를 입력해주세요.",
   },
-  CATEGORY_ID_NOT_VALID: {
-    isSuccess: false,
-    code: 2016,
-    message: "유효하지 않은 카테고리 아이디입니다.",
-  },
+  // CATEGORY_ID_NOT_VALID: {
+  //   isSuccess: false,
+  //   code: 2016,
+  //   message: "유효하지 않은 카테고리 아이디입니다.",
+  // },
   PAGE_IS_EMPTY: {
     isSuccess: false,
     code: 2017,
@@ -115,62 +115,6 @@ module.exports = {
     code: 2020,
     message: "size 형식이 올바르지 않습니다.",
   },
-
-  // made by note
-
-  // SIGNIN_EMAIL_EMPTY: {
-  //   isSuccess: false,
-  //   code: 2008,
-  //   message: "이메일을 입력해주세요",
-  // },
-  // SIGNIN_EMAIL_LENGTH: {
-  //   isSuccess: false,
-  //   code: 2009,
-  //   message: "이메일은 30자리 미만으로 입력해주세요.",
-  // },
-  // SIGNIN_EMAIL_ERROR_TYPE: {
-  //   isSuccess: false,
-  //   code: 2010,
-  //   message: "이메일을 형식을 정확하게 입력해주세요.",
-  // },
-
-  // USER_USERID_EMPTY: {
-  //   isSuccess: false,
-  //   code: 2012,
-  //   message: "userId를 입력해주세요.",
-  // },
-  // USER_USERID_NOT_EXIST: {
-  //   isSuccess: false,
-  //   code: 2013,
-  //   message: "해당 회원이 존재하지 않습니다.",
-  // },
-
-  // USER_USEREMAIL_EMPTY: {
-  //   isSuccess: false,
-  //   code: 2014,
-  //   message: "이메일을 입력해주세요.",
-  // },
-  // USER_USEREMAIL_NOT_EXIST: {
-  //   isSuccess: false,
-  //   code: 2015,
-  //   message: "해당 이메일을 가진 회원이 존재하지 않습니다.",
-  // },
-  // USER_ID_NOT_MATCH: {
-  //   isSuccess: false,
-  //   code: 2016,
-  //   message: "유저 아이디 값을 확인해주세요",
-  // },
-  // USER_NICKNAME_EMPTY: {
-  //   isSuccess: false,
-  //   code: 2017,
-  //   message: "변경할 닉네임 값을 입력해주세요",
-  // },
-
-  // USER_STATUS_EMPTY: {
-  //   isSuccess: false,
-  //   code: 2018,
-  //   message: "회원 상태값을 입력해주세요",
-  // },
 
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
@@ -206,6 +150,11 @@ module.exports = {
   ADDRESS_IS_NOT_EXIST: {
     isSuccess: false,
     code: 3007, // 2016
+    message: "존재하지 않는 주소입니다.",
+  },
+  STORE_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3008,
     message: "존재하지 않는 주소입니다.",
   },
   // made by note
