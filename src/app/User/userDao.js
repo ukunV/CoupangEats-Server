@@ -100,18 +100,35 @@ async function selectMyCarrot(connection, userId) {
 // 홈 화면 조회
 async function selectHome(connection, userId) {
   const query1 = `
+                  select case
+                          when a.nickname != '' and a.nickname is not null
+                              then a.nickname
+                          when a.buildingName != '' and a.buildingName is not null
+                              then a.buildingName
+                        else
+                            a.address
+                        end as nickname
+                  from User u
+                      left join Address a on u.id = a.userId
+                  where a.isDeleted = 1
+                  and a.addressLatitude = u.userLatitude
+                  and a.addressLongtitude = u.userLongtitude
+                  and u.id= ?;
+                  `;
+
+  const query2 = `
                   select subImageURL as eventImageURL, ROW_NUMBER() over (order by createdAt desc) AS number
                   from Event
                   where status = 1
                   order by createdAt desc;
                   `;
 
-  const query2 = `
+  const query3 = `
                   select id, categoryName, imageURL as categoryImageURL
                   from StoreCategory;
                   `;
 
-  const query3 = `
+  const query4 = `
                   select s.storeName, smi.imageURL, ifnull(oc.count, 0) as orderCount,
                         ifnull(rc.count, 0) as reviewCount, round(ifnull(rc.point, 0.0), 1) as avgPoint,
                         concat(format(getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude), 1), 'km') as distance,
@@ -143,7 +160,7 @@ async function selectHome(connection, userId) {
                   order by orderCount desc;
                   `;
 
-  const query4 = `
+  const query5 = `
                   select s.storeName,
                         case
                             when f.franchiseImageURL != '' or f.franchiseImageURL is not null
@@ -184,7 +201,7 @@ async function selectHome(connection, userId) {
                   limit 10;
                   `;
 
-  const query5 = `
+  const query6 = `
                   select s.storeName, smi.imageURL, ifnull(rc.count, 0) as reviewCount, round(ifnull(rc.point, 0.0), 1) as avgPoint,
                         concat(format(getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude), 1), 'km') as distance,
                         case
@@ -213,7 +230,7 @@ async function selectHome(connection, userId) {
                   limit 10;
                   `;
 
-  const query6 = `
+  const query7 = `
                 select count(*) as cheetahCount
                 from Store s, User u
                 where u.id = ?
@@ -221,21 +238,24 @@ async function selectHome(connection, userId) {
                 and s.isCheetah = 1;
                 `;
 
-  const result1 = await connection.query(query1);
+  const result1 = await connection.query(query1, userId);
   const result2 = await connection.query(query2);
-  const result3 = await connection.query(query3, userId);
+  const result3 = await connection.query(query3);
   const result4 = await connection.query(query4, userId);
   const result5 = await connection.query(query5, userId);
   const result6 = await connection.query(query6, userId);
+  const result7 = await connection.query(query7, userId);
 
-  const eventList = JSON.parse(JSON.stringify(result1[0]));
-  const categoryList = JSON.parse(JSON.stringify(result2[0]));
-  const bestStore = JSON.parse(JSON.stringify(result3[0]));
-  const bestFranchise = JSON.parse(JSON.stringify(result4[0]));
-  const newStore = JSON.parse(JSON.stringify(result5[0]));
-  const cheetahCount = JSON.parse(JSON.stringify(result6[0]));
+  const userAddress = JSON.parse(JSON.stringify(result1[0]));
+  const eventList = JSON.parse(JSON.stringify(result2[0]));
+  const categoryList = JSON.parse(JSON.stringify(result3[0]));
+  const bestStore = JSON.parse(JSON.stringify(result4[0]));
+  const bestFranchise = JSON.parse(JSON.stringify(result5[0]));
+  const newStore = JSON.parse(JSON.stringify(result6[0]));
+  const cheetahCount = JSON.parse(JSON.stringify(result7[0]));
 
   const row = {
+    userAddress,
     eventList,
     categoryList,
     bestStore,
