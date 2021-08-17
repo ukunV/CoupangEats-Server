@@ -12,10 +12,9 @@ const regexEmail = require("regex-email");
 const { emit } = require("nodemon");
 
 // regular expression
-// 주의: 같은 변수 연속으로 쓰면 오류
-const regPage = /^[0-9]/g;
-const regSize = /^[0-9]/g;
-const regCategoryId = /^[0-9]/g;
+const regPage = /^[0-9]/;
+const regSize = /^[0-9]/;
+const regCategoryId = /^[0-9]/;
 
 /**
  * API No. 10

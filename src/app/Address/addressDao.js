@@ -12,7 +12,7 @@ async function checkUserExist(connection, userId) {
 // 주소 추가
 async function insertAddress(connection, params) {
   const query = `
-                insert into Address(userId, type, nickname, budildingName, address,
+                insert into Address(userId, type, nickname, buildingName, address,
                                     detailAddress, information,
                                     addressLatitude, addressLongtitude)
                 values (?, ?, ?, ?, ?, ?, ?, ?, ?);
