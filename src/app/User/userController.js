@@ -198,37 +198,37 @@ exports.userLogOut = async function (req, res) {
  * [PATCH] /users/address
  */
 
-exports.changeAddress = async function (req, res) {
-  const { userId } = req.verifiedToken;
-  const { lat, lng } = req.body;
+// exports.changeAddress = async function (req, res) {
+//   const { userId } = req.verifiedToken;
+//   const { lat, lng } = req.body;
 
-  //Request Error Start
+//   //Request Error Start
 
-  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+//   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
-  // 위도 범위
-  if ((lat < 33) | (lat > 43))
-    return res.send(errResponse(baseResponse.LATITUDE_IS_NOT_VALID)); // 2013
+//   // 위도 범위
+//   if ((lat < 33) | (lat > 43))
+//     return res.send(errResponse(baseResponse.LATITUDE_IS_NOT_VALID)); // 2013
 
-  // 경도 범위
-  if ((lng < 124) | (lng > 132))
-    return res.send(errResponse(baseResponse.LONGTITUDE_IS_NOT_VALID)); // 2014
+//   // 경도 범위
+//   if ((lng < 124) | (lng > 132))
+//     return res.send(errResponse(baseResponse.LONGTITUDE_IS_NOT_VALID)); // 2014
 
-  //Request Error End
+//   //Request Error End
 
-  // Response Error Start
+//   // Response Error Start
 
-  const checkUserExist = userProvider.checkUserExist(userId);
+//   const checkUserExist = userProvider.checkUserExist(userId);
 
-  if (checkUserExist === 0)
-    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+//   if (checkUserExist === 0)
+//     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
-  // Response Error End
+//   // Response Error End
 
-  const result = await userService.updateAddress(lat, lng, userId);
+//   const result = await userService.updateAddress(lat, lng, userId);
 
-  return res.send(response(baseResponse.SUCCESS, result));
-};
+//   return res.send(response(baseResponse.SUCCESS, result));
+// };
 
 /**
  * API No. 9

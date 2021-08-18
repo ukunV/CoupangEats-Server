@@ -14,8 +14,8 @@ module.exports = function (app) {
   // 3. 로그아웃 API
   app.post("/users/sign-out", jwtMiddleware, user.userLogOut);
 
-  // 4. 유저 주소 변경 API
-  app.patch("/users/address", jwtMiddleware, user.changeAddress);
+  // // 4. 유저 주소 변경 API
+  // app.patch("/users/address", jwtMiddleware, user.changeAddress);
 
   // 9. 홈 화면 조회 API
   app.get("/users/home", jwtMiddleware, user.getHome);

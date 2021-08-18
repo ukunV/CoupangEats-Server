@@ -69,18 +69,18 @@ async function checkUserExist(connection, userId) {
   return row[0][0]["exist"];
 }
 
-// 유저 주소 변경
-async function updateAddress(connection, params) {
-  const query = `
-                update User
-                set userLatitude = ?, userLongtitude = ?
-                where id = ?;
-                `;
+// // 유저 주소 변경
+// async function updateAddress(connection, params) {
+//   const query = `
+//                 update User
+//                 set userLatitude = ?, userLongtitude = ?
+//                 where id = ?;
+//                 `;
 
-  const row = await connection.query(query, params);
+//   const row = await connection.query(query, params);
 
-  return row[0].info;
-}
+//   return row[0].info;
+// }
 
 // 홈 화면 조회
 async function selectHome(connection, userId) {
@@ -262,6 +262,5 @@ module.exports = {
   getSalt,
   checkPassword,
   checkUserExist,
-  updateAddress,
   selectHome,
 };
