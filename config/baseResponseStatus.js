@@ -157,6 +157,11 @@ module.exports = {
     code: 3008,
     message: "존재하지 않는 음식점입니다.",
   },
+  ADDRESS_IS_DELETED: {
+    isSuccess: false,
+    code: 3009,
+    message: "삭제된 주소입니다.",
+  },
   // made by note
 
   // SIGNIN_INACTIVE_ACCOUNT: {
