@@ -64,11 +64,11 @@ async function insertAddress(
   const row4 = await connection.query(query4, [lat, lng, userId]);
 
   const query5 = `
-  insert into Address(userId, type, nickname, buildingName,
-                      address, detailAddress, information,
-                      addressLatitude, addressLongtitude)
-  values (?, ?, ?, ?, ?, ?, ?, ?, ?);
-  `;
+                  insert into Address(userId, type, nickname, buildingName,
+                                      address, detailAddress, information,
+                                      addressLatitude, addressLongtitude)
+                  values (?, ?, ?, ?, ?, ?, ?, ?, ?);
+                  `;
 
   const row5 = await connection.query(query5, [
     userId,
@@ -179,15 +179,16 @@ async function deleteAddress(connection, addressId) {
 // 주소 목록 조회
 async function selectAddress(connection, userId) {
   const query = `
-                select case
-                      when type = 1
-                          then '집'
-                      when type = 2
-                          then '회사'
-                      when nickname != '' and nickname is not null
-                          then nickname
-                      when buildingName != '' and nickname is not null
-                          then buildingName
+                select id as addressId,
+                      case
+                          when type = 1
+                              then '집'
+                          when type = 2
+                              then '회사'
+                          when nickname != '' and nickname is not null
+                              then nickname
+                          when buildingName != '' and nickname is not null
+                              then buildingName
                       else
                         address
                       end as name, type, address, detailAddress, isChecked
@@ -215,7 +216,7 @@ async function checkHouseCompany(connection, userId, type) {
 }
 
 // 주소 삭제 여부 확인
-async function checkAddressExist(connection, addressId) {
+async function checkAddressDeleted(connection, addressId) {
   const query = `
                 select isDeleted
                 from Address
@@ -227,6 +228,39 @@ async function checkAddressExist(connection, addressId) {
   return row[0][0]["isDeleted"];
 }
 
+// 주소 목록에서 주소 선택
+async function updateLocation(connection, addressId, userId, lat, lng) {
+  const query1 = `
+                  update Address
+                  set isChecked = 0
+                  where userId = ?
+                  `;
+
+  const row1 = await connection.query(query1, userId);
+
+  const query2 = `
+              update Address
+              set isChecked = 1
+              where id = ?
+              `;
+
+  const row2 = await connection.query(query2, addressId);
+
+  const query3 = `
+                  update User
+                  set userLatitude = ?, userLongtitude = ?
+                  where id = ?
+                  `;
+
+  const row3 = await connection.query(query3, [lat, lng, userId]);
+
+  return {
+    makeChecked_0: row1[0].info,
+    makeChecked_1: row2[0].info,
+    userLocation: row3[0].info,
+  };
+}
+
 module.exports = {
   checkUserExist,
   insertAddress,
@@ -235,4 +269,6 @@ module.exports = {
   deleteAddress,
   selectAddress,
   checkHouseCompany,
+  checkAddressDeleted,
+  updateLocation,
 };

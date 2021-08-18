@@ -28,6 +28,9 @@ exports.createAddresses = async function (req, res) {
 
   if (!address) return res.send(errResponse(baseResponse.ADDRESS_IS_EMPTY)); // 2015
 
+  if ((type != 1) | (type != 2) | (type != 3))
+    return res.send(errResponse(baseResponse.TYPE_IS_NOT_VALID)); // 2021
+
   // Request Error End
 
   // Response Error Start
@@ -75,6 +78,12 @@ exports.modifyAddresses = async function (req, res) {
 
   if (!address) return res.send(errResponse(baseResponse.ADDRESS_IS_EMPTY)); // 2015
 
+  if (!addressId)
+    return res.send(errResponse(baseResponse.ADDRESS_ID_IS_EMPTY)); // 2022
+
+  if ((type != 1) | (type != 2) | (type != 3))
+    return res.send(errResponse(baseResponse.TYPE_IS_NOT_VALID)); // 2021
+
   // Request Error End
 
   // Response Error Start
@@ -119,7 +128,7 @@ exports.modifyAddresses = async function (req, res) {
 /**
  * API No. 7
  * API Name : 주소 삭제 API
- * [PATCH] /addresses/:addressId
+ * [PATCH] /addresses/:addressId/status
  */
 exports.deleteAddresses = async function (req, res) {
   const { userId } = req.verifiedToken;
@@ -129,6 +138,9 @@ exports.deleteAddresses = async function (req, res) {
   // Request Error Start
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  if (!addressId)
+    return res.send(errResponse(baseResponse.ADDRESS_ID_IS_EMPTY)); // 2022
 
   // Request Error End
 
@@ -200,6 +212,9 @@ exports.checkHouseCompany = async function (req, res) {
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
+  if ((type != 1) | (type != 2))
+    return res.send(errResponse(baseResponse.TYPE_IS_NOT_VALID)); // 2021
+
   // Request Error End
 
   // Response Error Start
@@ -221,27 +236,51 @@ exports.checkHouseCompany = async function (req, res) {
  * API Name : 주소 목록에서 주소 선택 API
  * [PATCH] /addresses/user-address
  */
-// exports.changeLocation = async function (req, res) {
-//   const { userId } = req.verifiedToken;
+exports.changeLocation = async function (req, res) {
+  const { userId } = req.verifiedToken;
 
-//   const body
+  const { addressId, address } = req.body;
 
-//   // Request Error Start
+  // Request Error Start
 
-//   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
-//   // Request Error End
+  if (!address) return res.send(errResponse(baseResponse.ADDRESS_IS_EMPTY)); // 2015
 
-//   // Response Error Start
+  if (!addressId)
+    return res.send(errResponse(baseResponse.ADDRESS_ID_IS_EMPTY)); // 2022
 
-//   const checkUserExist = addressProvider.checkUserExist(userId);
+  // Request Error End
 
-//   if (checkUserExist === 0)
-//     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+  // Response Error Start
 
-//   // Response Error End
+  const checkUserExist = addressProvider.checkUserExist(userId);
 
-//   const result = await addressService.updateLocation(userId);
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
-//   return res.send(response(baseResponse.SUCCESS, result));
-// };
+  const checkAddressExist = await addressProvider.checkAddressExist(addressId);
+
+  if (checkAddressExist === 0)
+    return res.send(errResponse(baseResponse.ADDRESS_IS_NOT_EXIST)); // 3007
+
+  const checkAddressDeleted = await addressProvider.checkAddressDeleted(
+    addressId
+  );
+
+  if (checkAddressDeleted === 0)
+    return res.send(errResponse(baseResponse.ADDRESS_IS_DELETED)); // 3009
+
+  // Response Error End
+
+  const { lat, lng } = await kakaoMap(address);
+
+  const result = await addressService.updateLocation(
+    addressId,
+    userId,
+    lat,
+    lng
+  );
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
