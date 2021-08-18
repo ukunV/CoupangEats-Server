@@ -22,6 +22,7 @@ module.exports = function () {
   require("../src/app/User/userRoute")(app);
   require("../src/app/Store/storeRoute")(app);
   require("../src/app/Address/addressRoute")(app);
+  require("../src/app/Cart/cartRoute")(app);
 
   return app;
 };
