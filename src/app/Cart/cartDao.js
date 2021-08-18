@@ -103,6 +103,43 @@ async function createCart(
   return { menuInsertResult: mainRow[0], subMenuInsertCount: insertCount };
 }
 
+// 카트 상태 check
+async function checkCartExist(connection, userId) {
+  const query = `
+                 select exists(select id from Cart
+                              where userId = ? and isDeleted = 1) as exist;
+                `;
+
+  const row = await connection.query(query, userId);
+
+  return row[0][0]["exist"];
+}
+
+// 같은 음식점의 메뉴 여부 check
+async function checkSameStore(connection, userId, storeId) {
+  const query = `
+                 select exists(select id from Cart
+                              where userId = ? and storeId = ? and isDeleted = 1) as exist;
+                `;
+
+  const row = await connection.query(query, [userId, storeId]);
+
+  return row[0][0]["exist"];
+}
+
+// 타 음식점 메뉴 카트에 담을 시 카트 항목 삭제
+async function deleteOtherStore(connection, userId) {
+  const query = `
+                update Cart
+                set isDeleted = 0
+                where userId = ?;
+                `;
+
+  const row = await connection.query(query, userId);
+
+  return row[0].info;
+}
+
 module.exports = {
   checkUserExist,
   checkStoreExist,
@@ -110,4 +147,7 @@ module.exports = {
   checkMenuExist,
   checkMenuDeleted,
   createCart,
+  checkCartExist,
+  checkSameStore,
+  deleteOtherStore,
 };

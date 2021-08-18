@@ -86,3 +86,35 @@ exports.checkMenuDeleted = async function (menuId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 카트 상태 check
+exports.checkCartExist = async function (userId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await cartDao.checkCartExist(connection, userId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Cart-checkCartExist Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 같은 음식점의 메뉴 여부 check
+exports.checkSameStore = async function (userId, storeId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await cartDao.checkSameStore(connection, userId, storeId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Cart-checkSameStore Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
