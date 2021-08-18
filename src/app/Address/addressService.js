@@ -29,7 +29,8 @@ exports.insertAddress = async function (
   try {
     await connection.beginTransaction();
 
-    const params = [
+    const result = await addressDao.insertAddress(
+      connection,
       userId,
       type,
       nickname,
@@ -38,10 +39,8 @@ exports.insertAddress = async function (
       detailAddress,
       information,
       lat,
-      lng,
-    ];
-
-    const result = await addressDao.insertAddress(connection, params);
+      lng
+    );
 
     await connection.commit();
 
@@ -57,6 +56,7 @@ exports.insertAddress = async function (
 
 // 주소 수정
 exports.updateAddress = async function (
+  userId,
   type,
   nickname,
   buildingName,
@@ -71,7 +71,9 @@ exports.updateAddress = async function (
   try {
     await connection.beginTransaction();
 
-    const params = [
+    const result = await addressDao.updateAddress(
+      connection,
+      userId,
       type,
       nickname,
       buildingName,
@@ -80,10 +82,8 @@ exports.updateAddress = async function (
       information,
       lat,
       lng,
-      addressId,
-    ];
-
-    const result = await addressDao.updateAddress(connection, params);
+      addressId
+    );
 
     await connection.commit();
 

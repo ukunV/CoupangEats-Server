@@ -17,4 +17,11 @@ module.exports = function (app) {
 
   // 8. 주소 목록 조회 API
   app.get("/addresses", jwtMiddleware, address.selectAddresses);
+
+  // 16. 집/회사 주소 존재 컨트롤 API
+  app.get(
+    "/addresses/:type/house-company",
+    jwtMiddleware,
+    address.checkHouseCompany
+  );
 };

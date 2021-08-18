@@ -10,24 +10,92 @@ async function checkUserExist(connection, userId) {
 }
 
 // 주소 추가
-async function insertAddress(connection, params) {
-  const query = `
-                insert into Address(userId, type, nickname, buildingName, address,
-                                    detailAddress, information,
-                                    addressLatitude, addressLongtitude)
-                values (?, ?, ?, ?, ?, ?, ?, ?, ?);
-                `;
+async function insertAddress(
+  connection,
+  userId,
+  type,
+  nickname,
+  buildingName,
+  address,
+  detailAddress,
+  information,
+  lat,
+  lng
+) {
+  const query1 = `
+                  update Address
+                  set isChecked = 0
+                  where userId = ?
+                  `;
 
-  const row = await connection.query(query, params);
+  const row1 = await connection.query(query1, userId);
 
-  return row[0];
+  let row2 = "";
+  let row3 = "";
+
+  if (type === 1) {
+    const query2 = `
+                      update Address
+                      set type = 3
+                      where type = 1
+                      and userId = ?;
+                      `;
+
+    row2 = await connection.query(query2, userId);
+    row2 = row2[0].info;
+  } else if (type === 2) {
+    const query3 = `
+                      update Address
+                      set type = 3
+                      where type = 2
+                      and userId = ?;
+                      `;
+
+    row3 = await connection.query(query3, userId);
+    row3 = row3[0].info;
+  }
+
+  const query4 = `
+                    update User
+                    set userLatitude = ?, userLongtitude = ?
+                    where id = ?
+                    `;
+
+  const row4 = await connection.query(query4, [lat, lng, userId]);
+
+  const query5 = `
+  insert into Address(userId, type, nickname, buildingName,
+                      address, detailAddress, information,
+                      addressLatitude, addressLongtitude)
+  values (?, ?, ?, ?, ?, ?, ?, ?, ?);
+  `;
+
+  const row5 = await connection.query(query5, [
+    userId,
+    type,
+    nickname,
+    buildingName,
+    address,
+    detailAddress,
+    information,
+    lat,
+    lng,
+  ]);
+
+  return {
+    isChecked: row1[0].info,
+    type1: row2,
+    type2: row3,
+    userLocation: row4[0].info,
+    insertedAddress: row5[0],
+  };
 }
 
 // 주소 존재 여부 확인
 async function checkAddressExist(connection, addressId) {
   const query = `
-    select exists(select id from Address where id = ?) as exist;
-    `;
+                select exists(select id from Address where id = ?) as exist;
+                `;
 
   const row = await connection.query(query, addressId);
 
@@ -35,25 +103,71 @@ async function checkAddressExist(connection, addressId) {
 }
 
 // 주소 수정
-async function updateAddress(connection, params) {
-  const query = `
+async function updateAddress(
+  connection,
+  userId,
+  type,
+  nickname,
+  buildingName,
+  address,
+  detailAddress,
+  information,
+  lat,
+  lng,
+  addressId
+) {
+  let row1 = "";
+  let row2 = "";
+
+  if (type === 1) {
+    const query1 = `
+                      update Address
+                      set type = 3
+                      where type = 1
+                      and userId = ?;
+                      `;
+
+    row1 = await connection.query(query1, userId);
+    row1 = row1[0].info;
+  } else if (type === 2) {
+    const query2 = `
+                      update Address
+                      set type = 3
+                      where type = 2
+                      and userId = ?;
+                      `;
+
+    row2 = await connection.query(query2, userId);
+    row2 = row2[0].info;
+  }
+
+  const query3 = `
                 update Address
-                set type = ?, nickname = ?, buildingName = ?, address = ?,
-                    detailAddress = ?, information = ?,
-                    addressLatitude = ?, addressLongtitude = ?
+                set type = ?, nickname = ?, buildingName = ?, address = ?, detailAddress = ?,
+                    information = ?, addressLatitude = ?, addressLongtitude = ?
                 where id = ?;
                 `;
 
-  const row = await connection.query(query, params);
+  const row3 = await connection.query(query3, [
+    type,
+    nickname,
+    buildingName,
+    address,
+    detailAddress,
+    information,
+    lat,
+    lng,
+    addressId,
+  ]);
 
-  return row[0].info;
+  return { type1: row1, type2: row2, modifiedAddress: row3[0].info };
 }
 
 // 주소 삭제
 async function deleteAddress(connection, addressId) {
   const query = `
                 update Address
-                set isDeleted = 0
+                set isDeleted = 0, type = 3
                 where id = ?;
                 `;
 
@@ -66,30 +180,51 @@ async function deleteAddress(connection, addressId) {
 async function selectAddress(connection, userId) {
   const query = `
                 select case
+                      when type = 1
+                          then '집'
+                      when type = 2
+                          then '회사'
                       when nickname != '' and nickname is not null
                           then nickname
                       when buildingName != '' and nickname is not null
                           then buildingName
                       else
                         address
-                      end as nickname, address, detailAddress, information,
-                      addressLatitude as lat, addressLongtitude as lng,
-                      case
-                        when type = 1
-                            then '집'
-                        when type = 2
-                            then '회사'
-                        when type = 3
-                            then '기타'
-                      end as type
+                      end as name, type, address, detailAddress, isChecked
                 from Address
                 where isDeleted = 1
-                and userId= ?;
+                and userId= ?
+                order by field(type, 2, 1) desc, createdAt desc;
                 `;
 
   const row = await connection.query(query, userId);
 
   return row[0];
+}
+
+// 집/회사 주소 존재 여부 확인
+async function checkHouseCompany(connection, userId, type) {
+  const query = `
+                select exists(select id from Address
+                              where userId = ? and type = ?) as exist;
+                `;
+
+  const row = await connection.query(query, [userId, type]);
+
+  return row[0][0]["exist"];
+}
+
+// 주소 삭제 여부 확인
+async function checkAddressExist(connection, addressId) {
+  const query = `
+                select isDeleted
+                from Address
+                where id = ?;
+                `;
+
+  const row = await connection.query(query, addressId);
+
+  return row[0][0]["isDeleted"];
 }
 
 module.exports = {
@@ -99,4 +234,5 @@ module.exports = {
   updateAddress,
   deleteAddress,
   selectAddress,
+  checkHouseCompany,
 };

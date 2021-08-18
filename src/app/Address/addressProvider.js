@@ -53,3 +53,35 @@ exports.selectAddress = async function (userId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 집/회사 주소 존재 여부 확인
+exports.checkHouseCompany = async function (userId, type) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await addressDao.checkHouseCompany(connection, userId, type);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Address-checkHouseCompany Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 주소 삭제 여부 확인
+exports.checkAddressDeleted = async function (addressId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await addressDao.checkAddressDeleted(connection, addressId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Address-checkAddressDeleted Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
