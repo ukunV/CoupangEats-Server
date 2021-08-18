@@ -197,6 +197,16 @@ module.exports = {
     code: 3012,
     message: "삭제된 메뉴입니다.",
   },
+  CART_IS_EMPTY: {
+    isSuccess: false,
+    code: 3013,
+    message: "카트가 비어 있습니다.",
+  },
+  SAME_STORE_MENU: {
+    isSuccess: false,
+    code: 3014,
+    message: "같은 음식점의 상품입니다.",
+  },
 
   // made by note
 
