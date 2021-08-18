@@ -125,6 +125,16 @@ module.exports = {
     code: 2022,
     message: "addressId 값이 입력되지 않았습니다.",
   },
+  AMOUNT_IS_EMPTY: {
+    isSuccess: false,
+    code: 2023,
+    message: "수량을 입력해주세요.",
+  },
+  AMOUNT_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2024,
+    message: "수량이 올바르지 않습니다.",
+  },
 
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
@@ -181,6 +191,11 @@ module.exports = {
     isSuccess: false,
     code: 3011,
     message: "존재하지 않는 메뉴입니다.",
+  },
+  MENU_IS_DELETED: {
+    isSuccess: false,
+    code: 3012,
+    message: "삭제된 메뉴입니다.",
   },
 
   // made by note
