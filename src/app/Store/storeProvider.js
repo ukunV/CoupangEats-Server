@@ -171,3 +171,51 @@ exports.selectStoreInfo = async function (storeId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 음식점 삭제 여부 check
+exports.checkStoreDeleted = async function (storeId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await storeDao.checkStoreDeleted(connection, storeId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Store-checkStoreDeleted Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 메뉴 존재 여부 check
+exports.checkMenuExist = async function (menuId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await storeDao.checkMenuExist(connection, menuId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Store-checkMenuExist Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 메인 메뉴 조회 check
+exports.selectMainMenu = async function (menuId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await storeDao.selectMainMenu(connection, menuId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Store-selectMainMenu Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

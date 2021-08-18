@@ -23,4 +23,7 @@ module.exports = function (app) {
 
   // 15. 음식점 매장/원산지 정보 조회 API
   app.get("/stores/:storeId/info-detail", store.getStoreInfo);
+
+  // 18. 메인 메뉴 조회 API
+  app.get("/stores/:storeId/menu-detail", store.getMainMenu);
 };

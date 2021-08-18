@@ -252,6 +252,66 @@ async function selectStoreInfo(connection, storeId) {
   return row[0];
 }
 
+// 음식점 삭제 여부 check
+async function checkStoreDeleted(connection, storeId) {
+  const query = `
+                select isDeleted
+                from Store
+                where id = ?;
+                `;
+
+  const row = await connection.query(query, storeId);
+
+  return row[0][0]["isDeleted"];
+}
+
+// 메뉴 존재 여부 check
+async function checkMenuExist(connection, menuId) {
+  const query = `
+                select exists(select id from StoreMenu where id = ?) as exist;
+                `;
+
+  const row = await connection.query(query, menuId);
+
+  return row[0][0]["exist"];
+}
+
+// 메인 메뉴 조회
+async function selectMainMenu(connection, menuId) {
+  const query1 = `
+                  select group_concat(smi.imageURL) as imageArray, sm.menuName, sm.description,
+                        concat(format(sm.price, 0), '원') as price
+                  from StoreMenu sm
+                      left join StoreMenuImage smi on sm.id = smi.menuId
+                  where smi.isDeleted = 1
+                  and sm.id = ?;
+                `;
+
+  const query2 = `
+                  select subMenuName, subMenuNumber, menuName, menuNumber,
+                        case
+                            when price = 0
+                                then ''
+                            else
+                                concat('(+ ', price, ')')
+                        end as price
+                  from StoreMenu
+                  where isDeleted = 1
+                  and subMenuNumber is not null
+                  and rootId = ?;
+                  `;
+
+  const result1 = await connection.query(query1, menuId);
+  const result2 = await connection.query(query2, menuId);
+
+  const mainMenu = JSON.parse(JSON.stringify(result1[0]));
+  const subMenu = JSON.parse(JSON.stringify(result2[0]));
+
+  const row = { mainMenu, subMenu };
+
+  return row;
+}
+
 module.exports = {
   selectFoodCategory,
   checkUserExist,
@@ -262,4 +322,7 @@ module.exports = {
   selectStore,
   selectStoreDelivery,
   selectStoreInfo,
+  checkStoreDeleted,
+  checkMenuExist,
+  selectMainMenu,
 };

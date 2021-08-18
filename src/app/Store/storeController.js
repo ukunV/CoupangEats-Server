@@ -31,6 +31,7 @@ exports.getFoodCategory = async function (req, res) {
  * API Name : 새로 들어왔어요 목록 조회 API
  * 카테고리로 조회 시 (쿠팡이츠에 등록된지 30일 이하)
  * [GET] /stores/:categoryId/new-store
+ * path variable: categoryId
  */
 exports.getNewStore = async function (req, res) {
   const { userId } = req.verifiedToken;
@@ -164,6 +165,7 @@ exports.getStoresByCategoryId = async function (req, res) {
  * API No. 13
  * API Name : 음식점 상세페이지 조회 API
  * [GET] /stores/:storeId/store-detail
+ * path variable: storeId
  */
 exports.getStore = async function (req, res) {
   const { storeId } = req.params;
@@ -186,6 +188,7 @@ exports.getStore = async function (req, res) {
  * API No. 14
  * API Name : 음식점 배달비 자세히 API
  * [GET] /stores/:storeId/delivery-detail
+ * path variable: storeId
  */
 exports.getStoreDelivery = async function (req, res) {
   const { storeId } = req.params;
@@ -208,6 +211,7 @@ exports.getStoreDelivery = async function (req, res) {
  * API No. 15
  * API Name : 음식점 매장/원산지 정보 조회 API
  * [GET] /stores/:storeId/info-detail
+ * path variable: storeId
  */
 exports.getStoreInfo = async function (req, res) {
   const { storeId } = req.params;
@@ -222,6 +226,42 @@ exports.getStoreInfo = async function (req, res) {
   // Response Error End
 
   const result = await storeProvider.selectStoreInfo(storeId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 18
+ * API Name : 메인 메뉴 조회 API
+ * [GET] /stores/:storeId/menu-detail
+ * path variable: storeId
+ * query string: menuId
+ */
+exports.getMainMenu = async function (req, res) {
+  const { storeId } = req.params;
+
+  const { menuId } = req.query;
+
+  // Response Error Start
+
+  const checkStoreExist = await storeProvider.checkStoreExist(storeId);
+
+  if (checkStoreExist === 0)
+    return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
+
+  const checkStoreDeleted = await storeProvider.checkStoreDeleted(storeId);
+
+  if (checkStoreDeleted === 0)
+    return res.send(response(baseResponse.STORE_IS_DELETED)); // 3010
+
+  const checkMenuExist = await storeProvider.checkMenuExist(menuId);
+
+  if (checkMenuExist === 0)
+    return res.send(response(baseResponse.MENU_IS_NOT_EXIST)); // 3011
+
+  // Response Error End
+
+  const result = await storeProvider.selectMainMenu(menuId);
 
   return res.send(response(baseResponse.SUCCESS, result));
 };
