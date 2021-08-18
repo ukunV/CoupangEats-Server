@@ -219,3 +219,19 @@ exports.selectMainMenu = async function (menuId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 메뉴 삭제 여부 check
+exports.checkMenuDeleted = async function (menuId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await storeDao.checkMenuDeleted(connection, menuId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Store-checkMenuDeleted Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

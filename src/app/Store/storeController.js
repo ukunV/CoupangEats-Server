@@ -14,6 +14,7 @@ const { emit } = require("nodemon");
 // regular expression
 const regPage = /^[0-9]/;
 const regSize = /^[0-9]/;
+const regAmount = /^[0-9]/;
 
 /**
  * API No. 10
@@ -258,6 +259,11 @@ exports.getMainMenu = async function (req, res) {
 
   if (checkMenuExist === 0)
     return res.send(response(baseResponse.MENU_IS_NOT_EXIST)); // 3011
+
+  const checkMenuDeleted = await storeProvider.checkMenuDeleted(menuId);
+
+  if (checkMenuDeleted === 0)
+    return res.send(response(baseResponse.MENU_IS_DELETED)); // 3012
 
   // Response Error End
 
