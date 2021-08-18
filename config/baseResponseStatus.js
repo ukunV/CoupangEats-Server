@@ -172,6 +172,17 @@ module.exports = {
     code: 3009,
     message: "삭제된 주소입니다.",
   },
+  STORE_IS_DELETED: {
+    isSuccess: false,
+    code: 3010,
+    message: "삭제된 음식점입니다.",
+  },
+  MENU_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3011,
+    message: "존재하지 않는 메뉴입니다.",
+  },
+
   // made by note
 
   // SIGNIN_INACTIVE_ACCOUNT: {
