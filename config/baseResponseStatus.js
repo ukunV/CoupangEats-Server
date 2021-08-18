@@ -115,6 +115,16 @@ module.exports = {
     code: 2020,
     message: "size 형식이 올바르지 않습니다.",
   },
+  TYPE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2021,
+    message: "type 형식이 올바르지 않습니다.",
+  },
+  ADDRESS_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2022,
+    message: "addressId 값이 입력되지 않았습니다.",
+  },
 
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
