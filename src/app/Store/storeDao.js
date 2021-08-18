@@ -288,7 +288,7 @@ async function selectMainMenu(connection, menuId) {
                 `;
 
   const query2 = `
-                  select subMenuName, subMenuNumber, menuName, menuNumber,
+                  select id as subMenuId, subMenuName, isRequired, subMenuNumber, menuName, menuNumber,
                         case
                             when price = 0
                                 then ''
@@ -298,7 +298,8 @@ async function selectMainMenu(connection, menuId) {
                   from StoreMenu
                   where isDeleted = 1
                   and subMenuNumber is not null
-                  and rootId = ?;
+                  and rootId = ?
+                  order by subMenuNumber, menuNumber;
                   `;
 
   const result1 = await connection.query(query1, menuId);
@@ -310,6 +311,19 @@ async function selectMainMenu(connection, menuId) {
   const row = { mainMenu, subMenu };
 
   return row;
+}
+
+// 메뉴 삭제 여부 check
+async function checkMenuDeleted(connection, menuId) {
+  const query = `
+                select isDeleted
+                from Store
+                where id = ?;
+                `;
+
+  const row = await connection.query(query, menuId);
+
+  return row[0][0]["isDeleted"];
 }
 
 module.exports = {
@@ -325,4 +339,5 @@ module.exports = {
   checkStoreDeleted,
   checkMenuExist,
   selectMainMenu,
+  checkMenuDeleted,
 };
