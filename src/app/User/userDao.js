@@ -292,6 +292,54 @@ async function selectEventList(connection, userId) {
 
   return row[0];
 }
+
+// 이벤트 존재 여부 check
+async function checkEventExist(connection, eventId) {
+  const query = `
+                select exists(select id from Event where id = ?) as exist;
+                `;
+
+  const row = await connection.query(query, eventId);
+
+  return row[0][0]["exist"];
+}
+
+// 이벤트 상태 check
+async function checkEventStatus(connection, eventId) {
+  const query = `
+                select status
+                from Event
+                where id = ?;
+                `;
+
+  const row = await connection.query(query, eventId);
+
+  return row[0][0]["status"];
+}
+
+// 이벤트 상세페이지 조회
+async function selectEvent(connection, eventId, distance) {
+  const query = `
+                select e.imageURL, e.midDescription, e.endDescription,
+                      e.franchiseId, c.number as couponNumber
+                from Event e
+                    left join Coupon c on c.franchiseId = e.franchiseId
+                where e.id = ?;
+                `;
+
+  const row = await connection.query(query, eventId);
+
+  const result = {
+    imageURL: row[0][0]["imageURL"],
+    midDescription: row[0][0]["midDescription"],
+    endDescription: row[0][0]["endDescription"],
+    franchiseId: row[0][0]["franchiseId"],
+    couponNumber: row[0][0]["couponNumber"],
+    distance,
+  };
+
+  return result;
+}
 module.exports = {
   checkEmailExist,
   checkPhoneNumExist,
@@ -301,4 +349,7 @@ module.exports = {
   checkUserExist,
   selectHome,
   selectEventList,
+  checkEventExist,
+  checkEventStatus,
+  selectEvent,
 };

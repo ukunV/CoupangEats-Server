@@ -19,6 +19,7 @@ const KakaoStrategy = require("passport-kakao").Strategy;
 // regex
 // const regexName = /^[가-힣]+$/;
 const regPhoneNum = /^\d{10,11}$/;
+const regDistance = /^[0-9]+(.[0-9]+)?$/;
 
 /**
  * API No. 0
@@ -289,6 +290,53 @@ exports.getEventList = async function (req, res) {
 };
 
 /**
+ * API No. 28
+ * API Name : 이벤트 상세페이지 조회 API
+ * [GET] /users/my-eats/:eventId/event-detail
+ * query string: distance
+ */
+
+exports.getEvent = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { eventId } = req.params;
+
+  const { distance } = req.query;
+
+  //Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  if (!eventId) return res.send(errResponse(baseResponse.EVENT_ID_IS_EMPTY)); // 2030
+
+  if (!regDistance.test(distance))
+    return res.send(errResponse(baseResponse.DISTANCE_IS_NOT_VALID)); // 2031
+
+  //Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await userProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkEventExist = await userProvider.checkEventExist(eventId);
+
+  if (checkEventExist === 0)
+    return res.send(errResponse(baseResponse.EVENT_IS_NOT_EXIST)); // 3022
+
+  const checkEventStatus = await userProvider.checkEventStatus(eventId);
+
+  if (checkEventStatus === 0)
+    return res.send(errResponse(baseResponse.EVENT_IS_DELETED)); // 3023
+
+  // Response Error End
+
+  const result = await userProvider.selectEvent(eventId, distance);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
 /**
  * API No.
  * API Name : 카카오 로그인 API

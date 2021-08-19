@@ -103,3 +103,48 @@ exports.selectEventList = async function (userId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 이벤트 존재 여부 check
+exports.checkEventExist = async function (eventId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.checkEventExist(connection, eventId);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-checkEventExist Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 이벤트 상태 check
+exports.checkEventStatus = async function (eventId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.checkEventStatus(connection, eventId);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-checkEventStatus Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 이벤트 상세페이지 조회
+exports.selectEvent = async function (eventId, distance) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.selectEvent(connection, eventId, distance);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-selectEvent Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
