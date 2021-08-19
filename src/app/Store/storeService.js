@@ -34,12 +34,16 @@ exports.createStoreLike = async function (userId, storeId) {
 };
 
 // 음식점 즐겨찾기 삭제
-exports.deleteStoreLike = async function (userId, storeId) {
+exports.deleteStoreLike = async function (userId, storeIdArr) {
   const connection = await pool.getConnection(async (conn) => conn);
   try {
     await connection.beginTransaction();
 
-    const result = await storeDao.deleteStoreLike(connection, userId, storeId);
+    const result = await storeDao.deleteStoreLike(
+      connection,
+      userId,
+      storeIdArr
+    );
 
     await connection.commit();
 

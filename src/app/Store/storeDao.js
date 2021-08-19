@@ -362,17 +362,25 @@ async function createStoreLike(connection, userId, storeId) {
 }
 
 // 음식점 즐겨찾기 삭제
-async function deleteStoreLike(connection, userId, storeId) {
-  const query = `
+async function deleteStoreLike(connection, userId, storeIdArr) {
+  let deleteCount = 0;
+
+  for (let i = 0; i < storeIdArr.length; i++) {
+    const query = `
                 update StoreLike
                 set isDeleted = 0
                 where userId = ?
                 and storeId = ?;
                 `;
 
-  const row = await connection.query(query, [userId, storeId]);
+    const row = await connection.query(query, [userId, storeIdArr[i]]);
 
-  return row[0].info;
+    if (row[0].affectedRows === 1) {
+      deleteCount += 1;
+    }
+  }
+
+  return { deleteCount };
 }
 
 // 즐겨찾기 목록 조회
