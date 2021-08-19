@@ -277,6 +277,16 @@ module.exports = {
     code: 3021,
     message: "삭제된 추가메뉴입니다.",
   },
+  EVENT_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3022,
+    message: "존재하지 않는 이벤트입니다.",
+  },
+  EVENT_IS_DELETED: {
+    isSuccess: false,
+    code: 3023,
+    message: "삭제된 이벤트입니다.",
+  },
 
   // made by note
 
