@@ -387,15 +387,20 @@ exports.deleteStoreLike = async function (req, res) {
 
 /**
  * API No. 26
- * API Name : 즐겨찾기 목록 조회 API (많이 주문한 순, 최근 주문한 순, 최근 추가한 순) filter 넣기
+ * API Name : 즐겨찾기 목록 조회 API
  * [GET] /stores/store-like
+ * query string: filter
  */
 exports.getStoreLike = async function (req, res) {
   const { userId } = req.verifiedToken;
 
+  const { filter } = req.query;
+
   // Request Error Start
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+  if ((filter != 1) & (filter != 2) & (filter != 3) & (filter != ""))
+    return res.send(errResponse(baseResponse.FILTER_IS_NOT_VALID)); // 2028
 
   // Request Error End
 
@@ -408,7 +413,14 @@ exports.getStoreLike = async function (req, res) {
 
   // Response Error End
 
-  const result = await storeProvider.selectStoreLike(userId);
+  let filterCondition = "order by ";
+
+  if (filter === "1") filterCondition += "ol.orderCount desc";
+  else if (filter === "2") filterCondition += "ol.recentOrder desc";
+  else if (filter === "3") filterCondition += "sl.createdAt desc";
+  else filterCondition += "ol.orderCount desc";
+
+  const result = await storeProvider.selectStoreLike(userId, filterCondition);
 
   return res.send(response(baseResponse.SUCCESS, result));
 };

@@ -253,11 +253,15 @@ exports.checkStoreLike = async function (userId, storeId) {
 };
 
 // 즐겨찾기 목록 조회
-exports.selectStoreLike = async function (userId) {
+exports.selectStoreLike = async function (userId, filterCondition) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await storeDao.selectStoreLike(connection, userId);
+    const result = await storeDao.selectStoreLike(
+      connection,
+      userId,
+      filterCondition
+    );
 
     connection.release();
 

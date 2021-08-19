@@ -384,7 +384,7 @@ async function deleteStoreLike(connection, userId, storeIdArr) {
 }
 
 // 즐겨찾기 목록 조회
-async function selectStoreLike(connection, userId) {
+async function selectStoreLike(connection, userId, filterCondition) {
   const query = `
                 select s.id as storeId, smi.imageURL, s.storeName, s.isCheetah,
                       concat(s.deliveryTime, '-', s.deliveryTime + 10, '분') as deliveryTime,
@@ -414,22 +414,27 @@ async function selectStoreLike(connection, userId) {
                               from Review
                               where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
                     left join User u on sl.userId = u.id
-                    left join (select *, row_number() over (partition by storeId order by price) as rn
-                        from StoreDeliveryPrice
-                        where isDeleted = 1) as sdp on s.id = sdp.storeId
-                    right join Franchise f on f.id = s.franchiseId
+                    left join (select storeId, min(price) as price
+                                from StoreDeliveryPrice
+                                where isDeleted = 1
+                                group by storeId) as sdp on sl.storeId = sdp.storeId
+                    left join Franchise f on f.id = s.franchiseId
                     left join Coupon c on c.franchiseId = f.id
-                where u.id = ?
+                    left join (select storeId, max(createdAt) as recentOrder, count(storeId) as orderCount
+                              from OrderList
+                              where isDeleted = 1
+                              and userId = ?
+                              group by storeId) as ol on ol.storeId = sl.storeId
+                where sl.userId = ?
                 and s.isDeleted = 1
                 and sl.isDeleted = 1
-                and sdp.rn = 1
                 and smi.number = 1
                 and smi.isDeleted = 1
-                and c.status = 1
-                order by c.createdAt desc;;
+                and c.status = 1 or c.status is null
+                ${filterCondition};
                 `;
 
-  const row = await connection.query(query, userId);
+  const row = await connection.query(query, [userId, userId]);
 
   return row[0];
 }
