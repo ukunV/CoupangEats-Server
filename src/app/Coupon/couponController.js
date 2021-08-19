@@ -30,7 +30,7 @@ exports.getMyEatsCoupons = async function (req, res) {
 
   // Response Error Start
 
-  const checkUserExist = couponProvider.checkUserExist(userId);
+  const checkUserExist = await couponProvider.checkUserExist(userId);
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
@@ -69,7 +69,7 @@ exports.getCartCoupons = async function (req, res) {
 
   // Response Error Start
 
-  const checkUserExist = couponProvider.checkUserExist(userId);
+  const checkUserExist = await couponProvider.checkUserExist(userId);
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
@@ -91,6 +91,54 @@ exports.getCartCoupons = async function (req, res) {
     storeId,
     totalPrice
   );
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 23
+ * API Name : 쿠폰 등록 API
+ * [POST] /coupons
+ */
+exports.createCoupons = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { number } = req.body;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await couponProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkCouponExist = await couponProvider.checkCouponExist(number);
+
+  if (checkCouponExist === 0)
+    return res.send(errResponse(baseResponse.COUPON_IS_NOT_EXIST)); // 3015
+
+  const checkCouponAlive = await couponProvider.checkCouponAlive(number);
+
+  if (checkCouponAlive === 0)
+    return res.send(errResponse(baseResponse.COUPON_IS_NOT_VALID)); // 3016
+
+  const checkCouponObtained = await couponProvider.checkCouponObtained(
+    userId,
+    number
+  );
+
+  if (checkCouponObtained === 1)
+    return res.send(errResponse(baseResponse.COUPON_AlREADY_OBTAINED)); // 3017
+
+  // Response Error End
+
+  const result = await couponService.createCoupons(userId, number);
 
   return res.send(response(baseResponse.SUCCESS, result));
 };

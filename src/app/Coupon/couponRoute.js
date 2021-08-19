@@ -11,4 +11,7 @@ module.exports = function (app) {
 
   // 22. 카트에서 쿠폰 목록 조회 API
   app.get("/coupons/cart/coupon-list", jwtMiddleware, coupon.getCartCoupons);
+
+  // 23. 쿠폰 등록 API
+  app.post("/coupons", jwtMiddleware, coupon.createCoupons);
 };

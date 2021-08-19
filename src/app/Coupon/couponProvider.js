@@ -90,3 +90,55 @@ exports.selectCartCoupons = async function (userId, storeId, totalPrice) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 쿠폰 존재 여부 check
+exports.checkCouponExist = async function (number) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await couponDao.checkCouponExist(connection, number);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Coupon-checkCouponExist Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 쿠폰 만료 여부 check
+exports.checkCouponAlive = async function (number) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await couponDao.checkCouponAlive(connection, number);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Coupon-checkCouponAlive Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 쿠폰 소지 여부 check
+exports.checkCouponObtained = async function (userId, number) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await couponDao.checkCouponObtained(
+      connection,
+      userId,
+      number
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Coupon-checkCouponObtained Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
