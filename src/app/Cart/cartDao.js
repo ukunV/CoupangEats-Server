@@ -95,7 +95,7 @@ async function createCart(
       amount,
     ]);
 
-    if (row[0].affectedRows == 1) {
+    if (row[0].affectedRows === 1) {
       insertCount += 1;
     }
   }
