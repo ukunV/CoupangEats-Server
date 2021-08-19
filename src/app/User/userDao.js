@@ -137,9 +137,10 @@ async function selectHome(connection, userId) {
                       left join (select storeId, count(storeId) as count, avg(point) as point
                                 from Review
                                 where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
-                      left join (select *, row_number() over (partition by storeId order by price) as rn
+                      left join (select storeId, min(price) as price
                                 from StoreDeliveryPrice
-                                where isDeleted = 1) as sdp on s.id = sdp.storeId
+                                where isDeleted = 1
+                                group by storeId) as sdp on s.id = sdp.storeId
                       right join Franchise f on f.id = s.franchiseId
                       left join Coupon c on c.franchiseId = f.id,
                       User u
@@ -149,8 +150,7 @@ async function selectHome(connection, userId) {
                   and s.status = 1
                   and smi.isDeleted = 1
                   and smi.number = 1
-                  and sdp.rn = 1
-                  and c.status = 1
+                  and c.status = 1 or c.status is null
                   group by s.id
                   order by oc.count desc;
                   `;
@@ -186,9 +186,10 @@ async function selectHome(connection, userId) {
                       left join (select storeId, count(storeId) as count, avg(point) as point
                                 from Review
                                 where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
-                      left join (select *, row_number() over (partition by storeId order by price) as rn
+                      left join (select storeId, min(price) as price
                                 from StoreDeliveryPrice
-                                where isDeleted = 1) as sdp on s.id = sdp.storeId
+                                where isDeleted = 1
+                                group by storeId) as sdp on s.id = sdp.storeId
                       left join Coupon c on c.franchiseId = f.id,
                       User u
                   where u.id = ?
@@ -198,8 +199,7 @@ async function selectHome(connection, userId) {
                   and smi.number = 1
                   and getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude) <= 4
                   and s.franchiseId != 0
-                  and sdp.rn = 1
-                  and c.status = 1
+                  and c.status = 1 or c.status is null
                   group by s.id
                   order by oc.count desc
                   limit 10;
@@ -223,9 +223,10 @@ async function selectHome(connection, userId) {
                         end as coupon
                   from Store s
                   left join StoreMainImage smi on s.id = smi.storeId
-                  left join (select *, row_number() over (partition by storeId order by price) as rn
+                  left join (select storeId, min(price) as price
                             from StoreDeliveryPrice
-                            where isDeleted = 1) as sdp on s.id = sdp.storeId
+                            where isDeleted = 1
+                            group by storeId) as sdp on s.id = sdp.storeId
                   left join (select storeId, count(storeId) as count, avg(point) as point
                             from Review
                             where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
@@ -235,11 +236,9 @@ async function selectHome(connection, userId) {
                   where u.id = ?
                   and smi.isDeleted = 1
                   and smi.number = 1
-                  and sdp.rn = 1
                   and s.status = 1
                   and s.isDeleted = 1
-                  and sdp.rn = 1
-                  and c.status = 1
+                  and c.status = 1 or c.status is null
                   and getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude) <= 4
                   order by s.createdAt desc
                   limit 10;
