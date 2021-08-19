@@ -145,7 +145,7 @@ async function checkStoreExist(connection, storeId) {
 // 음식점 상세페이지 조회
 async function selectStore(connection, storeId) {
   const query1 = `
-                  select group_concat(smi.imageURL) as imageArray, s.storeName,
+                  select s.id as storeId, group_concat(smi.imageURL) as imageArray, s.storeName,
                         round(ifnull(rc.point, 0.0), 1) as avgPoint, ifnull(rc.count, 0) as reviewCount,
                         concat(s.deliveryTime, '-', s.deliveryTime + 10, '분') as deliveryTime, s.isCheetah,
                         case
