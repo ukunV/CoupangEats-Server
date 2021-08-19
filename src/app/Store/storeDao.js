@@ -151,7 +151,7 @@ async function selectStore(connection, storeId) {
                                 then concat(format(c.discount, 0), '원 쿠폰 받기')
                             else
                                 '쿠폰 없음'
-                        end as coupon,
+                        end as coupon, c.number,
                         round(ifnull(rc.point, 0.0), 1) as avgPoint, ifnull(rc.count, 0) as reviewCount,
                         concat(s.deliveryTime, '-', s.deliveryTime + 10, '분') as deliveryTime, s.isCheetah,
                         case
