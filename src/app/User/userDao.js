@@ -122,7 +122,13 @@ async function selectHome(connection, userId) {
                                 then '무료배달'
                             else
                                 concat('배달비 ', format(sdp.price, 0), '원')
-                        end as deliveryFee
+                        end as deliveryFee,
+                          case
+                                when c.discount is not null
+                                    then concat(format(c.discount, 0), '원 쿠폰')
+                                else
+                                    '쿠폰 없음'
+                            end as coupon
                   from Store s
                       left join StoreMainImage smi on s.id = smi.storeId
                       left join (select storeId, count(storeId) as count
@@ -133,7 +139,9 @@ async function selectHome(connection, userId) {
                                 where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
                       left join (select *, row_number() over (partition by storeId order by price) as rn
                                 from StoreDeliveryPrice
-                                where isDeleted = 1) as sdp on s.id = sdp.storeId,
+                                where isDeleted = 1) as sdp on s.id = sdp.storeId
+                      right join Franchise f on f.id = s.franchiseId
+                      left join Coupon c on c.franchiseId = f.id,
                       User u
                   where u.id = ?
                   and getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude) <= 4
@@ -142,6 +150,7 @@ async function selectHome(connection, userId) {
                   and smi.isDeleted = 1
                   and smi.number = 1
                   and sdp.rn = 1
+                  and c.status = 1
                   group by s.id
                   order by oc.count desc;
                   `;
@@ -161,7 +170,13 @@ async function selectHome(connection, userId) {
                                 then '무료배달'
                             else
                                 concat('배달비 ', format(sdp.price, 0), '원')
-                        end as deliveryFee
+                        end as deliveryFee,
+                        case
+                            when c.discount is not null
+                                then concat(format(c.discount, 0), '원 쿠폰')
+                            else
+                                '쿠폰 없음'
+                        end as coupon
                   from Store s
                       left join StoreMainImage smi on s.id = smi.storeId
                       left join Franchise f on s.franchiseId = f.id
@@ -173,7 +188,8 @@ async function selectHome(connection, userId) {
                                 where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
                       left join (select *, row_number() over (partition by storeId order by price) as rn
                                 from StoreDeliveryPrice
-                                where isDeleted = 1) as sdp on s.id = sdp.storeId,
+                                where isDeleted = 1) as sdp on s.id = sdp.storeId
+                      left join Coupon c on c.franchiseId = f.id,
                       User u
                   where u.id = ?
                   and s.isDeleted = 1
@@ -183,6 +199,7 @@ async function selectHome(connection, userId) {
                   and getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude) <= 4
                   and s.franchiseId != 0
                   and sdp.rn = 1
+                  and c.status = 1
                   group by s.id
                   order by oc.count desc
                   limit 10;
@@ -197,16 +214,24 @@ async function selectHome(connection, userId) {
                                 then '무료배달'
                             else
                                 concat('배달비 ', format(sdp.price, 0), '원')
-                        end as deliveryFee
+                        end as deliveryFee,
+                        case
+                            when c.discount is not null
+                                then concat(format(c.discount, 0), '원 쿠폰')
+                            else
+                                '쿠폰 없음'
+                        end as coupon
                   from Store s
-                      left join StoreMainImage smi on s.id = smi.storeId
-                      left join (select *, row_number() over (partition by storeId order by price) as rn
-                                from StoreDeliveryPrice
-                                where isDeleted = 1) as sdp on s.id = sdp.storeId
-                      left join (select storeId, count(storeId) as count, avg(point) as point
-                                from Review
-                                where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId,
-                      User u
+                  left join StoreMainImage smi on s.id = smi.storeId
+                  left join (select *, row_number() over (partition by storeId order by price) as rn
+                            from StoreDeliveryPrice
+                            where isDeleted = 1) as sdp on s.id = sdp.storeId
+                  left join (select storeId, count(storeId) as count, avg(point) as point
+                            from Review
+                            where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
+                  right join Franchise f on f.id = s.franchiseId
+                  left join Coupon c on c.franchiseId = f.id,
+                  User u
                   where u.id = ?
                   and smi.isDeleted = 1
                   and smi.number = 1
@@ -214,6 +239,7 @@ async function selectHome(connection, userId) {
                   and s.status = 1
                   and s.isDeleted = 1
                   and sdp.rn = 1
+                  and c.status = 1
                   and getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude) <= 4
                   order by s.createdAt desc
                   limit 10;
