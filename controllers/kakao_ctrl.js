@@ -12,8 +12,8 @@ const getAddressInfo = async (address) => {
     },
   });
 
-  const lat = response.data.documents[0].road_address.x;
-  const lng = response.data.documents[0].road_address.y;
+  const lat = response.data.documents[0].address.x;
+  const lng = response.data.documents[0].address.y;
 
   return { lat, lng };
 };
@@ -27,8 +27,8 @@ const getQueryAddressInfo = async (address) => {
     },
   });
 
-  const lat = response.data.documents[0].road_address.x;
-  const lng = response.data.documents[0].road_address.y;
+  const lat = response.data.documents[0].address.x;
+  const lng = response.data.documents[0].address.y;
 
   return { lat, lng };
 };
