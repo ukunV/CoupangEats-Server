@@ -337,6 +337,50 @@ exports.getEvent = async function (req, res) {
 
   return res.send(response(baseResponse.SUCCESS, result));
 };
+
+/**
+ * API No. 29
+ * API Name : 이벤트 페이지 스토어로 이동 API
+ *            가장 가까운 프랜차이즈 음식점으로 이동
+ * [GET] /users/my-eats/event/franchise-store
+ * query string: franchiseId, distance
+ */
+
+exports.eventToStore = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { franchiseId, distance } = req.query;
+
+  //Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  // if (!regDistance.test(distance))
+  //   return res.send(errResponse(baseResponse.DISTANCE_IS_NOT_VALID)); // 2031
+
+  //Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await userProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkFranchiseExist = await userProvider.checkFranchiseExist(
+    franchiseId
+  );
+
+  if (checkFranchiseExist === 0)
+    return res.send(errResponse(baseResponse.FRANCHISE_IS_NOT_EXIST)); // 3024
+
+  // Response Error End
+
+  const result = await userProvider.eventToStore(userId, franchiseId, distance);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
 /**
  * API No.
  * API Name : 카카오 로그인 API

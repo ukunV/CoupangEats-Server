@@ -148,3 +148,38 @@ exports.selectEvent = async function (eventId, distance) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 프랜차이즈 존재 여부 check
+exports.checkFranchiseExist = async function (franchiseId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.checkFranchiseExist(connection, franchiseId);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-checkFranchiseExist Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 이벤트 페이지 스토어로 이동
+exports.eventToStore = async function (userId, franchiseId, distance) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.eventToStore(
+      connection,
+      userId,
+      franchiseId,
+      distance
+    );
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-eventToStore Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

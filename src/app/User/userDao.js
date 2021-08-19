@@ -340,6 +340,104 @@ async function selectEvent(connection, eventId, distance) {
 
   return result;
 }
+
+// 프랜차이즈 존재 여부 check
+async function checkFranchiseExist(connection, franchiseId) {
+  const query = `
+                select exists(select id from Franchise where id = ?) as exist;
+                `;
+
+  const row = await connection.query(query, franchiseId);
+
+  return row[0][0]["exist"];
+}
+
+// 이벤트 페이지 스토어로 이동
+async function eventToStore(connection, userId, franchiseId, distance) {
+  const query1 = `
+                  select s.id as storeId, group_concat(smi.imageURL) as imageArray, s.storeName,
+                        case
+                            when c.discount is not null
+                                then concat(format(c.discount, 0), '원 쿠폰 받기')
+                            else
+                                '쿠폰 없음'
+                        end as coupon, c.number,
+                        round(ifnull(rc.point, 0.0), 1) as avgPoint, ifnull(rc.count, 0) as reviewCount,
+                        concat(s.deliveryTime, '-', s.deliveryTime + 10, '분') as deliveryTime, s.isCheetah,
+                        case
+                            when sdp.price = 0
+                                then '무료배달'
+                            else
+                                concat('배달비 ', format(sdp.price, 0), '원')
+                        end as deliveryFee,
+                        concat(format(sdp.orderPrice, 0), '원') as minPrice
+                  from Store s
+                      left join (select * from StoreMainImage where isDeleted = 1) as smi on s.id = smi.storeId
+                      left join (select *, row_number() over (partition by storeId order by price) as rn
+                                from StoreDeliveryPrice
+                                where isDeleted = 1) as sdp on s.id = sdp.storeId
+                      left join (select storeId, count(storeId) as count, avg(point) as point
+                                from Review
+                                where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
+                      left join (select * from Franchise where id = ?) as f on f.id = s.franchiseId
+                      left join (select * from Coupon where status = 1) as c on c.franchiseId = f.id,
+                        User u
+                  where u.id = ?
+                  and format(getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude), 1) = ?
+                  and sdp.rn = 1
+                  and s.isDeleted = 1
+                  group by s.id;
+                  `;
+
+  const result1 = await connection.query(query1, [
+    franchiseId,
+    userId,
+    distance,
+  ]);
+
+  const query2 = `
+                  select imageURL, point,
+                        case
+                            when length(contents) > 35
+                                then concat(left(contents, 35), '...')
+                            else
+                                contents
+                        end as contents
+                  from Review
+                  where storeId = ?
+                  and isPhoto = 1
+                  and isDeleted = 1
+                  order by createdAt desc
+                  limit 3;
+                  `;
+
+  const query3 = `
+                  select sm.menuCategoryName, sm.menuCategoryNumber,
+                        sm.menuName, sm.menuNumber, concat(format(sm.price, 0), '원') as price,
+                        smi.imageURL, sm.description
+                  from StoreMenu sm
+                      left join StoreMenuImage smi on sm.id = smi.menuId
+                  where sm.storeId = ?
+                  and smi.number = 1
+                  order by sm.menuCategoryNumber, sm.menuNumber;
+                  `;
+
+  const result2 = await connection.query(query2, result1[0][0]["storeId"]);
+  const result3 = await connection.query(query3, result1[0][0]["storeId"]);
+
+  const info = JSON.parse(JSON.stringify(result1[0]));
+  const photoReview = JSON.parse(JSON.stringify(result2[0]));
+  const mainMenu = JSON.parse(JSON.stringify(result3[0]));
+
+  const row = {
+    info,
+    photoReview,
+    mainMenu,
+  };
+
+  return row;
+}
+
 module.exports = {
   checkEmailExist,
   checkPhoneNumExist,
@@ -352,4 +450,6 @@ module.exports = {
   checkEventExist,
   checkEventStatus,
   selectEvent,
+  checkFranchiseExist,
+  eventToStore,
 };

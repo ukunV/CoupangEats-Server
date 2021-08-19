@@ -22,6 +22,10 @@ module.exports = function (app) {
 
   // 27. 이벤트 목록 조회 API
   app.get("/users/my-eats/event-list", jwtMiddleware, user.getEventList);
+
+  // 28. 이벤트 상세페이지 조회 API
+  app.get("/users/my-eats/:eventId/event-list", jwtMiddleware, user.getEvent);
+
   // 29. 이벤트 페이지 스토어로 이동 API
   app.get(
     "/users/my-eats/event/franchise-store",
