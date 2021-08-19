@@ -14,7 +14,6 @@ const { emit } = require("nodemon");
 // regular expression
 const regPage = /^[0-9]/;
 const regSize = /^[0-9]/;
-const regAmount = /^[0-9]/;
 
 /**
  * API No. 10
