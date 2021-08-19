@@ -67,6 +67,18 @@ exports.createCarts = async function (req, res) {
   if (checkMenuDeleted === 0)
     return res.send(response(baseResponse.MENU_IS_DELETED)); // 3012
 
+  for (let i = 0; i < subIdArr.length; i++) {
+    const checkMenuExist = await cartProvider.checkMenuExist(subIdArr[i]);
+
+    if (checkMenuExist === 0)
+      return res.send(response(baseResponse.SUB_MENU_IS_NOT_EXIST)); // 3020
+
+    const checkMenuDeleted = await cartProvider.checkMenuDeleted(subIdArr[i]);
+
+    if (checkMenuDeleted === 0)
+      return res.send(response(baseResponse.SUB_MENU_IS_DELETED)); // 3021
+  }
+
   // Response Error End
 
   const result = await cartService.createCart(
