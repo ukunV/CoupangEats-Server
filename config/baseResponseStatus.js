@@ -135,6 +135,21 @@ module.exports = {
     code: 2024,
     message: "수량이 올바르지 않습니다.",
   },
+  PRICE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2025,
+    message: "주문금액이 올바르지 않습니다.",
+  },
+  STORE_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2026,
+    message: "storeId 값이 입력되지 않았습니다.",
+  },
+  TOTAL_PRICE_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2027,
+    message: "totalPrice 값이 입력되지 않았습니다.",
+  },
 
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
