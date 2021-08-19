@@ -150,6 +150,11 @@ module.exports = {
     code: 2027,
     message: "totalPrice 값이 입력되지 않았습니다.",
   },
+  FILTER_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2028,
+    message: "filter 값이 올바르지 않습니다.",
+  },
 
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
