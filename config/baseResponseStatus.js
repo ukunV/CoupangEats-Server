@@ -287,6 +287,11 @@ module.exports = {
     code: 3023,
     message: "삭제된 이벤트입니다.",
   },
+  FRANCHISE_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3024,
+    message: "존재하지 않는 프랜차이즈입니다.",
+  },
 
   // made by note
 
