@@ -237,6 +237,16 @@ module.exports = {
     code: 3017,
     message: "해당 쿠폰은 이미 등록되어 있습니다.",
   },
+  STORE_LIKE_ALREADY_EXIST: {
+    isSuccess: false,
+    code: 3018,
+    message: "해당 음식점은 이미 즐겨찾기에 있습니다.",
+  },
+  STORE_LIKE_NOT_EXIST: {
+    isSuccess: false,
+    code: 3019,
+    message: "즐겨찾기에 등록되지 않은 음식점입니다.",
+  },
 
   // made by note
 
