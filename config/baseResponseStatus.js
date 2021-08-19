@@ -155,6 +155,11 @@ module.exports = {
     code: 2028,
     message: "filter 값이 올바르지 않습니다.",
   },
+  COUPON_STATUS_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2029,
+    message: "coupon 값이 올바르지 않습니다.",
+  },
 
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
