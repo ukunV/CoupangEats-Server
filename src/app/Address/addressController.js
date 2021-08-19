@@ -186,7 +186,7 @@ exports.selectAddresses = async function (req, res) {
 
   // Response Error Start
 
-  const checkUserExist = addressProvider.checkUserExist(userId);
+  const checkUserExist = await addressProvider.checkUserExist(userId);
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
@@ -219,7 +219,7 @@ exports.checkHouseCompany = async function (req, res) {
 
   // Response Error Start
 
-  const checkUserExist = addressProvider.checkUserExist(userId);
+  const checkUserExist = await addressProvider.checkUserExist(userId);
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
@@ -254,7 +254,7 @@ exports.changeLocation = async function (req, res) {
 
   // Response Error Start
 
-  const checkUserExist = addressProvider.checkUserExist(userId);
+  const checkUserExist = await addressProvider.checkUserExist(userId);
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006

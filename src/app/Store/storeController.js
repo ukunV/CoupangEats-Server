@@ -45,7 +45,7 @@ exports.getNewStore = async function (req, res) {
 
   // Response Error Start
 
-  const checkUserExist = storeProvider.checkUserExist(userId);
+  const checkUserExist = await storeProvider.checkUserExist(userId);
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
