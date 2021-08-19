@@ -333,7 +333,7 @@ exports.createStoreLike = async function (req, res) {
 };
 
 /**
- * API No. 24
+ * API No. 25
  * API Name : 음식점 즐겨찾기 삭제 API
  * [PATCH] /stores/:storeId/store-like
  * path variable: storeId
@@ -374,6 +374,34 @@ exports.deleteStoreLike = async function (req, res) {
   // Response Error End
 
   const result = await storeService.deleteStoreLike(userId, storeId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 26
+ * API Name : 즐겨찾기 목록 조회 API
+ * [GET] /stores/store-like
+ */
+exports.getStoreLike = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await storeProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  // Response Error End
+
+  const result = await storeProvider.selectStoreLike(userId);
 
   return res.send(response(baseResponse.SUCCESS, result));
 };

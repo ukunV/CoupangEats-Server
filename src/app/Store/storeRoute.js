@@ -36,4 +36,7 @@ module.exports = function (app) {
     jwtMiddleware,
     store.deleteStoreLike
   );
+
+  // 26. 즐겨찾기 목록 조회 API
+  app.get("/stores/store-like", jwtMiddleware, store.getStoreLike);
 };

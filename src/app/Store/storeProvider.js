@@ -251,3 +251,19 @@ exports.checkStoreLike = async function (userId, storeId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 즐겨찾기 목록 조회
+exports.selectStoreLike = async function (userId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await storeDao.selectStoreLike(connection, userId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Store-selectStoreLike Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
