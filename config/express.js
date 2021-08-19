@@ -23,6 +23,7 @@ module.exports = function () {
   require("../src/app/Store/storeRoute")(app);
   require("../src/app/Address/addressRoute")(app);
   require("../src/app/Cart/cartRoute")(app);
+  require("../src/app/Coupon/couponRoute")(app);
 
   return app;
 };
