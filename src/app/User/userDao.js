@@ -271,6 +271,27 @@ async function selectHome(connection, userId) {
   return row;
 }
 
+// 이벤트 목록 조회
+async function selectEventList(connection, userId) {
+  const query = `
+                select e.id as eventId, e.subImageURL, date_format(e.endDate, '~ %m.%d 까지') as endDate,
+                      min(format(getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude), 1)) as distance
+                from Event e
+                    left join Franchise f on e.franchiseId = f.id
+                    left join Store s on s.franchiseId = f.id,
+                    User u
+                where u.id = ?
+                and e.status = 1
+                and (getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude) <= 4
+                or getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude) is null)
+                group by e.id
+                order by e.endDate is null asc, e.endDate asc, e.createdAt desc;
+                `;
+
+  const row = await connection.query(query, userId);
+
+  return row[0];
+}
 module.exports = {
   checkEmailExist,
   checkPhoneNumExist,
@@ -279,4 +300,5 @@ module.exports = {
   checkPassword,
   checkUserExist,
   selectHome,
+  selectEventList,
 };

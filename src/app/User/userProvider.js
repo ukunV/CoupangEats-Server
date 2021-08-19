@@ -88,3 +88,18 @@ exports.selectHome = async function (userId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 이벤트 목록 조회
+exports.selectEventList = async function (userId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.selectEventList(connection, userId);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-selectEventList Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

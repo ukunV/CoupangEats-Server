@@ -20,6 +20,8 @@ module.exports = function (app) {
   // 9. 홈 화면 조회 API
   app.get("/users/home", jwtMiddleware, user.getHome);
 
+  // 27. 이벤트 목록 조회 API
+  app.get("/users/my-eats/event-list", jwtMiddleware, user.getEventList);
   // // 카카오 로그인 API
   // app.post("/users/kakao-login", user.kakaoLogin);
   // app.get("/kakao", passport.authenticate("kakao-login"));

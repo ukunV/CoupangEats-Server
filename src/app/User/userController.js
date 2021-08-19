@@ -260,6 +260,36 @@ exports.getHome = async function (req, res) {
 };
 
 /**
+ * API No. 27
+ * API Name : 이벤트 목록 조회 API
+ * [GET] /users/my-eats/event-list
+ */
+
+exports.getEventList = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  //Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  //Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await userProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  // Response Error End
+
+  const result = await userProvider.selectEventList(userId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+/**
  * API No.
  * API Name : 카카오 로그인 API
  *
