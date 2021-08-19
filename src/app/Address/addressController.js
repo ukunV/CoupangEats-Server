@@ -28,7 +28,7 @@ exports.createAddresses = async function (req, res) {
 
   if (!address) return res.send(errResponse(baseResponse.ADDRESS_IS_EMPTY)); // 2015
 
-  if ((type != 1) | (type != 2) | (type != 3))
+  if ((type != 1) & (type != 2) & (type != 3))
     return res.send(errResponse(baseResponse.TYPE_IS_NOT_VALID)); // 2021
 
   // Request Error End
@@ -81,7 +81,7 @@ exports.modifyAddresses = async function (req, res) {
   if (!addressId)
     return res.send(errResponse(baseResponse.ADDRESS_ID_IS_EMPTY)); // 2022
 
-  if ((type != 1) | (type != 2) | (type != 3))
+  if ((type != 1) & (type != 2) & (type != 3))
     return res.send(errResponse(baseResponse.TYPE_IS_NOT_VALID)); // 2021
 
   // Request Error End
@@ -212,7 +212,7 @@ exports.checkHouseCompany = async function (req, res) {
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
-  if ((type != 1) | (type != 2))
+  if ((type != 1) & (type != 2))
     return res.send(errResponse(baseResponse.TYPE_IS_NOT_VALID)); // 2021
 
   // Request Error End
