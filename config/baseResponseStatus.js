@@ -222,6 +222,21 @@ module.exports = {
     code: 3014,
     message: "같은 음식점의 상품입니다.",
   },
+  COUPON_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3015,
+    message: "존재하지 않는 쿠폰입니다.",
+  },
+  COUPON_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 3016,
+    message: "유효기간이 지난 쿠폰입니다.",
+  },
+  COUPON_AlREADY_OBTAINED: {
+    isSuccess: false,
+    code: 3017,
+    message: "해당 쿠폰은 이미 등록되어 있습니다.",
+  },
 
   // made by note
 
