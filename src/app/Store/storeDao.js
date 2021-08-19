@@ -146,6 +146,12 @@ async function checkStoreExist(connection, storeId) {
 async function selectStore(connection, storeId) {
   const query1 = `
                   select s.id as storeId, group_concat(smi.imageURL) as imageArray, s.storeName,
+                        case
+                            when c.discount is not null
+                                then concat(format(c.discount, 0), '원 쿠폰 받기')
+                            else
+                                '쿠폰 없음'
+                        end as coupon,
                         round(ifnull(rc.point, 0.0), 1) as avgPoint, ifnull(rc.count, 0) as reviewCount,
                         concat(s.deliveryTime, '-', s.deliveryTime + 10, '분') as deliveryTime, s.isCheetah,
                         case
@@ -162,7 +168,9 @@ async function selectStore(connection, storeId) {
                               where isDeleted = 1) as sdp on s.id = sdp.storeId
                       left join (select storeId, count(storeId) as count, avg(point) as point
                                 from Review
-                                where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
+                            where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
+                      right join Franchise f on f.id = s.franchiseId
+                      left join Coupon c on c.franchiseId = f.id
                   where s.id = ?
                   and sdp.rn = 1
                   and s.isDeleted = 1
