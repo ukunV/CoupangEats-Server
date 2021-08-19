@@ -94,9 +94,8 @@ async function selectHome(connection, userId) {
                             a.address
                         end as nickname
                   from User u
-                      left join Address a on u.id = a.userId
-                  where a.isDeleted = 1
-                  and a.addressLatitude = u.userLatitude
+                      left join (select * from Address where isDeleted = 1) as a on u.id = a.userId
+                  where a.addressLatitude = u.userLatitude
                   and a.addressLongtitude = u.userLongtitude
                   and u.id= ?;
                   `;
@@ -123,14 +122,14 @@ async function selectHome(connection, userId) {
                             else
                                 concat('배달비 ', format(sdp.price, 0), '원')
                         end as deliveryFee,
-                          case
-                                when c.discount is not null
-                                    then concat(format(c.discount, 0), '원 쿠폰')
-                                else
-                                    '쿠폰 없음'
-                            end as coupon
+                        case
+                            when c.discount is not null
+                                then concat(format(c.discount, 0), '원 쿠폰')
+                            else
+                                '쿠폰 없음'
+                        end as coupon
                   from Store s
-                      left join StoreMainImage smi on s.id = smi.storeId
+                      left join (select * from StoreMainImage where isDeleted = 1 and number = 1) as smi on s.id = smi.storeId
                       left join (select storeId, count(storeId) as count
                                 from OrderList
                                 where isDeleted = 1 group by storeId) as oc on s.id = oc.storeId
@@ -141,16 +140,13 @@ async function selectHome(connection, userId) {
                                 from StoreDeliveryPrice
                                 where isDeleted = 1
                                 group by storeId) as sdp on s.id = sdp.storeId
-                      right join Franchise f on f.id = s.franchiseId
-                      left join Coupon c on c.franchiseId = f.id,
-                      User u
+                      left join Franchise f on f.id = s.franchiseId
+                      left join (select * from Coupon where status = 1 or status is null) as c on c.franchiseId = f.id,
+                  User u
                   where u.id = ?
                   and getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude) <= 4
                   and s.isDeleted = 1
                   and s.status = 1
-                  and smi.isDeleted = 1
-                  and smi.number = 1
-                  and c.status = 1 or c.status is null
                   group by s.id
                   order by oc.count desc;
                   `;
@@ -178,7 +174,7 @@ async function selectHome(connection, userId) {
                                 '쿠폰 없음'
                         end as coupon
                   from Store s
-                      left join StoreMainImage smi on s.id = smi.storeId
+                      left join (select * from StoreMainImage where isDeleted = 1 and number = 1) as smi on s.id = smi.storeId
                       left join Franchise f on s.franchiseId = f.id
                       left join (select storeId, count(storeId) as count
                                 from OrderList
@@ -190,16 +186,13 @@ async function selectHome(connection, userId) {
                                 from StoreDeliveryPrice
                                 where isDeleted = 1
                                 group by storeId) as sdp on s.id = sdp.storeId
-                      left join Coupon c on c.franchiseId = f.id,
+                      left join (select * from Coupon where status = 1 or status is null) as c on c.franchiseId = f.id,
                       User u
                   where u.id = ?
                   and s.isDeleted = 1
                   and s.status = 1
-                  and smi.isDeleted = 1
-                  and smi.number = 1
                   and getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude) <= 4
                   and s.franchiseId != 0
-                  and c.status = 1 or c.status is null
                   group by s.id
                   order by oc.count desc
                   limit 10;
@@ -222,23 +215,20 @@ async function selectHome(connection, userId) {
                                 '쿠폰 없음'
                         end as coupon
                   from Store s
-                  left join StoreMainImage smi on s.id = smi.storeId
-                  left join (select storeId, min(price) as price
+                      left join (select * from StoreMainImage where isDeleted = 1 and number = 1) as smi on s.id = smi.storeId
+                      left join (select storeId, min(price) as price
                             from StoreDeliveryPrice
                             where isDeleted = 1
                             group by storeId) as sdp on s.id = sdp.storeId
-                  left join (select storeId, count(storeId) as count, avg(point) as point
+                      left join (select storeId, count(storeId) as count, avg(point) as point
                             from Review
                             where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
-                  right join Franchise f on f.id = s.franchiseId
-                  left join Coupon c on c.franchiseId = f.id,
-                  User u
+                      left join Franchise f on f.id = s.franchiseId
+                      left join (select * from Coupon where status = 1 or status is null) as c on c.franchiseId = f.id,
+                      User u
                   where u.id = ?
-                  and smi.isDeleted = 1
-                  and smi.number = 1
                   and s.status = 1
                   and s.isDeleted = 1
-                  and c.status = 1 or c.status is null
                   and getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude) <= 4
                   order by s.createdAt desc
                   limit 10;
