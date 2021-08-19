@@ -68,7 +68,7 @@ exports.getNewStore = async function (req, res) {
  * [GET] /stores/:categoryId/list
  * categoryId: 0 = 골라먹는 맛집
  * path variable: categoryId
- * query string: ( page, size ), ( filter, cheetah, deliveryFee, minPrice )
+ * query string: ( page, size ), ( filter, cheetah, deliveryFee, minPrice, coupon )
  */
 exports.getStoresByCategoryId = async function (req, res) {
   const { userId } = req.verifiedToken;
@@ -77,7 +77,7 @@ exports.getStoresByCategoryId = async function (req, res) {
 
   let { page, size } = req.query;
 
-  const { filter, cheetah, deliveryFee, minPrice } = req.query;
+  const { filter, cheetah, deliveryFee, minPrice, coupon } = req.query;
 
   // Request Error Start
 
@@ -92,6 +92,9 @@ exports.getStoresByCategoryId = async function (req, res) {
 
   if (!regSize.test(size))
     return res.send(response(baseResponse.SIZE_IS_NOT_VALID)); // 2020
+
+  if ((coupon !== "0") & (coupon !== "1"))
+    return res.send(response(baseResponse.COUPON_STATUS_IS_NOT_VALID)); // 2029
 
   // Request Error End
 
@@ -145,6 +148,11 @@ exports.getStoresByCategoryId = async function (req, res) {
   else if (minPrice === "5000") minPriceCondition = "5000";
   else minPriceCondition = "";
 
+  let couponCondition;
+
+  if (coupon === "1") couponCondition = "and c.discount is not null";
+  else couponCondition = "";
+
   // Set Query Order Condition End
 
   const result = await storeProvider.selectStoresByCategoryId(
@@ -155,7 +163,8 @@ exports.getStoresByCategoryId = async function (req, res) {
     filterCondition,
     cheetahCondition,
     deliveryFeeCondition,
-    minPriceCondition
+    minPriceCondition,
+    couponCondition
   );
 
   return res.send(response(baseResponse.SUCCESS, result));

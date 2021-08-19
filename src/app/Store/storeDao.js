@@ -100,7 +100,13 @@ async function selectStoresByCategoryId(
                               then 1
                           else
                               0
-                      end as isNew
+                      end as isNew,
+                      case
+                          when c.discount is not null
+                              then concat(format(c.discount, 0), '원 쿠폰')
+                          else
+                              '쿠폰 없음'
+                      end as coupon
                 from Store s
                     left join (select *, row_number() over (partition by storeId order by price) as rn
                               from StoreDeliveryPrice
@@ -111,17 +117,19 @@ async function selectStoresByCategoryId(
                     left join (select storeId, count(storeId) as count
                               from OrderList
                               where isDeleted = 1 group by storeId) as oc on s.id = oc.storeId
-                    left join StoreMainImage smi on s.id = smi.storeId,
+                    left join (select * from StoreMainImage where isDeleted = 1) as smi on s.id = smi.storeId
+                    left join Franchise f on f.id = s.franchiseId
+                    left join (select * from Coupon where status = 1) as c on c.franchiseId = f.id,
                     User u
                 where u.id = ?
                 ${categoryCondition}
                 and s.isDeleted = 1
-                and smi.isDeleted = 1
                 and sdp.rn = 1
                 and getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude) <= 4
                 ${cheetahCondition}
                 ${deliveryFeeCondition}
                 ${minPriceCondition}
+                ${couponCondition}
                 group by s.id
                 ${filterCondition}
                 limit ${page}, ${size};

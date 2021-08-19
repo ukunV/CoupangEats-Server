@@ -80,7 +80,8 @@ exports.selectStoresByCategoryId = async function (
   filterCondition,
   cheetahCondition,
   deliveryFeeCondition,
-  minPriceCondition
+  minPriceCondition,
+  couponCondition
 ) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
@@ -94,7 +95,8 @@ exports.selectStoresByCategoryId = async function (
       filterCondition,
       cheetahCondition,
       deliveryFeeCondition,
-      minPriceCondition
+      minPriceCondition,
+      couponCondition
     );
 
     connection.release();
