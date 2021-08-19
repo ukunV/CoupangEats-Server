@@ -247,6 +247,16 @@ module.exports = {
     code: 3019,
     message: "즐겨찾기에 등록되지 않은 음식점입니다.",
   },
+  SUB_MENU_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3020,
+    message: "존재하지 않는 추가메뉴입니다.",
+  },
+  SUB_MENU_IS_DELETED: {
+    isSuccess: false,
+    code: 3021,
+    message: "삭제된 추가메뉴입니다.",
+  },
 
   // made by note
 
