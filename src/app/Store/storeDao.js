@@ -326,6 +326,44 @@ async function checkMenuDeleted(connection, menuId) {
   return row[0][0]["isDeleted"];
 }
 
+// 음식점 즐겨찾기 추가
+async function checkStoreLike(connection, userId, storeId) {
+  const query = `
+                select exists(select id from StoreLike
+                              where userId = ? and storeId = ?) as exist;
+                `;
+
+  const row = await connection.query(query, [userId, storeId]);
+
+  return row[0];
+}
+
+// 음식점 즐겨찾기 추가
+async function createStoreLike(connection, userId, storeId) {
+  const query = `
+                insert into StoreLike (userId, storeId)
+                values (?, ?);
+                `;
+
+  const row = await connection.query(query, [userId, storeId]);
+
+  return row[0];
+}
+
+// 음식점 즐겨찾기 삭제
+async function deleteStoreLike(connection, userId, storeId) {
+  const query = `
+                update StoreLike
+                set isDeleted = 0
+                where userId = ?
+                and storeId = ?;
+                `;
+
+  const row = await connection.query(query, [userId, storeId]);
+
+  return row[0].info;
+}
+
 module.exports = {
   selectFoodCategory,
   checkUserExist,
@@ -340,4 +378,7 @@ module.exports = {
   checkMenuExist,
   selectMainMenu,
   checkMenuDeleted,
+  checkStoreLike,
+  createStoreLike,
+  deleteStoreLike,
 };

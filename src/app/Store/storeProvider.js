@@ -235,3 +235,19 @@ exports.checkMenuDeleted = async function (menuId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 음식점 즐겨찾기 존재 여부 check
+exports.checkStoreLike = async function (userId, storeId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await storeDao.checkStoreLike(connection, userId, storeId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Store-checkStoreLike Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

@@ -177,6 +177,11 @@ exports.getStore = async function (req, res) {
   if (checkStoreExist === 0)
     return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
 
+  const checkStoreDeleted = await storeProvider.checkStoreDeleted(storeId);
+
+  if (checkStoreDeleted === 0)
+    return res.send(response(baseResponse.STORE_IS_DELETED)); // 3010
+
   // Response Error End
 
   const result = await storeProvider.selectStore(storeId);
@@ -200,6 +205,11 @@ exports.getStoreDelivery = async function (req, res) {
   if (checkStoreExist === 0)
     return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
 
+  const checkStoreDeleted = await storeProvider.checkStoreDeleted(storeId);
+
+  if (checkStoreDeleted === 0)
+    return res.send(response(baseResponse.STORE_IS_DELETED)); // 3010
+
   // Response Error End
 
   const result = await storeProvider.selectStoreDelivery(storeId);
@@ -222,6 +232,11 @@ exports.getStoreInfo = async function (req, res) {
 
   if (checkStoreExist === 0)
     return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
+
+  const checkStoreDeleted = await storeProvider.checkStoreDeleted(storeId);
+
+  if (checkStoreDeleted === 0)
+    return res.send(response(baseResponse.STORE_IS_DELETED)); // 3010
 
   // Response Error End
 
@@ -267,6 +282,98 @@ exports.getMainMenu = async function (req, res) {
   // Response Error End
 
   const result = await storeProvider.selectMainMenu(menuId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 24
+ * API Name : 음식점 즐겨찾기 추가 API
+ * [POST] /stores/:storeId/store-like
+ * path variable: storeId
+ */
+exports.createStoreLike = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { storeId } = req.params;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await storeProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkStoreExist = await storeProvider.checkStoreExist(storeId);
+
+  if (checkStoreExist === 0)
+    return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
+
+  const checkStoreDeleted = await storeProvider.checkStoreDeleted(storeId);
+
+  if (checkStoreDeleted === 0)
+    return res.send(response(baseResponse.STORE_IS_DELETED)); // 3010
+
+  const checkStoreLike = await storeProvider.checkStoreLike(userId, storeId);
+
+  if (checkStoreLike === 1)
+    return res.send(response(baseResponse.STORE_LIKE_ALREADY_EXIST)); // 3018
+
+  // Response Error End
+
+  const result = await storeService.createStoreLike(userId, storeId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 24
+ * API Name : 음식점 즐겨찾기 삭제 API
+ * [PATCH] /stores/:storeId/store-like
+ * path variable: storeId
+ */
+exports.deleteStoreLike = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { storeId } = req.params;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await storeProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkStoreExist = await storeProvider.checkStoreExist(storeId);
+
+  if (checkStoreExist === 0)
+    return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
+
+  const checkStoreDeleted = await storeProvider.checkStoreDeleted(storeId);
+
+  if (checkStoreDeleted === 0)
+    return res.send(response(baseResponse.STORE_IS_DELETED)); // 3010
+
+  const checkStoreLike = await storeProvider.checkStoreLike(userId, storeId);
+
+  if (checkStoreLike === 0)
+    return res.send(response(baseResponse.STORE_LIKE_NOT_EXIST)); // 3019
+
+  // Response Error End
+
+  const result = await storeService.deleteStoreLike(userId, storeId);
 
   return res.send(response(baseResponse.SUCCESS, result));
 };
