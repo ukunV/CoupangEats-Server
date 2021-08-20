@@ -355,6 +355,9 @@ exports.eventToStore = async function (req, res) {
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
+  if (!franchiseId)
+    return res.send(errResponse(baseResponse.FRANCHISE_ID_IS_EMPTY)); // 2035
+
   if (!regDistance.test(distance))
     return res.send(errResponse(baseResponse.DISTANCE_IS_NOT_VALID)); // 2031
 

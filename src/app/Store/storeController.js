@@ -41,6 +41,9 @@ exports.getNewStore = async function (req, res) {
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
+  if (!categoryId)
+    return res.send(errResponse(baseResponse.CATEGORY_ID_IS_EMPTY)); // 2034
+
   // Request Error End
 
   // Response Error Start
@@ -179,6 +182,12 @@ exports.getStoresByCategoryId = async function (req, res) {
 exports.getStore = async function (req, res) {
   const { storeId } = req.params;
 
+  // Request Error Start
+
+  if (!storeId) return res.send(errResponse(baseResponse.STORE_ID_IS_EMPTY)); // 2026
+
+  // Request Error End
+
   // Response Error Start
 
   const checkStoreExist = await storeProvider.checkStoreExist(storeId);
@@ -207,6 +216,12 @@ exports.getStore = async function (req, res) {
 exports.getStoreDelivery = async function (req, res) {
   const { storeId } = req.params;
 
+  // Request Error Start
+
+  if (!storeId) return res.send(errResponse(baseResponse.STORE_ID_IS_EMPTY)); // 2026
+
+  // Request Error End
+
   // Response Error Start
 
   const checkStoreExist = await storeProvider.checkStoreExist(storeId);
@@ -234,6 +249,12 @@ exports.getStoreDelivery = async function (req, res) {
  */
 exports.getStoreInfo = async function (req, res) {
   const { storeId } = req.params;
+
+  // Request Error Start
+
+  if (!storeId) return res.send(errResponse(baseResponse.STORE_ID_IS_EMPTY)); // 2026
+
+  // Request Error End
 
   // Response Error Start
 
@@ -265,6 +286,14 @@ exports.getMainMenu = async function (req, res) {
   const { storeId } = req.params;
 
   const { menuId } = req.query;
+
+  // Request Error Start
+
+  if (!storeId) return res.send(errResponse(baseResponse.STORE_ID_IS_EMPTY)); // 2026
+
+  if (!menuId) return res.send(errResponse(baseResponse.MENU_ID_IS_EMPTY)); // 2033
+
+  // Request Error End
 
   // Response Error Start
 
@@ -310,6 +339,8 @@ exports.createStoreLike = async function (req, res) {
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
+  if (!storeId) return res.send(errResponse(baseResponse.STORE_ID_IS_EMPTY)); // 2026
+
   // Request Error End
 
   // Response Error Start
@@ -345,7 +376,6 @@ exports.createStoreLike = async function (req, res) {
  * API No. 25
  * API Name : 음식점 즐겨찾기 삭제 API
  * [PATCH] /stores/store-like
- * path variable: storeId
  */
 exports.deleteStoreLike = async function (req, res) {
   const { userId } = req.verifiedToken;
