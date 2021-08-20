@@ -33,8 +33,32 @@ async function checkStoreDeleted(connection, storeId) {
   return row[0][0]["isDeleted"];
 }
 
+// 최근 포토 리뷰 3개 조회
+async function selectPhotoReviews(connection, storeId) {
+  const query = `
+                select id as reviewId, imageURL, point,
+                case
+                    when length(contents) > 35
+                        then concat(left(contents, 35), '...')
+                    else
+                        contents
+                end as contents
+                from Review
+                where storeId = ?
+                and isPhoto = 1
+                and isDeleted = 1
+                order by createdAt desc
+                limit 3;
+                `;
+
+  const row = await connection.query(query, storeId);
+
+  return row[0];
+}
+
 module.exports = {
   checkUserExist,
   checkStoreExist,
   checkStoreDeleted,
+  selectPhotoReviews,
 };

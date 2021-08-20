@@ -54,3 +54,19 @@ exports.checkStoreDeleted = async function (storeId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 최근 포토 리뷰 3개 조회
+exports.selectPhotoReviews = async function (storeId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await reviewDao.selectPhotoReviews(connection, storeId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Review-selectPhotoReviews Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
