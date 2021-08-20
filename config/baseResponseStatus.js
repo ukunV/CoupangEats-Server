@@ -170,6 +170,11 @@ module.exports = {
     code: 2031,
     message: "distance 값이 올바르지 않습니다.",
   },
+  NOTICE_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2032,
+    message: "noticeId 값을 입력해주세요.",
+  },
 
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
@@ -291,6 +296,16 @@ module.exports = {
     isSuccess: false,
     code: 3024,
     message: "존재하지 않는 프랜차이즈입니다.",
+  },
+  NOTICE_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3025,
+    message: "존재하지 않는 공지입니다.",
+  },
+  NOTICE_IS_DELETED: {
+    isSuccess: false,
+    code: 3026,
+    message: "삭제된 공지입니다.",
   },
 
   // made by note
