@@ -72,14 +72,23 @@ exports.selectPhotoReviews = async function (storeId) {
 };
 
 // 리뷰 조회
-exports.selectReviewList = async function (storeId, onlyPhotoCondition) {
+exports.selectReviewList = async function (
+  storeId,
+  page,
+  size,
+  condition,
+  photoCondition
+) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
     const result = await reviewDao.selectReviewList(
       connection,
       storeId,
-      onlyPhotoCondition
+      page,
+      size,
+      condition,
+      photoCondition
     );
 
     connection.release();
