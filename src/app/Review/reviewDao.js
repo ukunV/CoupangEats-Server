@@ -50,9 +50,27 @@ async function selectPhotoReviews(connection, storeId) {
   return row[0];
 }
 
+// 리뷰 조회
+async function selectReviewList(connection, storeId, onlyPhotoCondition) {
+  const query = `
+                select id as reviewId, imageURL, point, contents
+                from Review
+                where storeId = ?
+                ${onlyPhotoCondition}
+                and isDeleted = 1
+                order by createdAt desc
+                limit 3;
+                `;
+
+  const row = await connection.query(query, storeId);
+
+  return row[0];
+}
+
 module.exports = {
   checkUserExist,
   checkStoreExist,
   checkStoreDeleted,
   selectPhotoReviews,
+  selectReviewList,
 };

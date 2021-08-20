@@ -70,3 +70,23 @@ exports.selectPhotoReviews = async function (storeId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 리뷰 조회
+exports.selectReviewList = async function (storeId, onlyPhotoCondition) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await reviewDao.selectReviewList(
+      connection,
+      storeId,
+      onlyPhotoCondition
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Review-selectReviewList Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

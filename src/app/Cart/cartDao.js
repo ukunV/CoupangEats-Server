@@ -134,7 +134,7 @@ async function createCart(
 // 카트 상태 check
 async function checkCartExist(connection, userId) {
   const query = `
-                 select exists(select id from Cart
+                select exists(select id from Cart
                               where userId = ? and isDeleted = 1) as exist;
                 `;
 
@@ -146,7 +146,7 @@ async function checkCartExist(connection, userId) {
 // 같은 음식점의 메뉴 여부 check
 async function checkSameStore(connection, userId, storeId) {
   const query = `
-                 select exists(select id from Cart
+                select exists(select id from Cart
                               where userId = ? and storeId = ? and isDeleted = 1) as exist;
                 `;
 
