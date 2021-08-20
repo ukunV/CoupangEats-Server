@@ -1,8 +1,8 @@
 // 유저 존재 여부 확인
 async function checkUserExist(connection, userId) {
   const query = `
-    select exists(select id from User where id = ?) as exist;
-    `;
+                select exists(select id from User where id = ?) as exist;
+                `;
 
   const row = await connection.query(query, userId);
 
@@ -167,7 +167,7 @@ async function updateAddress(
 async function deleteAddress(connection, addressId) {
   const query = `
                 update Address
-                set isDeleted = 0, type = 3
+                set isDeleted = 0, type = 3, isChecked = 0
                 where id = ?;
                 `;
 
