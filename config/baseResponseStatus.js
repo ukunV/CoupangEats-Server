@@ -190,6 +190,11 @@ module.exports = {
     code: 2035,
     message: "franchiseId 값을 입력해주세요.",
   },
+  PHOTO_FILTER_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2036,
+    message: "photoFilter 값이 올바르지 않습니다.",
+  },
 
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
