@@ -68,7 +68,7 @@ module.exports = {
   USER_ID_IS_EMPTY: {
     isSuccess: false,
     code: 2010,
-    message: "userId값이 입력해주세요.",
+    message: "userId값을 입력해주세요.",
   },
   // USER_ID_NOT_MATCH: {
   //   isSuccess: false,
@@ -123,7 +123,7 @@ module.exports = {
   ADDRESS_ID_IS_EMPTY: {
     isSuccess: false,
     code: 2022,
-    message: "addressId 값이 입력해주세요.",
+    message: "addressId 값을 입력해주세요.",
   },
   AMOUNT_IS_EMPTY: {
     isSuccess: false,
@@ -143,12 +143,12 @@ module.exports = {
   STORE_ID_IS_EMPTY: {
     isSuccess: false,
     code: 2026,
-    message: "storeId 값이 입력해주세요.",
+    message: "storeId 값을 입력해주세요.",
   },
   TOTAL_PRICE_ID_IS_EMPTY: {
     isSuccess: false,
     code: 2027,
-    message: "totalPrice 값이 입력해주세요.",
+    message: "totalPrice 값을 입력해주세요.",
   },
   FILTER_IS_NOT_VALID: {
     isSuccess: false,
