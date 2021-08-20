@@ -194,23 +194,7 @@ async function selectStore(connection, storeId) {
                   `;
 
   const query2 = `
-                  select imageURL, point,
-                        case
-                            when length(contents) > 35
-                                then concat(left(contents, 35), '...')
-                            else
-                                contents
-                        end as contents
-                  from Review
-                  where storeId = ?
-                  and isPhoto = 1
-                  and isDeleted = 1
-                  order by createdAt desc
-                  limit 3;
-                  `;
-
-  const query3 = `
-                  select sm.menuCategoryName, sm.menuCategoryNumber,
+                  select sm.id as menuId, sm.menuCategoryName, sm.menuCategoryNumber,
                         sm.menuName, sm.menuNumber, concat(format(sm.price, 0), '원') as price,
                         smi.imageURL, sm.description
                   from StoreMenu sm
@@ -222,15 +206,12 @@ async function selectStore(connection, storeId) {
 
   const result1 = await connection.query(query1, storeId);
   const result2 = await connection.query(query2, storeId);
-  const result3 = await connection.query(query3, storeId);
 
   const info = JSON.parse(JSON.stringify(result1[0]));
-  const photoReview = JSON.parse(JSON.stringify(result2[0]));
-  const mainMenu = JSON.parse(JSON.stringify(result3[0]));
+  const mainMenu = JSON.parse(JSON.stringify(result2[0]));
 
   const row = {
     info,
-    photoReview,
     mainMenu,
   };
 

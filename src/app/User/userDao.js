@@ -94,7 +94,10 @@ async function selectHome(connection, userId) {
                             a.address
                         end as nickname
                   from User u
-                      left join (select * from Address where isDeleted = 1) as a on u.id = a.userId
+                      left join (select *
+                                from Address
+                                where isDeleted = 1
+                                and isChecked = 1) as a on u.id = a.userId
                   where a.addressLatitude = u.userLatitude
                   and a.addressLongtitude = u.userLongtitude
                   and u.id= ?;
@@ -396,23 +399,7 @@ async function eventToStore(connection, userId, franchiseId, distance) {
   ]);
 
   const query2 = `
-                  select imageURL, point,
-                        case
-                            when length(contents) > 35
-                                then concat(left(contents, 35), '...')
-                            else
-                                contents
-                        end as contents
-                  from Review
-                  where storeId = ?
-                  and isPhoto = 1
-                  and isDeleted = 1
-                  order by createdAt desc
-                  limit 3;
-                  `;
-
-  const query3 = `
-                  select sm.menuCategoryName, sm.menuCategoryNumber,
+                  select sm.id as menuId, sm.menuCategoryName, sm.menuCategoryNumber,
                         sm.menuName, sm.menuNumber, concat(format(sm.price, 0), '원') as price,
                         smi.imageURL, sm.description
                   from StoreMenu sm
@@ -423,15 +410,12 @@ async function eventToStore(connection, userId, franchiseId, distance) {
                   `;
 
   const result2 = await connection.query(query2, result1[0][0]["storeId"]);
-  const result3 = await connection.query(query3, result1[0][0]["storeId"]);
 
   const info = JSON.parse(JSON.stringify(result1[0]));
-  const photoReview = JSON.parse(JSON.stringify(result2[0]));
-  const mainMenu = JSON.parse(JSON.stringify(result3[0]));
+  const mainMenu = JSON.parse(JSON.stringify(result2[0]));
 
   const row = {
     info,
-    photoReview,
     mainMenu,
   };
 
