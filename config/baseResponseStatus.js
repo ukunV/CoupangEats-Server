@@ -400,7 +400,7 @@ module.exports = {
   USER_IS_NOT_REVIEW_HOST: {
     isSuccess: false,
     code: 3032,
-    message: "리뷰 삭제는 작성자만 가능합니다.",
+    message: "리뷰 수정/삭제는 작성자만 가능합니다.",
   },
   REVIEW_CAN_REPORTED_BY_OTHERS: {
     isSuccess: false,
