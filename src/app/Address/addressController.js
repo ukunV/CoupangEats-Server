@@ -13,7 +13,7 @@ const kakaoMap = require("../../../controllers/kakao_ctrl").getAddressInfo;
 
 /**
  * API No. 5
- * API Name : 주소 추가 API
+ * API Name : 주소 추가 API (추가와 동시에 사용자 위치 변경)
  * [POST] /addresses
  */
 exports.createAddresses = async function (req, res) {
@@ -26,14 +26,21 @@ exports.createAddresses = async function (req, res) {
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
+  if (!address) return res.send(errResponse(baseResponse.ADDRESS_IS_EMPTY)); // 2015
+
+  if ((type != 1) & (type != 2) & (type != 3))
+    return res.send(errResponse(baseResponse.TYPE_IS_NOT_VALID)); // 2021
+
+  // Request Error End
+
+  // Response Error Start
+
   const checkUserExist = addressProvider.checkUserExist(userId);
 
   if (checkUserExist === 0)
-    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
-  if (!address) return res.send(errResponse(baseResponse.ADDRESS_IS_EMPTY)); // 2015
-
-  // Request Error End
+  // Response Error End
 
   const { lat, lng } = await kakaoMap(address);
 
@@ -69,23 +76,41 @@ exports.modifyAddresses = async function (req, res) {
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
+  if (!address) return res.send(errResponse(baseResponse.ADDRESS_IS_EMPTY)); // 2015
+
+  if (!addressId)
+    return res.send(errResponse(baseResponse.ADDRESS_ID_IS_EMPTY)); // 2022
+
+  if ((type != 1) & (type != 2) & (type != 3))
+    return res.send(errResponse(baseResponse.TYPE_IS_NOT_VALID)); // 2021
+
+  // Request Error End
+
+  // Response Error Start
+
   const checkUserExist = addressProvider.checkUserExist(userId);
 
   if (checkUserExist === 0)
-    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
   const checkAddressExist = await addressProvider.checkAddressExist(addressId);
 
   if (checkAddressExist === 0)
-    return res.send(errResponse(baseResponse.ADDRESS_IS_NOT_EXIST)); // 2016
+    return res.send(errResponse(baseResponse.ADDRESS_IS_NOT_EXIST)); // 3007
 
-  if (!address) return res.send(errResponse(baseResponse.ADDRESS_IS_EMPTY)); // 2015
+  const checkAddressDeleted = await addressProvider.checkAddressDeleted(
+    addressId
+  );
 
-  // Request Error End
+  if (checkAddressDeleted === 0)
+    return res.send(errResponse(baseResponse.ADDRESS_IS_DELETED)); // 3009
+
+  // Response Error End
 
   const { lat, lng } = await kakaoMap(address);
 
   const result = await addressService.updateAddress(
+    userId,
     type,
     nickname,
     buildingName,
@@ -103,7 +128,7 @@ exports.modifyAddresses = async function (req, res) {
 /**
  * API No. 7
  * API Name : 주소 삭제 API
- * [PATCH] /addresses/:addressId
+ * [PATCH] /addresses/:addressId/status
  */
 exports.deleteAddresses = async function (req, res) {
   const { userId } = req.verifiedToken;
@@ -114,17 +139,31 @@ exports.deleteAddresses = async function (req, res) {
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
+  if (!addressId)
+    return res.send(errResponse(baseResponse.ADDRESS_ID_IS_EMPTY)); // 2022
+
+  // Request Error End
+
+  // Response Error Start
+
   const checkUserExist = addressProvider.checkUserExist(userId);
 
   if (checkUserExist === 0)
-    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
   const checkAddressExist = await addressProvider.checkAddressExist(addressId);
 
   if (checkAddressExist === 0)
-    return res.send(errResponse(baseResponse.ADDRESS_IS_NOT_EXIST)); // 2016
+    return res.send(errResponse(baseResponse.ADDRESS_IS_NOT_EXIST)); // 3007
 
-  // Request Error End
+  const checkAddressDeleted = await addressProvider.checkAddressDeleted(
+    addressId
+  );
+
+  if (checkAddressDeleted === 0)
+    return res.send(errResponse(baseResponse.ADDRESS_IS_DELETED)); // 3009
+
+  // Response Error End
 
   const result = await addressService.deleteAddress(addressId);
 
@@ -143,14 +182,105 @@ exports.selectAddresses = async function (req, res) {
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
-  const checkUserExist = addressProvider.checkUserExist(userId);
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await addressProvider.checkUserExist(userId);
 
   if (checkUserExist === 0)
-    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  // Response Error End
+
+  const result = await addressProvider.selectAddress(userId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 16
+ * API Name : 집/회사 주소 존재 여부 확인 API
+ * [GET] /addresses/:type/house-company
+ */
+exports.checkHouseCompany = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { type } = req.params;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  if ((type != 1) & (type != 2))
+    return res.send(errResponse(baseResponse.TYPE_IS_NOT_VALID)); // 2021
 
   // Request Error End
 
-  const result = await addressProvider.selectAddress(userId);
+  // Response Error Start
+
+  const checkUserExist = await addressProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  // Response Error End
+
+  const result = await addressProvider.checkHouseCompany(userId, type);
+
+  return res.send(response(baseResponse.SUCCESS, { type, exist: result }));
+};
+
+/**
+ * API No. 17
+ * API Name : 주소 목록에서 주소 선택 API
+ * [PATCH] /addresses/user-address
+ */
+exports.changeLocation = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { addressId, address } = req.body;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  if (!address) return res.send(errResponse(baseResponse.ADDRESS_IS_EMPTY)); // 2015
+
+  if (!addressId)
+    return res.send(errResponse(baseResponse.ADDRESS_ID_IS_EMPTY)); // 2022
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await addressProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkAddressExist = await addressProvider.checkAddressExist(addressId);
+
+  if (checkAddressExist === 0)
+    return res.send(errResponse(baseResponse.ADDRESS_IS_NOT_EXIST)); // 3007
+
+  const checkAddressDeleted = await addressProvider.checkAddressDeleted(
+    addressId
+  );
+
+  if (checkAddressDeleted === 0)
+    return res.send(errResponse(baseResponse.ADDRESS_IS_DELETED)); // 3009
+
+  // Response Error End
+
+  const { lat, lng } = await kakaoMap(address);
+
+  const result = await addressService.updateLocation(
+    addressId,
+    userId,
+    lat,
+    lng
+  );
 
   return res.send(response(baseResponse.SUCCESS, result));
 };

@@ -14,13 +14,36 @@ module.exports = function (app) {
   // 3. 로그아웃 API
   app.post("/users/sign-out", jwtMiddleware, user.userLogOut);
 
-  // 4. 유저 주소 변경 API
-  app.patch("/users/address", jwtMiddleware, user.changeAddress);
+  // // 4. 유저 주소 변경 API
+  // app.patch("/users/address", jwtMiddleware, user.changeAddress);
 
-  // 5. 홈 화면 조회 API
+  // 9. 홈 화면 조회 API
   app.get("/users/home", jwtMiddleware, user.getHome);
 
-  // // API No 6. 카카오 로그인 API
+  // 27. 이벤트 목록 조회 API
+  app.get("/users/my-eats/event-list", jwtMiddleware, user.getEventList);
+
+  // 28. 이벤트 상세페이지 조회 API
+  app.get("/users/my-eats/:eventId/event-list", jwtMiddleware, user.getEvent);
+
+  // 29. 이벤트 페이지 스토어로 이동 API
+  app.get(
+    "/users/my-eats/event/franchise-store",
+    jwtMiddleware,
+    user.eventToStore
+  );
+
+  // 30. 공지사항 목록 조회 API
+  app.get("/users/my-eats/notice-list", jwtMiddleware, user.getNoticeList);
+
+  // 31. 공지사항 세부페이지 조회 API
+  app.get(
+    "/users/my-eats/:noticeId/notice-detail",
+    jwtMiddleware,
+    user.getNotice
+  );
+
+  // // 카카오 로그인 API
   // app.post("/users/kakao-login", user.kakaoLogin);
   // app.get("/kakao", passport.authenticate("kakao-login"));
   // app.get(

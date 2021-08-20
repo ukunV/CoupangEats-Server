@@ -68,12 +68,7 @@ module.exports = {
   USER_ID_IS_EMPTY: {
     isSuccess: false,
     code: 2010,
-    message: "userId값이 입력되지 않았습니다.",
-  },
-  USER_IS_NOT_EXIST: {
-    isSuccess: false,
-    code: 2011,
-    message: "해당 유저는 존재하지 않습니다.",
+    message: "userId값을 입력해주세요.",
   },
   // USER_ID_NOT_MATCH: {
   //   isSuccess: false,
@@ -95,66 +90,105 @@ module.exports = {
     code: 2015,
     message: "주소를 입력해주세요.",
   },
-  ADDRESS_IS_NOT_EXIST: {
-    isSuccess: false,
-    code: 2016,
-    message: "존재하지 않는 주소입니다.",
-  },
-
-  // made by note
-
-  SIGNIN_EMAIL_EMPTY: {
-    isSuccess: false,
-    code: 2008,
-    message: "이메일을 입력해주세요",
-  },
-  SIGNIN_EMAIL_LENGTH: {
-    isSuccess: false,
-    code: 2009,
-    message: "이메일은 30자리 미만으로 입력해주세요.",
-  },
-  SIGNIN_EMAIL_ERROR_TYPE: {
-    isSuccess: false,
-    code: 2010,
-    message: "이메일을 형식을 정확하게 입력해주세요.",
-  },
-
-  USER_USERID_EMPTY: {
-    isSuccess: false,
-    code: 2012,
-    message: "userId를 입력해주세요.",
-  },
-  USER_USERID_NOT_EXIST: {
-    isSuccess: false,
-    code: 2013,
-    message: "해당 회원이 존재하지 않습니다.",
-  },
-
-  USER_USEREMAIL_EMPTY: {
-    isSuccess: false,
-    code: 2014,
-    message: "이메일을 입력해주세요.",
-  },
-  USER_USEREMAIL_NOT_EXIST: {
-    isSuccess: false,
-    code: 2015,
-    message: "해당 이메일을 가진 회원이 존재하지 않습니다.",
-  },
-  USER_ID_NOT_MATCH: {
-    isSuccess: false,
-    code: 2016,
-    message: "유저 아이디 값을 확인해주세요",
-  },
-  USER_NICKNAME_EMPTY: {
+  // CATEGORY_ID_NOT_VALID: {
+  //   isSuccess: false,
+  //   code: 2016,
+  //   message: "유효하지 않은 카테고리 아이디입니다.",
+  // },
+  PAGE_IS_EMPTY: {
     isSuccess: false,
     code: 2017,
-    message: "변경할 닉네임 값을 입력해주세요",
+    message: "page를 입력해주세요.",
   },
-
-  USER_STATUS_EMPTY: {
+  PAGE_IS_NOT_VALID: {
     isSuccess: false,
     code: 2018,
-    message: "회원 상태값을 입력해주세요",
+    message: "page 형식이 올바르지 않습니다.",
+  },
+  SIZE_IS_EMPTY: {
+    isSuccess: false,
+    code: 2019,
+    message: "size를 입력해주세요.",
+  },
+  SIZE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2020,
+    message: "size 형식이 올바르지 않습니다.",
+  },
+  TYPE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2021,
+    message: "type 형식이 올바르지 않습니다.",
+  },
+  ADDRESS_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2022,
+    message: "addressId 값을 입력해주세요.",
+  },
+  AMOUNT_IS_EMPTY: {
+    isSuccess: false,
+    code: 2023,
+    message: "수량을 입력해주세요.",
+  },
+  AMOUNT_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2024,
+    message: "수량이 올바르지 않습니다.",
+  },
+  PRICE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2025,
+    message: "주문금액이 올바르지 않습니다.",
+  },
+  STORE_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2026,
+    message: "storeId 값을 입력해주세요.",
+  },
+  TOTAL_PRICE_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2027,
+    message: "totalPrice 값을 입력해주세요.",
+  },
+  FILTER_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2028,
+    message: "filter 값이 올바르지 않습니다.",
+  },
+  COUPON_STATUS_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2029,
+    message: "coupon 값이 올바르지 않습니다.",
+  },
+  EVENT_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2030,
+    message: "eventId 값을 입력해주세요.",
+  },
+  DISTANCE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2031,
+    message: "distance 값이 올바르지 않습니다.",
+  },
+  NOTICE_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2032,
+    message: "noticeId 값을 입력해주세요.",
+  },
+  MENU_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2033,
+    message: "menuId 값을 입력해주세요.",
+  },
+  CATEGORY_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2034,
+    message: "categoryId 값을 입력해주세요.",
+  },
+  FRANCHISE_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2035,
+    message: "franchiseId 값을 입력해주세요.",
   },
 
   // Response error
@@ -183,18 +217,124 @@ module.exports = {
     code: 3005,
     message: "존재하지 않는 카테고리입니다.",
   },
+  USER_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3006, // 2011
+    message: "해당 유저는 존재하지 않습니다.",
+  },
+  ADDRESS_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3007, // 2016
+    message: "존재하지 않는 주소입니다.",
+  },
+  STORE_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3008,
+    message: "존재하지 않는 음식점입니다.",
+  },
+  ADDRESS_IS_DELETED: {
+    isSuccess: false,
+    code: 3009,
+    message: "삭제된 주소입니다.",
+  },
+  STORE_IS_DELETED: {
+    isSuccess: false,
+    code: 3010,
+    message: "삭제된 음식점입니다.",
+  },
+  MENU_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3011,
+    message: "존재하지 않는 메뉴입니다.",
+  },
+  MENU_IS_DELETED: {
+    isSuccess: false,
+    code: 3012,
+    message: "삭제된 메뉴입니다.",
+  },
+  CART_IS_EMPTY: {
+    isSuccess: false,
+    code: 3013,
+    message: "카트가 비어 있습니다.",
+  },
+  SAME_STORE_MENU: {
+    isSuccess: false,
+    code: 3014,
+    message: "같은 음식점의 상품입니다.",
+  },
+  COUPON_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3015,
+    message: "존재하지 않는 쿠폰입니다.",
+  },
+  COUPON_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 3016,
+    message: "유효기간이 지난 쿠폰입니다.",
+  },
+  COUPON_AlREADY_OBTAINED: {
+    isSuccess: false,
+    code: 3017,
+    message: "해당 쿠폰은 이미 등록되어 있습니다.",
+  },
+  STORE_LIKE_ALREADY_EXIST: {
+    isSuccess: false,
+    code: 3018,
+    message: "해당 음식점은 이미 즐겨찾기에 있습니다.",
+  },
+  STORE_LIKE_NOT_EXIST: {
+    isSuccess: false,
+    code: 3019,
+    message: "즐겨찾기에 등록되지 않은 음식점입니다.",
+  },
+  SUB_MENU_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3020,
+    message: "존재하지 않는 추가메뉴입니다.",
+  },
+  SUB_MENU_IS_DELETED: {
+    isSuccess: false,
+    code: 3021,
+    message: "삭제된 추가메뉴입니다.",
+  },
+  EVENT_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3022,
+    message: "존재하지 않는 이벤트입니다.",
+  },
+  EVENT_IS_DELETED: {
+    isSuccess: false,
+    code: 3023,
+    message: "삭제된 이벤트입니다.",
+  },
+  FRANCHISE_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3024,
+    message: "존재하지 않는 프랜차이즈입니다.",
+  },
+  NOTICE_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3025,
+    message: "존재하지 않는 공지입니다.",
+  },
+  NOTICE_IS_DELETED: {
+    isSuccess: false,
+    code: 3026,
+    message: "삭제된 공지입니다.",
+  },
+
   // made by note
 
-  SIGNIN_INACTIVE_ACCOUNT: {
-    isSuccess: false,
-    code: 3005,
-    message: "비활성화 된 계정입니다. 고객센터에 문의해주세요.",
-  },
-  SIGNIN_WITHDRAWAL_ACCOUNT: {
-    isSuccess: false,
-    code: 3006,
-    message: "탈퇴 된 계정입니다. 고객센터에 문의해주세요.",
-  },
+  // SIGNIN_INACTIVE_ACCOUNT: {
+  //   isSuccess: false,
+  //   code: 3005,
+  //   message: "비활성화 된 계정입니다. 고객센터에 문의해주세요.",
+  // },
+  // SIGNIN_WITHDRAWAL_ACCOUNT: {
+  //   isSuccess: false,
+  //   code: 3006,
+  //   message: "탈퇴 된 계정입니다. 고객센터에 문의해주세요.",
+  // },
 
   //Connection, Transaction 등의 서버 오류
   DB_ERROR: { isSuccess: false, code: 4000, message: "데이터 베이스 에러" },

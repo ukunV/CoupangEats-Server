@@ -3,3 +3,5 @@ node_modules
 package-lock.json
 log
 .DS_Store
+a.js
+dist_ctrl.js

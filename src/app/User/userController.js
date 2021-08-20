@@ -19,6 +19,7 @@ const KakaoStrategy = require("passport-kakao").Strategy;
 // regex
 // const regexName = /^[가-힣]+$/;
 const regPhoneNum = /^\d{10,11}$/;
+const regDistance = /^[0-9]+(.[0-9]+)?$/;
 
 /**
  * API No. 0
@@ -176,12 +177,16 @@ exports.userLogOut = async function (req, res) {
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
-  const checkUserExist = userProvider.checkUserExist(userId);
+  //Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await userProvider.checkUserExist(userId);
 
   if (checkUserExist === 0)
-    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
-  //Request Error End
+  // Response Error End
 
   res.clearCookie("x-access-token");
 
@@ -194,36 +199,40 @@ exports.userLogOut = async function (req, res) {
  * [PATCH] /users/address
  */
 
-exports.changeAddress = async function (req, res) {
-  const { userId } = req.verifiedToken;
-  const { lat, lng } = req.body;
+// exports.changeAddress = async function (req, res) {
+//   const { userId } = req.verifiedToken;
+//   const { lat, lng } = req.body;
 
-  //Request Error Start
+//   //Request Error Start
 
-  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+//   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
-  const checkUserExist = userProvider.checkUserExist(userId);
+//   // 위도 범위
+//   if ((lat < 33) | (lat > 43))
+//     return res.send(errResponse(baseResponse.LATITUDE_IS_NOT_VALID)); // 2013
 
-  if (checkUserExist === 0)
-    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
+//   // 경도 범위
+//   if ((lng < 124) | (lng > 132))
+//     return res.send(errResponse(baseResponse.LONGTITUDE_IS_NOT_VALID)); // 2014
 
-  // 위도 범위
-  if ((lat < 33) | (lat > 43))
-    return res.send(errResponse(baseResponse.LATITUDE_IS_NOT_VALID)); // 2013
+//   //Request Error End
 
-  // 경도 범위
-  if ((lng < 124) | (lng > 132))
-    return res.send(errResponse(baseResponse.LONGTITUDE_IS_NOT_VALID)); // 2014
+//   // Response Error Start
 
-  //Request Error End
+//   const checkUserExist = userProvider.checkUserExist(userId);
 
-  const result = await userService.updateAddress(lat, lng, userId);
+//   if (checkUserExist === 0)
+//     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
-  return res.send(response(baseResponse.SUCCESS, result));
-};
+//   // Response Error End
+
+//   const result = await userService.updateAddress(lat, lng, userId);
+
+//   return res.send(response(baseResponse.SUCCESS, result));
+// };
 
 /**
- * API No. 5
+ * API No. 9
  * API Name : 홈 화면 조회 API
  * [GET] /users/home
  */
@@ -235,14 +244,215 @@ exports.getHome = async function (req, res) {
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
-  const checkUserExist = userProvider.checkUserExist(userId);
+  //Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await userProvider.checkUserExist(userId);
 
   if (checkUserExist === 0)
-    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 2011
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  // Response Error End
+
+  const result = await userProvider.selectHome(userId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 27
+ * API Name : 이벤트 목록 조회 API
+ * [GET] /users/my-eats/event-list
+ */
+
+exports.getEventList = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  //Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
   //Request Error End
 
-  const result = await userProvider.selectHome(userId);
+  // Response Error Start
+
+  const checkUserExist = await userProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  // Response Error End
+
+  const result = await userProvider.selectEventList(userId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 28
+ * API Name : 이벤트 상세페이지 조회 API
+ * [GET] /users/my-eats/:eventId/event-detail
+ * query string: distance
+ */
+
+exports.getEvent = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { eventId } = req.params;
+
+  const { distance } = req.query;
+
+  //Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  if (!eventId) return res.send(errResponse(baseResponse.EVENT_ID_IS_EMPTY)); // 2030
+
+  if (!regDistance.test(distance))
+    return res.send(errResponse(baseResponse.DISTANCE_IS_NOT_VALID)); // 2031
+
+  //Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await userProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkEventExist = await userProvider.checkEventExist(eventId);
+
+  if (checkEventExist === 0)
+    return res.send(errResponse(baseResponse.EVENT_IS_NOT_EXIST)); // 3022
+
+  const checkEventStatus = await userProvider.checkEventStatus(eventId);
+
+  if (checkEventStatus === 0)
+    return res.send(errResponse(baseResponse.EVENT_IS_DELETED)); // 3023
+
+  // Response Error End
+
+  const result = await userProvider.selectEvent(eventId, distance);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 29
+ * API Name : 이벤트 페이지 스토어로 이동 API
+ *            가장 가까운 프랜차이즈 음식점으로 이동
+ * [GET] /users/my-eats/event/franchise-store
+ * query string: franchiseId, distance
+ */
+
+exports.eventToStore = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { franchiseId, distance } = req.query;
+
+  //Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  if (!franchiseId)
+    return res.send(errResponse(baseResponse.FRANCHISE_ID_IS_EMPTY)); // 2035
+
+  if (!regDistance.test(distance))
+    return res.send(errResponse(baseResponse.DISTANCE_IS_NOT_VALID)); // 2031
+
+  //Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await userProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkFranchiseExist = await userProvider.checkFranchiseExist(
+    franchiseId
+  );
+
+  if (checkFranchiseExist === 0)
+    return res.send(errResponse(baseResponse.FRANCHISE_IS_NOT_EXIST)); // 3024
+
+  // Response Error End
+
+  const result = await userProvider.eventToStore(userId, franchiseId, distance);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 30
+ * API Name : 공지사항 목록 조회 API
+ * [GET] /users/my-eats/notice-list
+ */
+
+exports.getNoticeList = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  //Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  //Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await userProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  // Response Error End
+
+  const result = await userProvider.selectNoticeList();
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 31
+ * API Name : 공지사항 세부페이지 조회 API
+ * [GET] /users/my-eats/:noticeId/notice-detail
+ * path variable: noticeId
+ */
+
+exports.getNotice = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { noticeId } = req.params;
+
+  //Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  if (!noticeId) return res.send(errResponse(baseResponse.NOTICE_ID_IS_EMPTY)); // 2032
+
+  //Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await userProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkNoticeExist = await userProvider.checkNoticeExist(noticeId);
+
+  if (checkNoticeExist === 0)
+    return res.send(errResponse(baseResponse.NOTICE_IS_NOT_EXIST)); // 3025
+
+  const checkNoticeDeleted = await userProvider.checkNoticeDeleted(noticeId);
+
+  if (checkNoticeDeleted === 0)
+    return res.send(errResponse(baseResponse.NOTICE_IS_DELETED)); // 3026
+
+  // Response Error End
+
+  const result = await userProvider.selectNotice(noticeId);
 
   return res.send(response(baseResponse.SUCCESS, result));
 };

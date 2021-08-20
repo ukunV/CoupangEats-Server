@@ -29,7 +29,8 @@ exports.insertAddress = async function (
   try {
     await connection.beginTransaction();
 
-    const params = [
+    const result = await addressDao.insertAddress(
+      connection,
       userId,
       type,
       nickname,
@@ -38,10 +39,8 @@ exports.insertAddress = async function (
       detailAddress,
       information,
       lat,
-      lng,
-    ];
-
-    const result = await addressDao.insertAddress(connection, params);
+      lng
+    );
 
     await connection.commit();
 
@@ -57,6 +56,7 @@ exports.insertAddress = async function (
 
 // 주소 수정
 exports.updateAddress = async function (
+  userId,
   type,
   nickname,
   buildingName,
@@ -71,7 +71,9 @@ exports.updateAddress = async function (
   try {
     await connection.beginTransaction();
 
-    const params = [
+    const result = await addressDao.updateAddress(
+      connection,
+      userId,
       type,
       nickname,
       buildingName,
@@ -80,10 +82,8 @@ exports.updateAddress = async function (
       information,
       lat,
       lng,
-      addressId,
-    ];
-
-    const result = await addressDao.updateAddress(connection, params);
+      addressId
+    );
 
     await connection.commit();
 
@@ -113,6 +113,32 @@ exports.deleteAddress = async function (addressId) {
     await connection.rollback();
     connection.release();
     logger.error(`Address-deleteAddress Service error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 주소 목록에서 주소 선택
+exports.updateLocation = async function (addressId, userId, lat, lng) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  try {
+    await connection.beginTransaction();
+
+    const result = await addressDao.updateLocation(
+      connection,
+      addressId,
+      userId,
+      lat,
+      lng
+    );
+
+    await connection.commit();
+
+    connection.release();
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    logger.error(`Address-updateLocation Service error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
