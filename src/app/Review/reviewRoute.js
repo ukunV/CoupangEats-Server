@@ -7,4 +7,7 @@ module.exports = function (app) {
 
   // 33. 리뷰 조회 API
   app.get("/reviews/:storeId/review-list", review.getReviewList);
+
+  // 35. 리뷰 삭제 API
+  app.patch("/reviews", jwtMiddleware, review.deleteReview);
 };

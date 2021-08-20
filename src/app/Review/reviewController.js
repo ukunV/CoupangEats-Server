@@ -50,7 +50,7 @@ exports.getPhotoReviews = async function (req, res) {
 };
 
 /**
- * API No. 32
+ * API No. 33
  * API Name : 리뷰 조회 API
  * [GET] /reviews/:storeId/review-list
  * path variable: storeId
@@ -128,5 +128,73 @@ exports.getReviewList = async function (req, res) {
     photoCondition
   );
 
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 34
+ * API Name : 리뷰 작성 API
+ * [POST] /reviews
+ */
+exports.createReview = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { orderId, imageURL, contents, point } = req.body;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  if (!orderId) return res.send(errResponse(baseResponse.ORDER_ID_IS_EMPTY)); // 2040
+
+  if (!point) return res.send(errResponse(baseResponse.POINT_IS_EMPTY)); // 2039
+
+  if ((point != 1) & (point != 2) & (point != 3) & (point != 4) & (point != 5))
+    return res.send(errResponse(baseResponse.POINT_IS_NOT_VALID)); // 2038
+
+  if (contents.length < 10)
+    return res.send(errResponse(baseResponse.CONTENTS_IS_SHORT)); // 2041
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await reviewProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUsersOrder = await reviewProvider.checkUsersOrder(userId, orderId);
+
+  if (checkUsersOrder === 0)
+    return res.send(response(baseResponse.ORDER_IS_NOT_USERS)); // 3030
+
+  const checkOrderExist = await reviewProvider.checkOrderExist(orderId);
+
+  if (checkOrderExist === 0)
+    return res.send(response(baseResponse.ORDER_IS_NOT_EXIST)); // 3027
+
+  const checkOrderDeleted = await reviewProvider.checkOrderDeleted(orderId);
+
+  if (checkOrderDeleted === 0)
+    return res.send(response(baseResponse.ORDER_IS_DELETED)); // 3028
+
+  const checkReviewExistByOrderId =
+    await reviewProvider.checkReviewExistByOrderId(orderId);
+
+  if (checkReviewExistByOrderId === 1)
+    return res.send(response(baseResponse.REVIEW_ALREADY_EXIST)); // 3029
+
+  // Response Error End
+
+  const result = await reviewService.createReview(
+    userId,
+    orderId,
+    imageURL,
+    contents,
+    point
+  );
+
+  return res.send(response(baseResponse.SUCCESS, result));
   return res.send(response(baseResponse.SUCCESS, result));
 };

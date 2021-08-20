@@ -99,3 +99,82 @@ exports.selectReviewList = async function (
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 주문과 회원 일치 여부 check
+exports.checkUsersOrder = async function (userId, orderId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await reviewDao.checkUsersOrder(connection, userId, orderId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Review-checkUsersOrder Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 주문 존재 여부 check
+exports.checkOrderExist = async function (orderId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await reviewDao.checkOrderExist(connection, orderId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Review-checkOrderExist Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 주문 취소 여부 check
+exports.checkOrderDeleted = async function (orderId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await reviewDao.checkOrderDeleted(connection, orderId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Review-checkOrderDeleted Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 리뷰 존재 여부 check by orderId
+exports.checkReviewExistByOrderId = async function (orderId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await reviewDao.checkReviewExistByOrderId(
+      connection,
+      orderId
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(
+      `Review-checkReviewExistByOrderId Provider error: ${err.message}`
+    );
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Review-checkReviewHost Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

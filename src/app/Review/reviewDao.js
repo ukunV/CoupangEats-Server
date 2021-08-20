@@ -130,10 +130,136 @@ async function selectReviewList(
   return row;
 }
 
+// 주문과 회원 일치 여부 check
+async function checkUsersOrder(connection, userId, orderId) {
+  const query = `
+                select exists(select id
+                              from OrderList
+                              where id = ?
+                              and userId = ?) as exist;
+                `;
+
+  const row = await connection.query(query, [orderId, userId]);
+
+  return row[0][0]["exist"];
+}
+
+// 주문 존재 여부 check
+async function checkOrderExist(connection, orderId) {
+  const query = `
+                select exists(select id from OrderList where id = ?) as exist;
+                `;
+
+  const row = await connection.query(query, orderId);
+
+  return row[0][0]["exist"];
+}
+
+// 주문 취소 여부 check
+async function checkOrderDeleted(connection, orderId) {
+  const query = `
+                select isDeleted
+                from OrderList
+                where id = ?;
+                `;
+
+  const row = await connection.query(query, orderId);
+
+  return row[0][0]["isDeleted"];
+}
+
+// 리뷰 존재 여부 check
+async function checkReviewExistByOrderId(connection, orderId) {
+  const query = `
+                select reviewStatus
+                from OrderList
+                where id = ?;
+                `;
+
+  const row = await connection.query(query, orderId);
+
+  return row[0][0]["reviewStatus"];
+}
+
+// 리뷰 작성
+async function createReview(
+  connection,
+  userId,
+  orderId,
+  imageURL,
+  contents,
+  point
+) {
+  const getStoreIdQuery = `
+                select storeId
+                from OrderList
+                where id = ?;
+                `;
+
+  const getStoreIdRow = await connection.query(getStoreIdQuery, orderId);
+
+  const storeId = getStoreIdRow[0][0]["storeId"];
+
+  if (imageURL === "") {
+    const query1 = `
+                  insert into Review (userId, orderId, storeId,
+                                      contents, point)
+                  values (?, ?, ?, ?, ?);
+                  `;
+
+    const row1 = await connection.query(query1, [
+      userId,
+      orderId,
+      storeId,
+      contents,
+      point,
+    ]);
+
+    const query2 = `
+                    update OrderList
+                    set reviewStatus = 1
+                    where id = ?;
+                    `;
+
+    await connection.query(query2, orderId);
+
+    return row1[0];
+  } else {
+    const query1 = `
+                  insert into Review (userId, orderId, storeId,
+                                      imageURL, contents, point, isPhoto)
+                  values (?, ?, ?, ?, ?, ?, 1);
+                  `;
+
+    const row1 = await connection.query(query1, [
+      userId,
+      orderId,
+      storeId,
+      imageURL,
+      contents,
+      point,
+    ]);
+
+    const query2 = `
+                    update OrderList
+                    set reviewStatus = 1
+                    where id = ?;
+                    `;
+
+    await connection.query(query2, orderId);
+
+    return row1[0];
+  }
+}
 module.exports = {
   checkUserExist,
   checkStoreExist,
   checkStoreDeleted,
   selectPhotoReviews,
   selectReviewList,
+  checkUsersOrder,
+  checkOrderExist,
+  checkOrderDeleted,
+  checkReviewExistByOrderId,
+  createReview,
 };
