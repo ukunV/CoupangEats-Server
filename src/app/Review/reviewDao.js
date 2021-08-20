@@ -36,13 +36,7 @@ async function checkStoreDeleted(connection, storeId) {
 // 최근 포토 리뷰 3개 조회
 async function selectPhotoReviews(connection, storeId) {
   const query = `
-                select id as reviewId, imageURL, point,
-                case
-                    when length(contents) > 35
-                        then concat(left(contents, 35), '...')
-                    else
-                        contents
-                end as contents
+                select id as reviewId, imageURL, point, contents
                 from Review
                 where storeId = ?
                 and isPhoto = 1
