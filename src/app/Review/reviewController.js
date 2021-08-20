@@ -135,7 +135,7 @@ exports.getReviewList = async function (req, res) {
 /**
  * API No. 34
  * API Name : 리뷰 작성 API
- * [POST] /reviews
+ * [POST] /reviews/detail
  */
 exports.createReview = async function (req, res) {
   const { userId } = req.verifiedToken;
@@ -248,7 +248,7 @@ exports.deleteReview = async function (req, res) {
 /**
  * API No. 35
  * API Name : 리뷰 신고 API
- * [POST] /reviews/:reviewId/review-report
+ * [POST] /reviews
  */
 exports.reportReview = async function (req, res) {
   const { userId } = req.verifiedToken;
@@ -325,3 +325,62 @@ exports.reportReview = async function (req, res) {
 
   return res.send(response(baseResponse.SUCCESS, result));
 };
+
+/**
+ * API No. 36
+ * API Name : 내가 작성한 리뷰 조회 API
+ * [GET] /reviews/:orderId/review-detail
+ */
+exports.getMyReview = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { orderId } = req.params;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  if (!orderId) return res.send(errResponse(baseResponse.ORDER_ID_IS_EMPTY)); // 2040
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await reviewProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkOrderExist = await reviewProvider.checkOrderExist(orderId);
+
+  if (checkOrderExist === 0)
+    return res.send(response(baseResponse.ORDER_IS_NOT_EXIST)); // 3027
+
+  const checkOrderDeleted = await reviewProvider.checkOrderDeleted(orderId);
+
+  if (checkOrderDeleted === 0)
+    return res.send(response(baseResponse.ORDER_IS_DELETED)); // 3028
+
+  const checkUsersOrder = await reviewProvider.checkUsersOrder(userId, orderId);
+
+  if (checkUsersOrder === 0)
+    return res.send(response(baseResponse.ORDER_IS_NOT_USERS)); // 3030
+
+  const checkReviewExistByOrderId =
+    await reviewProvider.checkReviewExistByOrderId(orderId);
+
+  if (checkReviewExistByOrderId === 0)
+    return res.send(response(baseResponse.REVIEW_IS_NOT_EXIST)); // 3031
+
+  // Response Error End
+
+  const result = await reviewProvider.selectMyReview(orderId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 37
+ * API Name : 리뷰 수정 API
+ * [PATCH] /reviews/detail
+ */

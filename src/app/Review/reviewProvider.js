@@ -229,3 +229,19 @@ exports.checkAlreadyReport = async function (userId, reviewId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 내가 작성한 리뷰 조회
+exports.selectMyReview = async function (orderId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await reviewDao.selectMyReview(connection, orderId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Review-selectMyReview Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

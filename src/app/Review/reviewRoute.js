@@ -9,7 +9,7 @@ module.exports = function (app) {
   app.get("/reviews/:storeId/review-list", review.getReviewList);
 
   // 34. 리뷰 작성 API
-  app.post("/reviews", jwtMiddleware, review.createReview);
+  app.post("/reviews/detail", jwtMiddleware, review.createReview);
 
   // 35. 리뷰 삭제 API
   app.patch("/reviews", jwtMiddleware, review.deleteReview);
@@ -20,4 +20,7 @@ module.exports = function (app) {
     jwtMiddleware,
     review.reportReview
   );
+
+  // 37. 내가 작성한 리뷰 조회 API
+  app.get("/reviews/:orderId/review-detail", jwtMiddleware, review.getMyReview);
 };
