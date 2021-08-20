@@ -220,6 +220,11 @@ module.exports = {
     code: 2041,
     message: "리뷰는 10자 이상 작성해주세요.",
   },
+  REVIEW_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2042,
+    message: "reviewId 값을 입력해주세요.",
+  },
 
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
@@ -371,6 +376,16 @@ module.exports = {
     isSuccess: false,
     code: 3030,
     message: "해당 주문은 다른 유저의 주문입니다.",
+  },
+  REVIEW_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3031,
+    message: "존재하지 않는 리뷰입니다.",
+  },
+  USER_IS_NOT_REVIEW_HOST: {
+    isSuccess: false,
+    code: 3032,
+    message: "리뷰 삭제는 작성자만 가능합니다.",
   },
 
   // made by note
