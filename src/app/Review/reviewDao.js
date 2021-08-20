@@ -404,6 +404,36 @@ async function selectMyReview(connection, orderId) {
   return row[0];
 }
 
+// 리뷰 수정
+async function modifyReview(connection, reviewId, point, contents, imageURL) {
+  if (imageURL === "") {
+    const query1 = `
+                    update Review
+                    set point = ?, contents = ?, imageURL = null, isPhoto = 0
+                    where id = ?
+                  `;
+
+    const row1 = await connection.query(query1, [point, contents, reviewId]);
+
+    return row1[0].info;
+  } else {
+    const query1 = `
+                    update Review
+                    set point = ?, contents = ?, imageURL = ?, isPhoto = 1
+                    where id = ?
+                  `;
+
+    const row1 = await connection.query(query1, [
+      point,
+      contents,
+      imageURL,
+      reviewId,
+    ]);
+
+    return row1[0].info;
+  }
+}
+
 module.exports = {
   checkUserExist,
   checkStoreExist,
@@ -421,4 +451,5 @@ module.exports = {
   reportReview,
   checkAlreadyReport,
   selectMyReview,
+  modifyReview,
 };

@@ -23,4 +23,7 @@ module.exports = function (app) {
 
   // 37. 내가 작성한 리뷰 조회 API
   app.get("/reviews/:orderId/review-detail", jwtMiddleware, review.getMyReview);
+
+  // 38. 리뷰 수정 API
+  app.patch("/reviews/detail", jwtMiddleware, review.modifyReview);
 };

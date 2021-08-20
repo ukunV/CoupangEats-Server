@@ -384,3 +384,58 @@ exports.getMyReview = async function (req, res) {
  * API Name : 리뷰 수정 API
  * [PATCH] /reviews/detail
  */
+exports.modifyReview = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { reviewId } = req.body;
+
+  const { point, contents, imageURL } = req.body;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  if (!reviewId) return res.send(errResponse(baseResponse.REVIEW_ID_IS_EMPTY)); // 2042
+
+  if (!point) return res.send(errResponse(baseResponse.POINT_IS_EMPTY)); // 2039
+
+  if ((point != 1) & (point != 2) & (point != 3) & (point != 4) & (point != 5))
+    return res.send(errResponse(baseResponse.POINT_IS_NOT_VALID)); // 2038
+
+  if (contents.length < 10)
+    return res.send(errResponse(baseResponse.CONTENTS_IS_SHORT)); // 2041
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await reviewProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkReviewExistByReviewId =
+    await reviewProvider.checkReviewExistByReviewId(reviewId);
+
+  if (checkReviewExistByReviewId === 0)
+    return res.send(errResponse(baseResponse.REVIEW_IS_NOT_EXIST)); // 3031
+
+  const checkReviewHost = await reviewProvider.checkReviewHost(
+    userId,
+    reviewId
+  );
+
+  if (checkReviewHost === 0)
+    return res.send(response(baseResponse.USER_IS_NOT_REVIEW_HOST)); // 3032
+
+  // Response Error End
+
+  const result = await reviewService.modifyReview(
+    reviewId,
+    point,
+    contents,
+    imageURL
+  );
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};

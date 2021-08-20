@@ -96,3 +96,29 @@ exports.reportReview = async function (
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 리뷰 수정
+exports.modifyReview = async function (reviewId, point, contents, imageURL) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  try {
+    await connection.beginTransaction();
+
+    const result = await reviewDao.modifyReview(
+      connection,
+      reviewId,
+      point,
+      contents,
+      imageURL
+    );
+
+    await connection.commit();
+
+    connection.release();
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    logger.error(`Review-modifyReview Service error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
