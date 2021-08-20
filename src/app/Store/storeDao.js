@@ -322,7 +322,7 @@ async function selectMainMenu(connection, menuId) {
 async function checkMenuDeleted(connection, menuId) {
   const query = `
                 select isDeleted
-                from Store
+                from StoreMenu
                 where id = ?;
                 `;
 
