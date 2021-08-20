@@ -225,6 +225,21 @@ module.exports = {
     code: 2042,
     message: "reviewId 값을 입력해주세요.",
   },
+  CHOOSE_MORE_THAN_ONE_SELECT_REASON: {
+    isSuccess: false,
+    code: 2043,
+    message: "선택사유를 선택해주세요.",
+  },
+  COMMENT_REASON_IS_SHORT: {
+    isSuccess: false,
+    code: 2044,
+    message: "기재사유는 10자 이상 작성해주세요.",
+  },
+  SELECT_REASON_TYPE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2045,
+    message: "선택사유의 값이 유효하지 않습니다.",
+  },
 
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
@@ -386,6 +401,16 @@ module.exports = {
     isSuccess: false,
     code: 3032,
     message: "리뷰 삭제는 작성자만 가능합니다.",
+  },
+  REVIEW_CAN_REPORTED_BY_OTHERS: {
+    isSuccess: false,
+    code: 3033,
+    message: "자신의 리뷰는 신고가 불가능합니다.",
+  },
+  USER_ALREADY_REPORT: {
+    isSuccess: false,
+    code: 3034,
+    message: "해당 리뷰는 이미 신고가 완료되었습니다.",
   },
 
   // made by note
