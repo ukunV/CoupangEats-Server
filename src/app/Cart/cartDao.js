@@ -66,36 +66,64 @@ async function createCart(
   amount,
   subIdArr
 ) {
+  const checkQuery = `
+                      select rootId
+                      from Cart
+                      where storeId = ?
+                      and rootId = menuId
+                      and isDeleted = 1;
+                      `;
+
+  const checkRow = await connection.query(checkQuery, storeId);
+
   const mainQuery = `
                 insert into Cart (userId, storeId, rootId, menuId, amount)
                 values (?, ?, ?, ?, ?);
                 `;
 
-  const mainRow = await connection.query(mainQuery, [
-    userId,
-    storeId,
-    menuId,
-    menuId,
-    amount,
-  ]);
+  let mainRow;
+
+  let subParams;
+
+  if (checkRow[0].length === 0) {
+    mainRow = await connection.query(mainQuery, [
+      userId,
+      storeId,
+      menuId,
+      menuId,
+      amount,
+    ]);
+
+    subParams = [userId, storeId, menuId];
+  } else {
+    mainRow = await connection.query(mainQuery, [
+      userId,
+      storeId,
+      checkRow[0][0]["rootId"],
+      menuId,
+      amount,
+    ]);
+
+    subParams = [userId, storeId, checkRow[0][0]["rootId"]];
+  }
 
   let insertCount = 0;
 
   for (let i = 0; i < subIdArr.length; i++) {
-    const query = `
+    const subQuery = `
                     insert into Cart (userId, storeId, rootId, menuId, amount)
                     values (?, ?, ?, ?, ?);
                     `;
 
-    const row = await connection.query(query, [
-      userId,
-      storeId,
-      menuId,
-      subIdArr[i],
-      amount,
-    ]);
+    subParams.push(subIdArr[i]);
+    subParams.push(amount);
 
-    if (row[0].affectedRows === 1) {
+    const subRow = await connection.query(subQuery, subParams);
+
+    subParams.pop();
+    subParams.pop();
+
+    if (subRow[0].affectedRows === 1) {
       insertCount += 1;
     }
   }
