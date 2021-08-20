@@ -33,3 +33,35 @@ exports.createReview = async function (
       contents,
       point
     );
+
+    await connection.commit();
+
+    connection.release();
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    logger.error(`Review-createReview Service error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 리뷰 삭제
+exports.deleteReview = async function (reviewId) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  try {
+    await connection.beginTransaction();
+
+    const result = await reviewDao.deleteReview(connection, reviewId);
+
+    await connection.commit();
+
+    connection.release();
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    logger.error(`Review-deleteReview Service error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

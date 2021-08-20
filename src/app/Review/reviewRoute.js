@@ -8,6 +8,9 @@ module.exports = function (app) {
   // 33. 리뷰 조회 API
   app.get("/reviews/:storeId/review-list", review.getReviewList);
 
+  // 34. 리뷰 작성 API
+  app.post("/reviews", jwtMiddleware, review.createReview);
+
   // 35. 리뷰 삭제 API
   app.patch("/reviews", jwtMiddleware, review.deleteReview);
 };

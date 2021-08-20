@@ -196,5 +196,50 @@ exports.createReview = async function (req, res) {
   );
 
   return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 35
+ * API Name : 리뷰 삭제 API
+ * [PATCH] /reviews
+ */
+exports.deleteReview = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { reviewId } = req.body;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  if (!reviewId) return res.send(errResponse(baseResponse.REVIEW_ID_IS_EMPTY)); // 2042
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await reviewProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkReviewExistByReviewId =
+    await reviewProvider.checkReviewExistByReviewId(reviewId);
+
+  if (checkReviewExistByReviewId === 0)
+    return res.send(errResponse(baseResponse.REVIEW_IS_NOT_EXIST)); // 3031
+
+  const checkReviewHost = await reviewProvider.checkReviewHost(
+    userId,
+    reviewId
+  );
+
+  if (checkReviewHost === 0)
+    return res.send(response(baseResponse.USER_IS_NOT_REVIEW_HOST)); // 3032
+
+  // Response Error End
+
+  const result = await reviewService.deleteReview(reviewId);
+
   return res.send(response(baseResponse.SUCCESS, result));
 };

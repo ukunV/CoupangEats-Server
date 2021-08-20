@@ -168,6 +168,37 @@ exports.checkReviewExistByOrderId = async function (orderId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 리뷰 존재 여부 check by reviewId
+exports.checkReviewExistByReviewId = async function (reviewId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await reviewDao.checkReviewExistByReviewId(
+      connection,
+      reviewId
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(
+      `Review-checkReviewExistByReviewId Provider error: ${err.message}`
+    );
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 리뷰 작성자 여부 check
+exports.checkReviewHost = async function (userId, reviewId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await reviewDao.checkReviewHost(
+      connection,
+      userId,
+      reviewId
     );
 
     connection.release();

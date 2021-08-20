@@ -251,6 +251,47 @@ async function createReview(
     return row1[0];
   }
 }
+
+// 리뷰 존재 여부 check
+async function checkReviewExistByReviewId(connection, reviewId) {
+  const query = `
+                select exists(select id
+                              from Review
+                              where id = ?) as exist;
+                `;
+
+  const row = await connection.query(query, reviewId);
+
+  return row[0][0]["exist"];
+}
+
+// 리뷰 작성자 여부 check
+async function checkReviewHost(connection, userId, reviewId) {
+  const query = `
+                select exists(select id
+                              from Review
+                              where userId = ?
+                              and id = ?) as exist;
+                `;
+
+  const row = await connection.query(query, [userId, reviewId]);
+
+  return row[0][0]["exist"];
+}
+
+// 리뷰 삭제
+async function deleteReview(connection, reviewId) {
+  const query = `
+                update Review
+                set isDeleted = 0
+                where id = ?;
+                `;
+
+  const row = await connection.query(query, reviewId);
+
+  return row[0].info;
+}
+
 module.exports = {
   checkUserExist,
   checkStoreExist,
@@ -262,4 +303,7 @@ module.exports = {
   checkOrderDeleted,
   checkReviewExistByOrderId,
   createReview,
+  checkReviewExistByReviewId,
+  checkReviewHost,
+  deleteReview,
 };
