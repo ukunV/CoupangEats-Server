@@ -209,3 +209,23 @@ exports.checkReviewHost = async function (userId, reviewId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 해당 유저가 이미 신고했는지 check
+exports.checkAlreadyReport = async function (userId, reviewId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await reviewDao.checkAlreadyReport(
+      connection,
+      userId,
+      reviewId
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Review-checkAlreadyReport Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

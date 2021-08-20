@@ -14,6 +14,7 @@ const { emit } = require("nodemon");
 // regular expression
 const regPage = /^[0-9]/;
 const regSize = /^[0-9]/;
+const regSelectedReason = /^[0-9]/;
 
 /**
  * API No. 32
@@ -240,6 +241,87 @@ exports.deleteReview = async function (req, res) {
   // Response Error End
 
   const result = await reviewService.deleteReview(reviewId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 35
+ * API Name : 리뷰 신고 API
+ * [POST] /reviews/:reviewId/review-report
+ */
+exports.reportReview = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { reviewId } = req.params;
+
+  const { selectReasonArr, commentReason } = req.body;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  if (!reviewId) return res.send(errResponse(baseResponse.REVIEW_ID_IS_EMPTY)); // 2042
+
+  if (selectReasonArr.length === 0)
+    return res.send(
+      errResponse(baseResponse.CHOOSE_MORE_THAN_ONE_SELECT_REASON)
+    ); // 2043
+
+  for (let i = 0; i < selectReasonArr.length; i++) {
+    if (!regSelectedReason.test(selectReasonArr[i]))
+      return res.send(
+        errResponse(baseResponse.SELECT_REASON_TYPE_IS_NOT_VALID)
+      ); // 2045
+
+    if (!(selectReasonArr[i] in [1, 2, 3, 4, 5, 6, 7, 8]))
+      return res.send(
+        errResponse(baseResponse.SELECT_REASON_TYPE_IS_NOT_VALID)
+      ); // 2045
+  }
+
+  if (commentReason.length < 10)
+    return res.send(errResponse(baseResponse.COMMENT_REASON_IS_SHORT)); // 2044
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await reviewProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkReviewExistByReviewId =
+    await reviewProvider.checkReviewExistByReviewId(reviewId);
+
+  if (checkReviewExistByReviewId === 0)
+    return res.send(errResponse(baseResponse.REVIEW_IS_NOT_EXIST)); // 3031
+
+  const checkReviewHost = await reviewProvider.checkReviewHost(
+    userId,
+    reviewId
+  );
+
+  if (checkReviewHost === 1)
+    return res.send(response(baseResponse.REVIEW_CAN_REPORTED_BY_OTHERS)); // 3033
+
+  const checkAlreadyReport = await reviewProvider.checkAlreadyReport(
+    userId,
+    reviewId
+  );
+
+  if (checkAlreadyReport === 1)
+    return res.send(response(baseResponse.USER_ALREADY_REPORT)); // 3034
+
+  // Response Error End
+
+  const result = await reviewService.reportReview(
+    userId,
+    reviewId,
+    selectReasonArr,
+    commentReason
+  );
 
   return res.send(response(baseResponse.SUCCESS, result));
 };

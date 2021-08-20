@@ -65,3 +65,34 @@ exports.deleteReview = async function (reviewId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 리뷰 신고
+exports.reportReview = async function (
+  userId,
+  reviewId,
+  selectReasonArr,
+  commentReason
+) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  try {
+    await connection.beginTransaction();
+
+    const result = await reviewDao.reportReview(
+      connection,
+      userId,
+      reviewId,
+      selectReasonArr,
+      commentReason
+    );
+
+    await connection.commit();
+
+    connection.release();
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    logger.error(`Review-reportReview Service error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

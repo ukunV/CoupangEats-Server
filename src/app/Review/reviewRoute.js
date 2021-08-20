@@ -13,4 +13,11 @@ module.exports = function (app) {
 
   // 35. 리뷰 삭제 API
   app.patch("/reviews", jwtMiddleware, review.deleteReview);
+
+  // 36. 리뷰 신고 API
+  app.post(
+    "/reviews/:reviewId/review-report",
+    jwtMiddleware,
+    review.reportReview
+  );
 };

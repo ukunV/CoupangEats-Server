@@ -292,6 +292,71 @@ async function deleteReview(connection, reviewId) {
   return row[0].info;
 }
 
+// 리뷰 신고
+async function reportReview(
+  connection,
+  userId,
+  reviewId,
+  selectReasonArr,
+  commentReason
+) {
+  const query1 = `
+                  insert into ReviewReported (userId, reviewId, commentReason)
+                  values (?, ?, ?);
+                  `;
+
+  const row1 = await connection.query(query1, [
+    userId,
+    reviewId,
+    commentReason,
+  ]);
+
+  const getReportIdQuery = `
+                            select id
+                            from ReviewReported
+                            where userId = ?
+                            and reviewId = ?;
+                            `;
+
+  const getReportIdRow = await connection.query(getReportIdQuery, [
+    userId,
+    reviewId,
+  ]);
+
+  const reportId = getReportIdRow[0][0]["id"];
+
+  let insertCount = 0;
+
+  for (let i = 0; i < selectReasonArr.length; i++) {
+    const query2 = `
+                    insert into ReviewReportedSelectedReason (reportId, reasonNum)
+                    values (?, ?);
+                    `;
+
+    const row2 = await connection.query(query2, [reportId, selectReasonArr[i]]);
+
+    if (row2[0].affectedRows === 1) {
+      insertCount += 1;
+    }
+  }
+
+  return { reportResult: row1[0], selectedReasonCount: insertCount };
+}
+
+// 해당 유저가 이미 신고했는지 check
+async function checkAlreadyReport(connection, userId, reviewId) {
+  const query = `
+                select exists(select id
+                              from ReviewReported
+                              where userId = ?
+                              and reviewId = ?) as exist;
+                `;
+
+  const row = await connection.query(query, [userId, reviewId]);
+
+  return row[0][0]["exist"];
+}
+
 module.exports = {
   checkUserExist,
   checkStoreExist,
@@ -306,4 +371,6 @@ module.exports = {
   checkReviewExistByReviewId,
   checkReviewHost,
   deleteReview,
+  reportReview,
+  checkAlreadyReport,
 };
