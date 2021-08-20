@@ -33,6 +33,16 @@ module.exports = function (app) {
     user.eventToStore
   );
 
+  // 30. 공지사항 목록 조회 API
+  app.get("/users/my-eats/notice-list", jwtMiddleware, user.getNoticeList);
+
+  // 31. 공지사항 세부페이지 조회 API
+  app.get(
+    "/users/my-eats/:noticeId/notice-detail",
+    jwtMiddleware,
+    user.getNotice
+  );
+
   // // 카카오 로그인 API
   // app.post("/users/kakao-login", user.kakaoLogin);
   // app.get("/kakao", passport.authenticate("kakao-login"));

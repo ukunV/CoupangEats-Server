@@ -438,6 +438,59 @@ async function eventToStore(connection, userId, franchiseId, distance) {
   return row;
 }
 
+// 공지사항 목록 조회
+async function selectNoticeList(connection) {
+  const query = `
+                select id as noticeId,
+                      date_format(createdAt, '%Y.%m.%d') as createdAt, title
+                from Notice
+                where isDeleted = 1
+                order by id desc;
+                `;
+
+  const row = await connection.query(query);
+
+  return row[0];
+}
+
+// 공지 존재 여부 check
+async function checkNoticeExist(connection, noticeId) {
+  const query = `
+                select exists(select id from Notice where id = ?) as exist;
+                `;
+
+  const row = await connection.query(query, noticeId);
+
+  return row[0][0]["exist"];
+}
+
+// 공지 상태 check
+async function checkNoticeDeleted(connection, noticeId) {
+  const query = `
+                select isDeleted
+                from Notice
+                where id = ?;
+                `;
+
+  const row = await connection.query(query, noticeId);
+
+  return row[0][0]["isDeleted"];
+}
+
+// 공지사항 세부페이지 조회
+async function selectNotice(connection, noticeId) {
+  const query = `
+                select id as noticeId,
+                      date_format(createdAt, '%Y.%m.%d') as createdAt, title, contents
+                from Notice
+                where id = ?;
+                `;
+
+  const row = await connection.query(query, noticeId);
+
+  return row[0];
+}
+
 module.exports = {
   checkEmailExist,
   checkPhoneNumExist,
@@ -452,4 +505,8 @@ module.exports = {
   selectEvent,
   checkFranchiseExist,
   eventToStore,
+  selectNoticeList,
+  checkNoticeExist,
+  checkNoticeDeleted,
+  selectNotice,
 };

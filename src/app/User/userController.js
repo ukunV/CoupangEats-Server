@@ -382,6 +382,79 @@ exports.eventToStore = async function (req, res) {
 };
 
 /**
+ * API No. 30
+ * API Name : 공지사항 목록 조회 API
+ * [GET] /users/my-eats/notice-list
+ */
+
+exports.getNoticeList = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  //Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  //Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await userProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  // Response Error End
+
+  const result = await userProvider.selectNoticeList();
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 31
+ * API Name : 공지사항 세부페이지 조회 API
+ * [GET] /users/my-eats/:noticeId/notice-detail
+ * path variable: noticeId
+ */
+
+exports.getNotice = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { noticeId } = req.params;
+
+  //Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  if (!noticeId) return res.send(errResponse(baseResponse.NOTICE_ID_IS_EMPTY)); // 2032
+
+  //Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await userProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkNoticeExist = await userProvider.checkNoticeExist(noticeId);
+
+  if (checkNoticeExist === 0)
+    return res.send(errResponse(baseResponse.NOTICE_IS_NOT_EXIST)); // 3025
+
+  const checkNoticeDeleted = await userProvider.checkNoticeDeleted(noticeId);
+
+  if (checkNoticeDeleted === 0)
+    return res.send(errResponse(baseResponse.NOTICE_IS_DELETED)); // 3026
+
+  // Response Error End
+
+  const result = await userProvider.selectNotice(noticeId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
  * API No.
  * API Name : 카카오 로그인 API
  *

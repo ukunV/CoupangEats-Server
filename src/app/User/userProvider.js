@@ -183,3 +183,63 @@ exports.eventToStore = async function (userId, franchiseId, distance) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 공지사항 목록 조회
+exports.selectNoticeList = async function () {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.selectNoticeList(connection);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-selectNoticeList Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 공지사항 세부페이지 조회
+exports.selectNotice = async function (noticeId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.selectNotice(connection, noticeId);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-selectNotice Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 공지 존재 여부 check
+exports.checkNoticeExist = async function (noticeId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.checkNoticeExist(connection, noticeId);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-checkNoticeExist Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 공지 상태 check
+exports.checkNoticeDeleted = async function (noticeId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.checkNoticeDeleted(connection, noticeId);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-checkNoticeDeleted Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
