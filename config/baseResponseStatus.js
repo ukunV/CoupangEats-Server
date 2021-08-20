@@ -195,6 +195,31 @@ module.exports = {
     code: 2036,
     message: "photoFilter 값이 올바르지 않습니다.",
   },
+  POINT_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2037,
+    message: "point 값을 입력해주세요.",
+  },
+  POINT_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2038,
+    message: "point 값이 올바르지 않습니다.",
+  },
+  POINT_IS_EMPTY: {
+    isSuccess: false,
+    code: 2039,
+    message: "point 값을 입력해주세요.",
+  },
+  ORDER_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2040,
+    message: "orderId 값을 입력해주세요.",
+  },
+  CONTENTS_IS_SHORT: {
+    isSuccess: false,
+    code: 2041,
+    message: "리뷰는 10자 이상 작성해주세요.",
+  },
 
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
@@ -326,6 +351,26 @@ module.exports = {
     isSuccess: false,
     code: 3026,
     message: "삭제된 공지입니다.",
+  },
+  ORDER_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3027,
+    message: "존재하지 않는 주문입니다.",
+  },
+  ORDER_IS_DELETED: {
+    isSuccess: false,
+    code: 3028,
+    message: "결제취소된 주문입니다.",
+  },
+  REVIEW_ALREADY_EXIST: {
+    isSuccess: false,
+    code: 3029,
+    message: "해당 주문의 리뷰는 이미 존재합니다.",
+  },
+  ORDER_IS_NOT_USERS: {
+    isSuccess: false,
+    code: 3030,
+    message: "해당 주문은 다른 유저의 주문입니다.",
   },
 
   // made by note
