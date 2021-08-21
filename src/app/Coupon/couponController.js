@@ -46,7 +46,7 @@ exports.getMyEatsCoupons = async function (req, res) {
  * API No. 22
  * API Name : 카트에서 쿠폰 목록 조회 API
  * [GET] /coupons/cart/coupon-list
- * query string: storeId, totalPrice(format 해제하고 받아야함)
+ * query string: storeId, totalPrice
  */
 exports.getCartCoupons = async function (req, res) {
   const { userId } = req.verifiedToken;

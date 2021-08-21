@@ -83,7 +83,7 @@ async function selectCartCoupons(connection, userId, storeId, totalPrice) {
                           then 0
                       else
                           s.franchiseId
-                  end as storeFranchiseId
+                  end as storeFranchiseId, co.isChecked
             from Coupon c
                 left join (select * from CouponObtained where status = 1) as co on c.id = co.couponId
                 left join Franchise f on c.franchiseId = f.id
