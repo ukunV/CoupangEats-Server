@@ -350,6 +350,11 @@ module.exports = {
     code: 2067,
     message: "현금영수증 발급 번호를 입력해주세요.",
   },
+  ROOT_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2068,
+    message: "메뉴의 부모 아이디(rootId)를 입력해주세요.",
+  },
 
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
@@ -546,6 +551,11 @@ module.exports = {
     isSuccess: false,
     code: 3039,
     message: "이미 다른 상점의 메뉴가 카트에 존재합니다.",
+  },
+  MENU_IS_NOT_EXIST_AT_CART: {
+    isSuccess: false,
+    code: 3040,
+    message: "해당 메뉴는 카트에 존재하지 않습니다.",
   },
 
   // SIGNIN_INACTIVE_ACCOUNT: {
