@@ -12,7 +12,10 @@ async function checkUserExist(connection, userId) {
 // 음식점 존재 여부 check
 async function checkStoreExist(connection, storeId) {
   const query = `
-                select exists(select id from Store where id = ?) as exist;
+                select exists(select id
+                              from Store
+                              where id = ?
+                              and isDeleted = 1) as exist;
                 `;
 
   const row = await connection.query(query, storeId);
@@ -20,23 +23,26 @@ async function checkStoreExist(connection, storeId) {
   return row[0][0]["exist"];
 }
 
-// 음식점 삭제 여부 check
-async function checkStoreDeleted(connection, storeId) {
-  const query = `
-                select isDeleted
-                from Store
-                where id = ?;
-                `;
+// // 음식점 삭제 여부 check
+// async function checkStoreDeleted(connection, storeId) {
+//   const query = `
+//                 select isDeleted
+//                 from Store
+//                 where id = ?;
+//                 `;
 
-  const row = await connection.query(query, storeId);
+//   const row = await connection.query(query, storeId);
 
-  return row[0][0]["isDeleted"];
-}
+//   return row[0][0]["isDeleted"];
+// }
 
 // 메뉴 존재 여부 check
 async function checkMenuExist(connection, menuId) {
   const query = `
-                select exists(select id from StoreMenu where id = ?) as exist;
+                select exists(select id
+                              from StoreMenu
+                              where id = ?
+                              and isDeleted = 1) as exist;
                 `;
 
   const row = await connection.query(query, menuId);
@@ -44,18 +50,18 @@ async function checkMenuExist(connection, menuId) {
   return row[0][0]["exist"];
 }
 
-// 메뉴 삭제 여부 check
-async function checkMenuDeleted(connection, menuId) {
-  const query = `
-                select isDeleted
-                from StoreMenu
-                where id = ?;
-                `;
+// // 메뉴 삭제 여부 check
+// async function checkMenuDeleted(connection, menuId) {
+//   const query = `
+//                 select isDeleted
+//                 from StoreMenu
+//                 where id = ?;
+//                 `;
 
-  const row = await connection.query(query, menuId);
+//   const row = await connection.query(query, menuId);
 
-  return row[0][0]["isDeleted"];
-}
+//   return row[0][0]["isDeleted"];
+// }
 
 // 카트에 담기
 async function createCart(
@@ -106,8 +112,10 @@ async function createCart(
 // 카트 상태 check
 async function checkCartExist(connection, userId) {
   const query = `
-                select exists(select id from Cart
-                              where userId = ? and isDeleted = 1) as exist;
+                select exists(select id
+                              from Cart
+                              where userId = ?
+                              and isDeleted = 1) as exist;
                 `;
 
   const row = await connection.query(query, userId);
@@ -118,8 +126,11 @@ async function checkCartExist(connection, userId) {
 // 같은 음식점의 메뉴 여부 check
 async function checkSameStore(connection, userId, storeId) {
   const query = `
-                select exists(select id from Cart
-                              where userId = ? and storeId = ? and isDeleted = 1) as exist;
+                select exists(select id
+                              from Cart
+                              where userId = ?
+                              and storeId = ?
+                              and isDeleted = 1) as exist;
                 `;
 
   const row = await connection.query(query, [userId, storeId]);
@@ -158,9 +169,7 @@ async function checkOtherStoreExist(connection, userId, storeId) {
 module.exports = {
   checkUserExist,
   checkStoreExist,
-  checkStoreDeleted,
   checkMenuExist,
-  checkMenuDeleted,
   createCart,
   checkCartExist,
   checkSameStore,

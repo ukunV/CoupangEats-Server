@@ -39,21 +39,21 @@ exports.checkStoreExist = async function (storeId) {
   }
 };
 
-// 음식점 삭제 여부 check
-exports.checkStoreDeleted = async function (storeId) {
-  try {
-    const connection = await pool.getConnection(async (conn) => conn);
+// // 음식점 삭제 여부 check
+// exports.checkStoreDeleted = async function (storeId) {
+//   try {
+//     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await cartDao.checkStoreDeleted(connection, storeId);
+//     const result = await cartDao.checkStoreDeleted(connection, storeId);
 
-    connection.release();
+//     connection.release();
 
-    return result;
-  } catch (err) {
-    logger.error(`Cart-checkStoreDeleted Provider error: ${err.message}`);
-    return errResponse(baseResponse.DB_ERROR);
-  }
-};
+//     return result;
+//   } catch (err) {
+//     logger.error(`Cart-checkStoreDeleted Provider error: ${err.message}`);
+//     return errResponse(baseResponse.DB_ERROR);
+//   }
+// };
 
 // 메뉴 존재 여부 check
 exports.checkMenuExist = async function (menuId) {
@@ -71,21 +71,21 @@ exports.checkMenuExist = async function (menuId) {
   }
 };
 
-// 메뉴 삭제 여부 check
-exports.checkMenuDeleted = async function (menuId) {
-  try {
-    const connection = await pool.getConnection(async (conn) => conn);
+// // 메뉴 삭제 여부 check
+// exports.checkMenuDeleted = async function (menuId) {
+//   try {
+//     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await cartDao.checkMenuDeleted(connection, menuId);
+//     const result = await cartDao.checkMenuDeleted(connection, menuId);
 
-    connection.release();
+//     connection.release();
 
-    return result;
-  } catch (err) {
-    logger.error(`Cart-checkMenuDeleted Provider error: ${err.message}`);
-    return errResponse(baseResponse.DB_ERROR);
-  }
-};
+//     return result;
+//   } catch (err) {
+//     logger.error(`Cart-checkMenuDeleted Provider error: ${err.message}`);
+//     return errResponse(baseResponse.DB_ERROR);
+//   }
+// };
 
 // 카트 상태 check
 exports.checkCartExist = async function (userId) {
@@ -115,6 +115,26 @@ exports.checkSameStore = async function (userId, storeId) {
     return result;
   } catch (err) {
     logger.error(`Cart-checkSameStore Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 카트에 다른 상점이 이미 있는지 check
+exports.checkOtherStoreExist = async function (userId, storeId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await cartDao.checkOtherStoreExist(
+      connection,
+      userId,
+      storeId
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Cart-checkOtherStoreExist Provider error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };

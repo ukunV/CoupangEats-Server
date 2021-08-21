@@ -52,32 +52,25 @@ exports.createCarts = async function (req, res) {
   if (checkStoreExist === 0)
     return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
 
-  const checkStoreDeleted = await cartProvider.checkStoreDeleted(storeId);
-
-  if (checkStoreDeleted === 0)
-    return res.send(response(baseResponse.STORE_IS_DELETED)); // 3010
-
   const checkMenuExist = await cartProvider.checkMenuExist(menuId);
 
   if (checkMenuExist === 0)
     return res.send(response(baseResponse.MENU_IS_NOT_EXIST)); // 3011
-
-  const checkMenuDeleted = await cartProvider.checkMenuDeleted(menuId);
-
-  if (checkMenuDeleted === 0)
-    return res.send(response(baseResponse.MENU_IS_DELETED)); // 3012
 
   for (let i = 0; i < subIdArr.length; i++) {
     const checkMenuExist = await cartProvider.checkMenuExist(subIdArr[i]);
 
     if (checkMenuExist === 0)
       return res.send(response(baseResponse.SUB_MENU_IS_NOT_EXIST)); // 3020
-
-    const checkMenuDeleted = await cartProvider.checkMenuDeleted(subIdArr[i]);
-
-    if (checkMenuDeleted === 0)
-      return res.send(response(baseResponse.SUB_MENU_IS_DELETED)); // 3021
   }
+
+  const checkOtherStoreExist = await cartProvider.checkOtherStoreExist(
+    userId,
+    storeId
+  );
+
+  if (checkOtherStoreExist === 1)
+    return res.send(response(baseResponse.OTHER_STORE_EXIST)); // 3039
 
   // Response Error End
 
@@ -119,11 +112,6 @@ exports.deleteOtherStore = async function (req, res) {
 
   if (checkStoreExist === 0)
     return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
-
-  const checkStoreDeleted = await cartProvider.checkStoreDeleted(storeId);
-
-  if (checkStoreDeleted === 0)
-    return res.send(response(baseResponse.STORE_IS_DELETED)); // 3010
 
   const checkCartExist = await cartProvider.checkCartExist(userId);
 
