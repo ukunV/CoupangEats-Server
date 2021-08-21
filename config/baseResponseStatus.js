@@ -517,8 +517,11 @@ module.exports = {
     code: 3038,
     message: "해당 결제방식은 다른 유저의 결제방식입니다.",
   },
-
-  // made by note
+  OTHER_STORE_EXIST: {
+    isSuccess: false,
+    code: 3039,
+    message: "이미 다른 상점의 메뉴가 카트에 존재합니다.",
+  },
 
   // SIGNIN_INACTIVE_ACCOUNT: {
   //   isSuccess: false,
