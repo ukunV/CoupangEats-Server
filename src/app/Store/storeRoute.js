@@ -25,7 +25,7 @@ module.exports = function (app) {
   app.get("/stores/:storeId/info-detail", store.getStoreInfo);
 
   // 18. 메인 메뉴 조회 API
-  app.get("/stores/:storeId/menu-detail", store.getMainMenu);
+  app.get("/stores/:menuId/menu-detail", store.getMainMenu);
 
   // 24. 음식점 즐겨찾기 추가 API
   app.post("/stores/:storeId/store-like", jwtMiddleware, store.createStoreLike);

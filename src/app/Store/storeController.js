@@ -263,29 +263,19 @@ exports.getStoreInfo = async function (req, res) {
 /**
  * API No. 18
  * API Name : 메인 메뉴 조회 API
- * [GET] /stores/:storeId/menu-detail
- * path variable: storeId
- * query string: menuId
+ * [GET] /stores/:menuId/menu-detail
+ * path variable: menuId
  */
 exports.getMainMenu = async function (req, res) {
-  const { storeId } = req.params;
-
-  const { menuId } = req.query;
+  const { menuId } = req.params;
 
   // Request Error Start
-
-  if (!storeId) return res.send(errResponse(baseResponse.STORE_ID_IS_EMPTY)); // 2026
 
   if (!menuId) return res.send(errResponse(baseResponse.MENU_ID_IS_EMPTY)); // 2033
 
   // Request Error End
 
   // Response Error Start
-
-  const checkStoreExist = await storeProvider.checkStoreExist(storeId);
-
-  if (checkStoreExist === 0)
-    return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
 
   const checkMenuExist = await storeProvider.checkMenuExist(menuId);
 
