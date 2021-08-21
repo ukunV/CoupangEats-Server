@@ -216,6 +216,48 @@ async function checkOtherStoreExist(connection, userId, storeId) {
   return row[0][0]["exist"];
 }
 
+// 카트에 메뉴 존재 여부 check
+async function checkMenuExistAtCart(connection, userId, rootId) {
+  const query = `
+                select exists(select id
+                              from Cart
+                              where userId = ?
+                              and rootId = ?
+                              and isDeleted = 1) as exist;
+                `;
+
+  const row = await connection.query(query, [userId, rootId]);
+
+  return row[0][0]["exist"];
+}
+
+// 메뉴 수량 변경
+async function changeMenuAmount(connection, userId, rootId, amount) {
+  const query = `
+                update Cart
+                set amount = ?
+                where userId = ?
+                and rootId = ?;
+                `;
+
+  const row = await connection.query(query, [amount, userId, rootId]);
+
+  return row[0].info;
+}
+
+// 카트 비우기
+async function cleanUpCart(connection, userId) {
+  const query = `
+                update Cart
+                set isDeleted = 0
+                where userId = ?;
+                `;
+
+  const row = await connection.query(query, userId);
+
+  return row[0].info;
+}
+
 module.exports = {
   checkUserExist,
   checkStoreExist,
@@ -225,4 +267,7 @@ module.exports = {
   checkSameStore,
   deleteOtherStore,
   checkOtherStoreExist,
+  checkMenuExistAtCart,
+  changeMenuAmount,
+  cleanUpCart,
 };

@@ -138,3 +138,23 @@ exports.checkOtherStoreExist = async function (userId, storeId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 카트에 메뉴 존재 여부 check
+exports.checkMenuExistAtCart = async function (userId, rootId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await cartDao.checkMenuExistAtCart(
+      connection,
+      userId,
+      rootId
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Cart-checkMenuExistAtCart Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

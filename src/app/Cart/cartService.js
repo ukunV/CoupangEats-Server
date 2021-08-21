@@ -65,3 +65,48 @@ exports.deleteOtherStore = async function (userId, storeId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 메뉴 수량 변경
+exports.changeMenuAmount = async function (userId, rootId, amount) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  try {
+    await connection.beginTransaction();
+
+    const result = await cartDao.changeMenuAmount(
+      connection,
+      userId,
+      rootId,
+      amount
+    );
+
+    await connection.commit();
+
+    connection.release();
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    logger.error(`Cart-changeMenuAmount Service error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 카트 비우기
+exports.cleanUpCart = async function (userId) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  try {
+    await connection.beginTransaction();
+
+    const result = await cartDao.cleanUpCart(connection, userId);
+
+    await connection.commit();
+
+    connection.release();
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    logger.error(`Cart-cleanUpCart Service error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
