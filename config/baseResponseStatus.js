@@ -365,6 +365,11 @@ module.exports = {
     code: 2070,
     message: "주문가격이 올바르지 않습니다.",
   },
+  COUPON_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2071,
+    message: "couponId를 입력해주세요.",
+  },
 
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
@@ -566,6 +571,11 @@ module.exports = {
     isSuccess: false,
     code: 3040,
     message: "해당 메뉴는 카트에 존재하지 않습니다.",
+  },
+  COUPON_NOT_OBTAIN: {
+    isSuccess: false,
+    code: 3041,
+    message: "획득하지 못한 쿠폰입니다.",
   },
 
   // SIGNIN_INACTIVE_ACCOUNT: {
