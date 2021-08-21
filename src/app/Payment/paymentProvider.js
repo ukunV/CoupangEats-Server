@@ -111,3 +111,37 @@ exports.checkPaymentHost = async function (userId, paymentId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 현금영수증 발급 정보 조회
+exports.selectCashReceiptInfo = async function (userId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await paymentDao.selectCashReceiptInfo(connection, userId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(
+      `Payment-selectCashReceiptInfo Provider error: ${err.message}`
+    );
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 결제 관리 페이지 조회
+exports.selectPayment = async function (userId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await paymentDao.selectPayment(connection, userId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Payment-selectPayment Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

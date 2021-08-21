@@ -92,3 +92,36 @@ exports.deletePayment = async function (paymentId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 현금영수증 발급 정보 변경
+exports.modifyCashReceiptMethod = async function (
+  userId,
+  isGet,
+  cashReceiptMethod,
+  cashReceiptNum
+) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  try {
+    await connection.beginTransaction();
+
+    const result = await paymentDao.modifyCashReceiptMethod(
+      connection,
+      userId,
+      isGet,
+      cashReceiptMethod,
+      cashReceiptNum
+    );
+
+    await connection.commit();
+
+    connection.release();
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    logger.error(
+      `Payment-modifyCashReceiptMethod Service error: ${err.message}`
+    );
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

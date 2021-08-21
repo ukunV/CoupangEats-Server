@@ -129,6 +129,88 @@ async function deletePayment(connection, paymentId) {
   return row[0].info;
 }
 
+// 현금영수증 발급 정보 조회
+async function selectCashReceiptInfo(connection, userId) {
+  const query = `
+                select isGet,
+                case
+                    when cashReceiptMethod = 1
+                        then '개인소득공제 (휴대폰번호)'
+                    when cashReceiptMethod = 2
+                        then '개인소득공제 (현금영수증카드)'
+                    when cashReceiptMethod = 3
+                        then '사업자증빙 (현금영수증카드)'
+                    when cashReceiptMethod = 4
+                        then '사업자증빙 (사업자등록번호)'
+                end as cashReceiptMethod, cashReceiptNum
+                from User
+                where id = ?;
+                `;
+
+  const row = await connection.query(query, userId);
+
+  return row[0];
+}
+
+// 현금영수증 발급 정보 변경
+async function modifyCashReceiptMethod(
+  connection,
+  userId,
+  isGet,
+  cashReceiptMethod,
+  cashReceiptNum
+) {
+  const query = `
+                update User
+                set isGet = ?, cashReceiptMethod = ?, cashReceiptNum = ?
+                where id = ?;
+                `;
+
+  const row = await connection.query(query, [
+    isGet,
+    cashReceiptMethod,
+    cashReceiptNum,
+    userId,
+  ]);
+
+  return row[0].info;
+}
+
+// 현금영수증 발급 정보 변경
+async function selectPayment(connection, userId) {
+  const query1 = `
+                  select id as paymentId, 
+                        concat('****', left(right(number, 4),3), '*') as number
+                  from Payment
+                  where type = 1
+                  and isDeleted = 1
+                  and userId = ?;
+                `;
+
+  const query2 = `
+                  select p.id as paymentId, ab.bankName,
+                        concat('****', right(p.number, 4)) as number
+                  from Payment p
+                      left join AccountBank ab on p.bankId = ab.id
+                  where type = 2
+                  and isDeleted = 1
+                  and userId = ?;
+                `;
+
+  const query3 = `
+                select cashReceiptNum
+                from User
+                where id = ?
+                and isGet = 1;
+                `;
+
+  const row1 = await connection.query(query1, userId);
+  const row2 = await connection.query(query2, userId);
+  const row3 = await connection.query(query3, userId);
+
+  return { card: row1[0], account: row2[0], cashReceipt: row3[0] };
+}
+
 module.exports = {
   checkUserExist,
   createCard,
@@ -139,4 +221,7 @@ module.exports = {
   checkPaymentExist,
   checkPaymentHost,
   deletePayment,
+  selectCashReceiptInfo,
+  modifyCashReceiptMethod,
+  selectPayment,
 };

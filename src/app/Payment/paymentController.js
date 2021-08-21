@@ -13,7 +13,6 @@ const kakaoMap = require("../../../controllers/kakao_ctrl").getpaymentInfo;
 
 // 계좌/카드/현금 영수증 조회
 // 현금영수증 변경
-// 계좌/카드정보 삭제
 
 /**
  * API No. 39
@@ -240,6 +239,111 @@ exports.deletePayment = async function (req, res) {
   // Response Error End
 
   const result = await paymentService.deletePayment(paymentId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 43
+ * API Name : 현금영수증 발급 정보 조회 API
+ * [GET] /payments/cash-receipt
+ */
+exports.getCashReceiptInfo = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await paymentProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  // Response Error End
+
+  const result = await paymentProvider.selectCashReceiptInfo(userId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 44
+ * API Name : 현금영수증 발급 정보 변경 API
+ * [PATCH] /payments/cash-receipt
+ */
+exports.modifyCashReceiptMethod = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { isGet, cashReceiptMethod, cashReceiptNum } = req.body;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  if (!isGet) return res.send(errResponse(baseResponse.IS_GET_IS_EMPTY)); // 2063
+
+  if (!(isGet in [0, 1]))
+    return res.send(errResponse(baseResponse.IS_GET_IS_NOT_VALID)); // 2064
+
+  if (!cashReceiptMethod)
+    return res.send(errResponse(baseResponse.CASH_RECEIPT_METHOD_IS_EMPTY)); // 2065
+
+  if (!(cashReceiptMethod in [1, 2, 3, 4]))
+    return res.send(errResponse(baseResponse.CASH_RECEIPT_METHOD_IS_NOT_VALID)); // 2066
+
+  if (!cashReceiptNum)
+    return res.send(errResponse(baseResponse.CASH_RECEIPT_NUM_IS_EMPTY)); // 2067
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await paymentProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  // Response Error End
+
+  const result = await paymentService.modifyCashReceiptMethod(
+    userId,
+    isGet,
+    cashReceiptMethod,
+    cashReceiptNum
+  );
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 45
+ * API Name : 결제 관리 페이지 조회 API
+ * [GET] /payments/detail
+ */
+exports.getPayment = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await paymentProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  // Response Error End
+
+  const result = await paymentProvider.selectPayment(userId);
 
   return res.send(response(baseResponse.SUCCESS, result));
 };
