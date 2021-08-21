@@ -93,7 +93,8 @@ async function checkPaymentExist(connection, paymentId) {
   const query = `
                 select exists(select id
                               from Payment
-                              where id = ?) as exist;                
+                              where id = ?
+                              and isDeleted = 1) as exist;                
                 `;
 
   const row = await connection.query(query, paymentId);
@@ -107,7 +108,8 @@ async function checkPaymentHost(connection, userId, paymentId) {
                 select exists(select id
                               from Payment
                               where id = ?
-                              and userId = ?) as exist;              
+                              and userId = ?
+                              and isDeleted = 1) as exist;              
                 `;
 
   const row = await connection.query(query, [paymentId, userId]);
@@ -119,7 +121,7 @@ async function checkPaymentHost(connection, userId, paymentId) {
 async function deletePayment(connection, paymentId) {
   const query = `
                 update Payment
-                isDeleted = 0
+                set isDeleted = 0
                 where id = ?;
                 `;
 

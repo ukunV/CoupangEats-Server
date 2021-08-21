@@ -74,7 +74,7 @@ exports.createAccount = async function (userId, bankId, number) {
 };
 
 // 결제방식 삭제
-exports.deletePayment = async function (userId, paymentId) {
+exports.deletePayment = async function (paymentId) {
   const connection = await pool.getConnection(async (conn) => conn);
   try {
     await connection.beginTransaction();
