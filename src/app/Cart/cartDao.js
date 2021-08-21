@@ -66,46 +66,18 @@ async function createCart(
   amount,
   subIdArr
 ) {
-  const checkQuery = `
-                      select rootId
-                      from Cart
-                      where storeId = ?
-                      and rootId = menuId
-                      and isDeleted = 1;
-                      `;
-
-  const checkRow = await connection.query(checkQuery, storeId);
-
   const mainQuery = `
                 insert into Cart (userId, storeId, rootId, menuId, amount)
                 values (?, ?, ?, ?, ?);
                 `;
 
-  let mainRow;
-
-  let subParams;
-
-  if (checkRow[0].length === 0) {
-    mainRow = await connection.query(mainQuery, [
-      userId,
-      storeId,
-      menuId,
-      menuId,
-      amount,
-    ]);
-
-    subParams = [userId, storeId, menuId];
-  } else {
-    mainRow = await connection.query(mainQuery, [
-      userId,
-      storeId,
-      checkRow[0][0]["rootId"],
-      menuId,
-      amount,
-    ]);
-
-    subParams = [userId, storeId, checkRow[0][0]["rootId"]];
-  }
+  const mainRow = await connection.query(mainQuery, [
+    userId,
+    storeId,
+    menuId,
+    menuId,
+    amount,
+  ]);
 
   let insertCount = 0;
 
@@ -115,13 +87,13 @@ async function createCart(
                     values (?, ?, ?, ?, ?);
                     `;
 
-    subParams.push(subIdArr[i]);
-    subParams.push(amount);
-
-    const subRow = await connection.query(subQuery, subParams);
-
-    subParams.pop();
-    subParams.pop();
+    const subRow = await connection.query(subQuery, [
+      userId,
+      storeId,
+      menuId,
+      menuId,
+      amount,
+    ]);
 
     if (subRow[0].affectedRows === 1) {
       insertCount += 1;
@@ -168,6 +140,21 @@ async function deleteOtherStore(connection, userId) {
   return row[0].info;
 }
 
+// 카트에 다른 상점이 이미 있는지 check
+async function checkOtherStoreExist(connection, userId, storeId) {
+  const query = `
+                select exists(select id
+                              from Cart
+                              where userId = ?
+                              storeId = ?
+                              and isDeleted = 1) as exist;
+                `;
+
+  const row = await connection.query(query, [userId, storeId]);
+
+  return row[0][0]["exist"];
+}
+
 module.exports = {
   checkUserExist,
   checkStoreExist,
@@ -178,4 +165,5 @@ module.exports = {
   checkCartExist,
   checkSameStore,
   deleteOtherStore,
+  checkOtherStoreExist,
 };
