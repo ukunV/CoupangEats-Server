@@ -13,4 +13,13 @@ module.exports = function (app) {
 
   // 47. 카트 비우기 API
   app.patch("/carts/clean-up", jwtMiddleware, cart.cleanUpCart);
+
+  // 48. 카트 조회 API
+  app.get("/carts/detail", jwtMiddleware, cart.getCart);
+
+  // 49. 카트 배달비 조회 API
+  app.get("/carts/detail/delivery-fee", jwtMiddleware, cart.getCartDeliveryFee);
+
+  // 50. 카트 최대 할인 쿠폰 조회 API
+  app.get("/carts/detail/coupon", jwtMiddleware, cart.getCartCoupon);
 };

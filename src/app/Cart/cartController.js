@@ -13,6 +13,7 @@ const { emit } = require("nodemon");
 
 // regular expression
 const regAmount = /^[0-9]/;
+const regPrice = /^[0-9]/;
 
 /**
  * API No. 19
@@ -199,6 +200,126 @@ exports.cleanUpCart = async function (req, res) {
   // Response Error End
 
   const result = await cartService.cleanUpCart(userId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 48
+ * API Name : 카트 조회 API
+ * [GET] /carts/detail
+ */
+exports.getCart = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await cartProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(response(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  // Response Error End
+
+  const result = await cartProvider.selectCart(userId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 49
+ * API Name : 카트 배달비 조회 API
+ * [GET] /carts/detail/delivery-fee
+ * query string: storeId, totalPrice
+ */
+exports.getCartDeliveryFee = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { storeId, totalPrice } = req.query;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  if (!storeId) return res.send(errResponse(baseResponse.STORE_ID_IS_EMPTY)); // 2026
+
+  if (!totalPrice)
+    return res.send(errResponse(baseResponse.TOTAL_PRICE_IS_EMPTY)); // 2069
+
+  if (!regPrice.test(totalPrice))
+    return res.send(errResponse(baseResponse.TOTAL_PRICE_IS_NOT_VALID)); // 2070
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await cartProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(response(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkStoreExist = await cartProvider.checkStoreExist(storeId);
+
+  if (checkStoreExist === 0)
+    return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
+
+  // Response Error End
+
+  const result = await cartProvider.selectCartDeliveryFee(storeId, totalPrice);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 50
+ * API Name : 카트 최대 할인 쿠폰 조회 API
+ * [GET] /carts/detail/coupon
+ * query string: storeId, totalPrice
+ */
+exports.getCartCoupon = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { storeId, totalPrice } = req.query;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  if (!storeId) return res.send(errResponse(baseResponse.STORE_ID_IS_EMPTY)); // 2026
+
+  if (!totalPrice)
+    return res.send(errResponse(baseResponse.TOTAL_PRICE_IS_EMPTY)); // 2069
+
+  if (!regPrice.test(totalPrice))
+    return res.send(errResponse(baseResponse.TOTAL_PRICE_IS_NOT_VALID)); // 2070
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await cartProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(response(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkStoreExist = await cartProvider.checkStoreExist(storeId);
+
+  if (checkStoreExist === 0)
+    return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
+
+  // Response Error End
+
+  const result = await cartProvider.selectCartCoupon(
+    userId,
+    storeId,
+    totalPrice
+  );
 
   return res.send(response(baseResponse.SUCCESS, result));
 };

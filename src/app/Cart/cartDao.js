@@ -258,6 +258,103 @@ async function cleanUpCart(connection, userId) {
   return row[0].info;
 }
 
+// 카트 조회
+async function selectCart(connection, userId) {
+  const query1 = `
+                select id as addressId,
+                      case
+                          when type = 1
+                              then '집'
+                          when type = 2
+                              then '회사'
+                          when nickname != '' and nickname is not null
+                              then nickname
+                          when buildingName != '' and nickname is not null
+                              then buildingName
+                      else
+                        address
+                      end as name,
+                      concat(address, ' ', detailAddress) as address
+                from Address
+                where isDeleted = 1
+                and isChecked = 1
+                and userId= ?;
+                `;
+
+  const row1 = await connection.query(query1, userId);
+
+  const query2 = `
+                  select c.rootId, c.menuId, c.storeId,
+                        s.storeName, s.isCheetah, sm.menuName,
+                        (sm.price * c.amount) as totalPrice, c.amount
+                  from Cart c
+                      left join StoreMenu sm on c.menuId = sm.id
+                      left join Store s on c.storeId = s.id
+                  where c.isDeleted = 1
+                  and c.userId = ?;
+                `;
+
+  const row2 = await connection.query(query2, userId);
+
+  return { userInfo: row1[0], cartInfo: row2[0] };
+}
+
+// 카트 배달비 조회
+async function selectCartDeliveryFee(connection, storeId, totalPrice) {
+  const query = `
+                select ifnull(price, max(price)) as deliveryFee
+                from StoreDeliveryPrice
+                where storeId = ?
+                and orderPrice <= ?
+                order by orderPrice desc
+                limit 1;
+                `;
+  // ifnull -> 최소주문금액(배달비의 주문금액 중 제일 작은 금액)
+  //            보다 작은 경우 가장 비싼 배달비 반환
+
+  const row = await connection.query(query, [storeId, totalPrice]);
+
+  return row[0];
+}
+
+// 카트 최대 할인 쿠폰 조회
+async function selectCartCoupon(connection, userId, storeId, totalPrice) {
+  const query1 = `
+                  select co.id, c.discount
+                  from Coupon c
+                      left join CouponObtained co on c.id = co.couponId
+                      left join Franchise f on c.franchiseId = f.id
+                      left join Store s on f.id = s.franchiseId
+                  where co.userId = ?
+                  and (s.id = ? or s.id is null)
+                  and orderPrice <= ?
+                  and co.status = 1
+                  and c.status = 1
+                  order by discount desc
+                  limit 1;
+                  `;
+
+  const row1 = await connection.query(query1, [userId, storeId, totalPrice]);
+
+  const query2 = `
+                  update CouponObtained
+                  set isChecked = 0
+                  where userId = ?
+                  `;
+
+  await connection.query(query2, userId);
+
+  const query3 = `
+                  update CouponObtained
+                  set isChecked = 1
+                  where id = ?;
+                  `;
+
+  await connection.query(query3, row1[0][0]["id"]);
+
+  return row1[0];
+}
+
 module.exports = {
   checkUserExist,
   checkStoreExist,
@@ -270,4 +367,7 @@ module.exports = {
   checkMenuExistAtCart,
   changeMenuAmount,
   cleanUpCart,
+  selectCart,
+  selectCartDeliveryFee,
+  selectCartCoupon,
 };

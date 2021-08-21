@@ -158,3 +158,60 @@ exports.checkMenuExistAtCart = async function (userId, rootId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 카트 조회
+exports.selectCart = async function (userId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await cartDao.selectCart(connection, userId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Cart-selectCart Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 카트 배달비 조회
+exports.selectCartDeliveryFee = async function (storeId, totalPrice) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await cartDao.selectCartDeliveryFee(
+      connection,
+      storeId,
+      totalPrice
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Cart-selectCartDeliveryFee Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 카트 최대 할인 쿠폰 조회
+exports.selectCartCoupon = async function (userId, storeId, totalPrice) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await cartDao.selectCartCoupon(
+      connection,
+      userId,
+      storeId,
+      totalPrice
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Cart-selectCartCoupon Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
