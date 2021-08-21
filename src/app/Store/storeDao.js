@@ -354,14 +354,39 @@ async function checkStoreLike(connection, userId, storeId) {
 
 // 음식점 즐겨찾기 추가
 async function createStoreLike(connection, userId, storeId) {
-  const query = `
-                insert into StoreLike (userId, storeId)
-                values (?, ?);
-                `;
+  const checkExistQuery = `
+                  select exists(select id
+                                from StoreLike
+                                where userId = ?
+                                and storeId = ?) as exist;
+                  `;
 
-  const row = await connection.query(query, [userId, storeId]);
+  const checkExistRow = await connection.query(checkExistQuery, [
+    userId,
+    storeId,
+  ]);
 
-  return row[0];
+  if (checkExistRow[0][0]["exist"] === 0) {
+    const query = `
+                  insert into StoreLike (userId, storeId)
+                  values (?, ?);
+                  `;
+
+    const row = await connection.query(query, [userId, storeId]);
+
+    return row[0];
+  } else {
+    const query = `
+                  update StoreLike
+                  set isDeleted = 1
+                  where userId = ?
+                  and storeId = ?;
+                  `;
+
+    const row = await connection.query(query, [userId, storeId]);
+
+    return row[0].info;
+  }
 }
 
 // 음식점 즐겨찾기 삭제
