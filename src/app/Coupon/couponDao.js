@@ -39,7 +39,7 @@ async function checkStoreExist(connection, storeId) {
 // My 이츠에서 쿠폰 목록 조회
 async function selectMyEatsCoupons(connection, userId) {
   const query = `
-            select c.id as couponId, c.couponName,
+            select co.id as couponObtainedId, c.couponName,
                   concat(format(c.discount, 0), '원 할인') as discount,
                   concat(format(c.orderPrice, 0), '원 이상 주문 시') as orderPrice,
                   case
@@ -51,6 +51,7 @@ async function selectMyEatsCoupons(connection, userId) {
             from Coupon c
                 left join (select * from CouponObtained where status = 1) as co on c.id = co.couponId
             where co.userId = ?
+            and c.status = 1
             order by co.createdAt desc;
             `;
 
@@ -62,7 +63,7 @@ async function selectMyEatsCoupons(connection, userId) {
 // 카트에서 쿠폰 목록 조회
 async function selectCartCoupons(connection, userId, storeId, totalPrice) {
   const query = `
-            select c.id as couponId, c.couponName,
+            select co.id as couponObtainedId, c.couponName,
                   concat(format(c.discount, 0), '원 할인') as discount,
                   concat(format(c.orderPrice, 0), '원 이상 주문 시') as orderPrice,
                   case
@@ -89,6 +90,7 @@ async function selectCartCoupons(connection, userId, storeId, totalPrice) {
                 left join Franchise f on c.franchiseId = f.id
                 left join (select * from Store where id = ?) as s on s.franchiseId = f.id
             where co.userId = ?
+            and c.status = 1
             group by co.createdAt
             order by co.createdAt desc;
             `;
