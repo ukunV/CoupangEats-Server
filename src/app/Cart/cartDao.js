@@ -72,6 +72,56 @@ async function createCart(
   amount,
   subIdArr
 ) {
+  const existCheckQuery = `
+                          select rootId, menuId
+                          from Cart
+                          where rootId = ?
+                          and isDeleted = 1
+                          and userId = ?
+                          order by menuId;
+                          `;
+
+  const existCheckRow = await connection.query(existCheckQuery, [
+    menuId,
+    userId,
+  ]);
+
+  let existMainId;
+  let existSubArr = [];
+
+  if (existCheckRow[0].length !== 0) {
+    existMainId = existCheckRow[0][0]["rootId"];
+
+    for (let i = 1; i < existCheckRow[0].length; i++) {
+      existSubArr.push(existCheckRow[0][i]["menuId"]);
+    }
+  }
+
+  let same = 1;
+
+  if ((existMainId === menuId) & (existSubArr.length === subIdArr.length)) {
+    for (let i = 0; i < subIdArr.length; i++) {
+      if (existSubArr[i] !== subIdArr[i]) {
+        same = 0;
+        break;
+      }
+    }
+  }
+
+  if (same === 1) {
+    const query = `
+                  update Cart
+                  set amount = amount + ?
+                  where userId = ?
+                  and rootId = ?
+                  and isDeleted = 1;
+                  `;
+
+    const row = await connection.query(query, [amount, userId, menuId]);
+
+    return row[0].info;
+  }
+
   const mainQuery = `
                 insert into Cart (userId, storeId, rootId, menuId, amount)
                 values (?, ?, ?, ?, ?);
@@ -157,7 +207,7 @@ async function checkOtherStoreExist(connection, userId, storeId) {
                 select exists(select id
                               from Cart
                               where userId = ?
-                              storeId = ?
+                              and storeId != ?
                               and isDeleted = 1) as exist;
                 `;
 
