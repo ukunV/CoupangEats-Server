@@ -25,6 +25,7 @@ module.exports = function () {
   require("../src/app/Cart/cartRoute")(app);
   require("../src/app/Coupon/couponRoute")(app);
   require("../src/app/Review/reviewRoute")(app);
+  require("../src/app/Payment/paymentRoute")(app);
 
   return app;
 };
