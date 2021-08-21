@@ -325,6 +325,31 @@ module.exports = {
     code: 2062,
     message: "paymentId를 입력해주세요.",
   },
+  IS_GET_IS_EMPTY: {
+    isSuccess: false,
+    code: 2063,
+    message: "현금영수증 발급 여부를 선택해주세요.",
+  },
+  IS_GET_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2064,
+    message: "현금영수증 발급 여부가 올바르지 않습니다.",
+  },
+  CASH_RECEIPT_METHOD_IS_EMPTY: {
+    isSuccess: false,
+    code: 2065,
+    message: "현금영수증 발급 방식을 선택해주세요.",
+  },
+  CASH_RECEIPT_METHOD_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2066,
+    message: "현금영수증 발급 방식이 올바르지 않습니다.",
+  },
+  CASH_RECEIPT_NUM_IS_EMPTY: {
+    isSuccess: false,
+    code: 2067,
+    message: "현금영수증 발급 번호를 입력해주세요.",
+  },
 
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
