@@ -38,11 +38,6 @@ exports.getPhotoReviews = async function (req, res) {
   if (checkStoreExist === 0)
     return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
 
-  const checkStoreDeleted = await reviewProvider.checkStoreDeleted(storeId);
-
-  if (checkStoreDeleted === 0)
-    return res.send(response(baseResponse.STORE_IS_DELETED)); // 3010
-
   // Response Error End
 
   const result = await reviewProvider.selectPhotoReviews(storeId);
@@ -100,11 +95,6 @@ exports.getReviewList = async function (req, res) {
 
   if (checkStoreExist === 0)
     return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
-
-  const checkStoreDeleted = await reviewProvider.checkStoreDeleted(storeId);
-
-  if (checkStoreDeleted === 0)
-    return res.send(response(baseResponse.STORE_IS_DELETED)); // 3010
 
   // Response Error End
 

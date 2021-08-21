@@ -108,8 +108,7 @@ async function checkPaymentHost(connection, userId, paymentId) {
                 select exists(select id
                               from Payment
                               where id = ?
-                              and userId = ?
-                              and isDeleted = 1) as exist;              
+                              and userId = ?) as exist;              
                 `;
 
   const row = await connection.query(query, [paymentId, userId]);

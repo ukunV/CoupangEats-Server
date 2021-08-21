@@ -94,7 +94,10 @@ async function insertAddress(
 // 주소 존재 여부 확인
 async function checkAddressExist(connection, addressId) {
   const query = `
-                select exists(select id from Address where id = ?) as exist;
+                select exists(select id
+                              from Address
+                              where id = ?
+                              and isDeleted = 1) as exist;
                 `;
 
   const row = await connection.query(query, addressId);
@@ -206,8 +209,11 @@ async function selectAddress(connection, userId) {
 // 집/회사 주소 존재 여부 확인
 async function checkHouseCompany(connection, userId, type) {
   const query = `
-                select exists(select id from Address
-                              where userId = ? and type = ?) as exist;
+                select exists(select id
+                              from Address
+                              where userId = ?
+                              and type = ?
+                              and isDeleted = 1) as exist;
                 `;
 
   const row = await connection.query(query, [userId, type]);
@@ -215,18 +221,18 @@ async function checkHouseCompany(connection, userId, type) {
   return row[0][0]["exist"];
 }
 
-// 주소 삭제 여부 확인
-async function checkAddressDeleted(connection, addressId) {
-  const query = `
-                select isDeleted
-                from Address
-                where id = ?;
-                `;
+// // 주소 삭제 여부 확인
+// async function checkAddressDeleted(connection, addressId) {
+//   const query = `
+//                 select isDeleted
+//                 from Address
+//                 where id = ?;
+//                 `;
 
-  const row = await connection.query(query, addressId);
+//   const row = await connection.query(query, addressId);
 
-  return row[0][0]["isDeleted"];
-}
+//   return row[0][0]["isDeleted"];
+// }
 
 // 주소 목록에서 주소 선택
 async function updateLocation(connection, addressId, userId, lat, lng) {
@@ -269,6 +275,5 @@ module.exports = {
   deleteAddress,
   selectAddress,
   checkHouseCompany,
-  checkAddressDeleted,
   updateLocation,
 };

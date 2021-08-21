@@ -150,7 +150,10 @@ async function selectStoresByCategoryId(
 // 음식점 존재 여부 check
 async function checkStoreExist(connection, storeId) {
   const query = `
-                select exists(select id from Store where id = ?) as exist;
+                select exists(select id
+                              from Store
+                              where id = ?
+                              and isDeleted = 1) as exist;
                 `;
 
   const row = await connection.query(query, storeId);
@@ -257,23 +260,26 @@ async function selectStoreInfo(connection, storeId) {
   return row[0];
 }
 
-// 음식점 삭제 여부 check
-async function checkStoreDeleted(connection, storeId) {
-  const query = `
-                select isDeleted
-                from Store
-                where id = ?;
-                `;
+// // 음식점 삭제 여부 check
+// async function checkStoreDeleted(connection, storeId) {
+//   const query = `
+//                 select isDeleted
+//                 from Store
+//                 where id = ?;
+//                 `;
 
-  const row = await connection.query(query, storeId);
+//   const row = await connection.query(query, storeId);
 
-  return row[0][0]["isDeleted"];
-}
+//   return row[0][0]["isDeleted"];
+// }
 
 // 메뉴 존재 여부 check
 async function checkMenuExist(connection, menuId) {
   const query = `
-                select exists(select id from StoreMenu where id = ?) as exist;
+                select exists(select id
+                              from StoreMenu
+                              where id = ?
+                              and isDeleted = 1) as exist;
                 `;
 
   const row = await connection.query(query, menuId);
@@ -318,18 +324,18 @@ async function selectMainMenu(connection, menuId) {
   return row;
 }
 
-// 메뉴 삭제 여부 check
-async function checkMenuDeleted(connection, menuId) {
-  const query = `
-                select isDeleted
-                from StoreMenu
-                where id = ?;
-                `;
+// // 메뉴 삭제 여부 check
+// async function checkMenuDeleted(connection, menuId) {
+//   const query = `
+//                 select isDeleted
+//                 from StoreMenu
+//                 where id = ?;
+//                 `;
 
-  const row = await connection.query(query, menuId);
+//   const row = await connection.query(query, menuId);
 
-  return row[0][0]["isDeleted"];
-}
+//   return row[0][0]["isDeleted"];
+// }
 
 // 음식점 즐겨찾기 추가
 async function checkStoreLike(connection, userId, storeId) {
@@ -441,10 +447,8 @@ module.exports = {
   selectStore,
   selectStoreDelivery,
   selectStoreInfo,
-  checkStoreDeleted,
   checkMenuExist,
   selectMainMenu,
-  checkMenuDeleted,
   checkStoreLike,
   createStoreLike,
   deleteStoreLike,

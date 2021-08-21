@@ -119,20 +119,20 @@ exports.checkEventExist = async function (eventId) {
   }
 };
 
-// 이벤트 상태 check
-exports.checkEventStatus = async function (eventId) {
-  try {
-    const connection = await pool.getConnection(async (conn) => conn);
+// // 이벤트 상태 check
+// exports.checkEventStatus = async function (eventId) {
+//   try {
+//     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await userDao.checkEventStatus(connection, eventId);
-    connection.release();
+//     const result = await userDao.checkEventStatus(connection, eventId);
+//     connection.release();
 
-    return result;
-  } catch (err) {
-    logger.error(`User-checkEventStatus Provider error: ${err.message}`);
-    return errResponse(baseResponse.DB_ERROR);
-  }
-};
+//     return result;
+//   } catch (err) {
+//     logger.error(`User-checkEventStatus Provider error: ${err.message}`);
+//     return errResponse(baseResponse.DB_ERROR);
+//   }
+// };
 
 // 이벤트 상세페이지 조회
 exports.selectEvent = async function (eventId, distance) {
@@ -229,17 +229,17 @@ exports.checkNoticeExist = async function (noticeId) {
   }
 };
 
-// 공지 상태 check
-exports.checkNoticeDeleted = async function (noticeId) {
-  try {
-    const connection = await pool.getConnection(async (conn) => conn);
+// // 공지 상태 check
+// exports.checkNoticeDeleted = async function (noticeId) {
+//   try {
+//     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await userDao.checkNoticeDeleted(connection, noticeId);
-    connection.release();
+//     const result = await userDao.checkNoticeDeleted(connection, noticeId);
+//     connection.release();
 
-    return result;
-  } catch (err) {
-    logger.error(`User-checkNoticeDeleted Provider error: ${err.message}`);
-    return errResponse(baseResponse.DB_ERROR);
-  }
-};
+//     return result;
+//   } catch (err) {
+//     logger.error(`User-checkNoticeDeleted Provider error: ${err.message}`);
+//     return errResponse(baseResponse.DB_ERROR);
+//   }
+// };

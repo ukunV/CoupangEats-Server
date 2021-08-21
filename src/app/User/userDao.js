@@ -1,7 +1,9 @@
 // 이메일 존재 여부 확인
 async function checkEmailExist(connection, email) {
   const query = `
-    select exists(select email from User where email = ?) as exist;
+    select exists(select email
+                  from User
+                  where email = ?) as exist;
     `;
 
   const row = await connection.query(query, email);
@@ -12,7 +14,10 @@ async function checkEmailExist(connection, email) {
 // 전화번호 존재 여부 확인
 async function checkPhoneNumExist(connection, phoneNum) {
   const query = `
-    select exists(select phoneNum from User where phoneNum = ?) as exist;
+    select exists(select phoneNum
+                  from User
+                  where phoneNum = ?
+                  and status in (1, 2)) as exist;
     `;
 
   const row = await connection.query(query, phoneNum);
@@ -299,7 +304,10 @@ async function selectEventList(connection, userId) {
 // 이벤트 존재 여부 check
 async function checkEventExist(connection, eventId) {
   const query = `
-                select exists(select id from Event where id = ?) as exist;
+                select exists(select id
+                              from Event
+                              where id = ?
+                              and status = 1) as exist;
                 `;
 
   const row = await connection.query(query, eventId);
@@ -307,18 +315,18 @@ async function checkEventExist(connection, eventId) {
   return row[0][0]["exist"];
 }
 
-// 이벤트 상태 check
-async function checkEventStatus(connection, eventId) {
-  const query = `
-                select status
-                from Event
-                where id = ?;
-                `;
+// // 이벤트 상태 check
+// async function checkEventStatus(connection, eventId) {
+//   const query = `
+//                 select status
+//                 from Event
+//                 where id = ?;
+//                 `;
 
-  const row = await connection.query(query, eventId);
+//   const row = await connection.query(query, eventId);
 
-  return row[0][0]["status"];
-}
+//   return row[0][0]["status"];
+// }
 
 // 이벤트 상세페이지 조회
 async function selectEvent(connection, eventId, distance) {
@@ -440,7 +448,10 @@ async function selectNoticeList(connection) {
 // 공지 존재 여부 check
 async function checkNoticeExist(connection, noticeId) {
   const query = `
-                select exists(select id from Notice where id = ?) as exist;
+                select exists(select id
+                              from Notice
+                              where id = ?
+                              and isDeleted = 1) as exist;
                 `;
 
   const row = await connection.query(query, noticeId);
@@ -448,18 +459,18 @@ async function checkNoticeExist(connection, noticeId) {
   return row[0][0]["exist"];
 }
 
-// 공지 상태 check
-async function checkNoticeDeleted(connection, noticeId) {
-  const query = `
-                select isDeleted
-                from Notice
-                where id = ?;
-                `;
+// // 공지 상태 check
+// async function checkNoticeDeleted(connection, noticeId) {
+//   const query = `
+//                 select isDeleted
+//                 from Notice
+//                 where id = ?;
+//                 `;
 
-  const row = await connection.query(query, noticeId);
+//   const row = await connection.query(query, noticeId);
 
-  return row[0][0]["isDeleted"];
-}
+//   return row[0][0]["isDeleted"];
+// }
 
 // 공지사항 세부페이지 조회
 async function selectNotice(connection, noticeId) {
@@ -485,12 +496,10 @@ module.exports = {
   selectHome,
   selectEventList,
   checkEventExist,
-  checkEventStatus,
   selectEvent,
   checkFranchiseExist,
   eventToStore,
   selectNoticeList,
   checkNoticeExist,
-  checkNoticeDeleted,
   selectNotice,
 };

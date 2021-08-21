@@ -12,7 +12,10 @@ async function checkUserExist(connection, userId) {
 // 음식점 존재 여부 check
 async function checkStoreExist(connection, storeId) {
   const query = `
-                select exists(select id from Store where id = ?) as exist;
+                select exists(select id
+                              from Store
+                              where id = ?
+                              and isDeleted = 1) as exist;
                 `;
 
   const row = await connection.query(query, storeId);
@@ -20,18 +23,18 @@ async function checkStoreExist(connection, storeId) {
   return row[0][0]["exist"];
 }
 
-// 음식점 삭제 여부 check
-async function checkStoreDeleted(connection, storeId) {
-  const query = `
-                select isDeleted
-                from Store
-                where id = ?;
-                `;
+// // 음식점 삭제 여부 check
+// async function checkStoreDeleted(connection, storeId) {
+//   const query = `
+//                 select isDeleted
+//                 from Store
+//                 where id = ?;
+//                 `;
 
-  const row = await connection.query(query, storeId);
+//   const row = await connection.query(query, storeId);
 
-  return row[0][0]["isDeleted"];
-}
+//   return row[0][0]["isDeleted"];
+// }
 
 // My 이츠에서 쿠폰 목록 조회
 async function selectMyEatsCoupons(connection, userId) {
@@ -167,7 +170,6 @@ async function createCoupons(connection, userId, number) {
 module.exports = {
   checkUserExist,
   checkStoreExist,
-  checkStoreDeleted,
   selectMyEatsCoupons,
   selectCartCoupons,
   checkCouponExist,

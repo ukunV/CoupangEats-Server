@@ -195,11 +195,6 @@ exports.getStore = async function (req, res) {
   if (checkStoreExist === 0)
     return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
 
-  const checkStoreDeleted = await storeProvider.checkStoreDeleted(storeId);
-
-  if (checkStoreDeleted === 0)
-    return res.send(response(baseResponse.STORE_IS_DELETED)); // 3010
-
   // Response Error End
 
   const result = await storeProvider.selectStore(storeId);
@@ -229,11 +224,6 @@ exports.getStoreDelivery = async function (req, res) {
   if (checkStoreExist === 0)
     return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
 
-  const checkStoreDeleted = await storeProvider.checkStoreDeleted(storeId);
-
-  if (checkStoreDeleted === 0)
-    return res.send(response(baseResponse.STORE_IS_DELETED)); // 3010
-
   // Response Error End
 
   const result = await storeProvider.selectStoreDelivery(storeId);
@@ -262,11 +252,6 @@ exports.getStoreInfo = async function (req, res) {
 
   if (checkStoreExist === 0)
     return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
-
-  const checkStoreDeleted = await storeProvider.checkStoreDeleted(storeId);
-
-  if (checkStoreDeleted === 0)
-    return res.send(response(baseResponse.STORE_IS_DELETED)); // 3010
 
   // Response Error End
 
@@ -302,20 +287,10 @@ exports.getMainMenu = async function (req, res) {
   if (checkStoreExist === 0)
     return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
 
-  const checkStoreDeleted = await storeProvider.checkStoreDeleted(storeId);
-
-  if (checkStoreDeleted === 0)
-    return res.send(response(baseResponse.STORE_IS_DELETED)); // 3010
-
   const checkMenuExist = await storeProvider.checkMenuExist(menuId);
 
   if (checkMenuExist === 0)
     return res.send(response(baseResponse.MENU_IS_NOT_EXIST)); // 3011
-
-  const checkMenuDeleted = await storeProvider.checkMenuDeleted(menuId);
-
-  if (checkMenuDeleted === 0)
-    return res.send(response(baseResponse.MENU_IS_DELETED)); // 3012
 
   // Response Error End
 
@@ -354,11 +329,6 @@ exports.createStoreLike = async function (req, res) {
 
   if (checkStoreExist === 0)
     return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
-
-  const checkStoreDeleted = await storeProvider.checkStoreDeleted(storeId);
-
-  if (checkStoreDeleted === 0)
-    return res.send(response(baseResponse.STORE_IS_DELETED)); // 3010
 
   const checkStoreLike = await storeProvider.checkStoreLike(userId, storeId);
 
@@ -400,13 +370,6 @@ exports.deleteStoreLike = async function (req, res) {
 
     if (checkStoreExist === 0)
       return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
-
-    const checkStoreDeleted = await storeProvider.checkStoreDeleted(
-      storeIdArr[i]
-    );
-
-    if (checkStoreDeleted === 0)
-      return res.send(response(baseResponse.STORE_IS_DELETED)); // 3010
 
     const checkStoreLike = await storeProvider.checkStoreLike(
       userId,

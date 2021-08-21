@@ -326,11 +326,6 @@ exports.getEvent = async function (req, res) {
   if (checkEventExist === 0)
     return res.send(errResponse(baseResponse.EVENT_IS_NOT_EXIST)); // 3022
 
-  const checkEventStatus = await userProvider.checkEventStatus(eventId);
-
-  if (checkEventStatus === 0)
-    return res.send(errResponse(baseResponse.EVENT_IS_DELETED)); // 3023
-
   // Response Error End
 
   const result = await userProvider.selectEvent(eventId, distance);
@@ -444,11 +439,6 @@ exports.getNotice = async function (req, res) {
 
   if (checkNoticeExist === 0)
     return res.send(errResponse(baseResponse.NOTICE_IS_NOT_EXIST)); // 3025
-
-  const checkNoticeDeleted = await userProvider.checkNoticeDeleted(noticeId);
-
-  if (checkNoticeDeleted === 0)
-    return res.send(errResponse(baseResponse.NOTICE_IS_DELETED)); // 3026
 
   // Response Error End
 

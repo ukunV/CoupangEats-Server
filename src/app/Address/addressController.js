@@ -156,13 +156,6 @@ exports.deleteAddresses = async function (req, res) {
   if (checkAddressExist === 0)
     return res.send(errResponse(baseResponse.ADDRESS_IS_NOT_EXIST)); // 3007
 
-  const checkAddressDeleted = await addressProvider.checkAddressDeleted(
-    addressId
-  );
-
-  if (checkAddressDeleted === 0)
-    return res.send(errResponse(baseResponse.ADDRESS_IS_DELETED)); // 3009
-
   // Response Error End
 
   const result = await addressService.deleteAddress(addressId);
@@ -263,13 +256,6 @@ exports.changeLocation = async function (req, res) {
 
   if (checkAddressExist === 0)
     return res.send(errResponse(baseResponse.ADDRESS_IS_NOT_EXIST)); // 3007
-
-  const checkAddressDeleted = await addressProvider.checkAddressDeleted(
-    addressId
-  );
-
-  if (checkAddressDeleted === 0)
-    return res.send(errResponse(baseResponse.ADDRESS_IS_DELETED)); // 3009
 
   // Response Error End
 

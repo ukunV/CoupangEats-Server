@@ -70,18 +70,18 @@ exports.checkHouseCompany = async function (userId, type) {
   }
 };
 
-// 주소 삭제 여부 확인
-exports.checkAddressDeleted = async function (addressId) {
-  try {
-    const connection = await pool.getConnection(async (conn) => conn);
+// // 주소 삭제 여부 확인
+// exports.checkAddressDeleted = async function (addressId) {
+//   try {
+//     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await addressDao.checkAddressDeleted(connection, addressId);
+//     const result = await addressDao.checkAddressDeleted(connection, addressId);
 
-    connection.release();
+//     connection.release();
 
-    return result;
-  } catch (err) {
-    logger.error(`Address-checkAddressDeleted Provider error: ${err.message}`);
-    return errResponse(baseResponse.DB_ERROR);
-  }
-};
+//     return result;
+//   } catch (err) {
+//     logger.error(`Address-checkAddressDeleted Provider error: ${err.message}`);
+//     return errResponse(baseResponse.DB_ERROR);
+//   }
+// };

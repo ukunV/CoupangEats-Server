@@ -174,21 +174,21 @@ exports.selectStoreInfo = async function (storeId) {
   }
 };
 
-// 음식점 삭제 여부 check
-exports.checkStoreDeleted = async function (storeId) {
-  try {
-    const connection = await pool.getConnection(async (conn) => conn);
+// // 음식점 삭제 여부 check
+// exports.checkStoreDeleted = async function (storeId) {
+//   try {
+//     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await storeDao.checkStoreDeleted(connection, storeId);
+//     const result = await storeDao.checkStoreDeleted(connection, storeId);
 
-    connection.release();
+//     connection.release();
 
-    return result;
-  } catch (err) {
-    logger.error(`Store-checkStoreDeleted Provider error: ${err.message}`);
-    return errResponse(baseResponse.DB_ERROR);
-  }
-};
+//     return result;
+//   } catch (err) {
+//     logger.error(`Store-checkStoreDeleted Provider error: ${err.message}`);
+//     return errResponse(baseResponse.DB_ERROR);
+//   }
+// };
 
 // 메뉴 존재 여부 check
 exports.checkMenuExist = async function (menuId) {
@@ -222,21 +222,21 @@ exports.selectMainMenu = async function (menuId) {
   }
 };
 
-// 메뉴 삭제 여부 check
-exports.checkMenuDeleted = async function (menuId) {
-  try {
-    const connection = await pool.getConnection(async (conn) => conn);
+// // 메뉴 삭제 여부 check
+// exports.checkMenuDeleted = async function (menuId) {
+//   try {
+//     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await storeDao.checkMenuDeleted(connection, menuId);
+//     const result = await storeDao.checkMenuDeleted(connection, menuId);
 
-    connection.release();
+//     connection.release();
 
-    return result;
-  } catch (err) {
-    logger.error(`Store-checkMenuDeleted Provider error: ${err.message}`);
-    return errResponse(baseResponse.DB_ERROR);
-  }
-};
+//     return result;
+//   } catch (err) {
+//     logger.error(`Store-checkMenuDeleted Provider error: ${err.message}`);
+//     return errResponse(baseResponse.DB_ERROR);
+//   }
+// };
 
 // 음식점 즐겨찾기 존재 여부 check
 exports.checkStoreLike = async function (userId, storeId) {

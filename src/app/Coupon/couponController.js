@@ -79,11 +79,6 @@ exports.getCartCoupons = async function (req, res) {
   if (checkStoreExist === 0)
     return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
 
-  const checkStoreDeleted = await couponProvider.checkStoreDeleted(storeId);
-
-  if (checkStoreDeleted === 0)
-    return res.send(response(baseResponse.STORE_IS_DELETED)); // 3010
-
   // Response Error End
 
   const result = await couponProvider.selectCartCoupons(
