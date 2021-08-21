@@ -119,7 +119,7 @@ async function createCart(
 
     const row = await connection.query(query, [amount, userId, menuId]);
 
-    return row[0].info;
+    return `Same Menu -> add mount: ${amount}`;
   }
 
   const mainQuery = `
