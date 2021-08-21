@@ -367,26 +367,26 @@ module.exports = {
     code: 3008,
     message: "존재하지 않는 음식점입니다.",
   },
-  ADDRESS_IS_DELETED: {
-    isSuccess: false,
-    code: 3009,
-    message: "삭제된 주소입니다.",
-  },
-  STORE_IS_DELETED: {
-    isSuccess: false,
-    code: 3010,
-    message: "삭제된 음식점입니다.",
-  },
+  // ADDRESS_IS_DELETED: {
+  //   isSuccess: false,
+  //   code: 3009,
+  //   message: "삭제된 주소입니다.",
+  // },
+  // STORE_IS_DELETED: {
+  //   isSuccess: false,
+  //   code: 3010,
+  //   message: "삭제된 음식점입니다.",
+  // },
   MENU_IS_NOT_EXIST: {
     isSuccess: false,
     code: 3011,
     message: "존재하지 않는 메뉴입니다.",
   },
-  MENU_IS_DELETED: {
-    isSuccess: false,
-    code: 3012,
-    message: "삭제된 메뉴입니다.",
-  },
+  // MENU_IS_DELETED: {
+  //   isSuccess: false,
+  //   code: 3012,
+  //   message: "삭제된 메뉴입니다.",
+  // },
   CART_IS_EMPTY: {
     isSuccess: false,
     code: 3013,
@@ -452,11 +452,11 @@ module.exports = {
     code: 3025,
     message: "존재하지 않는 공지입니다.",
   },
-  NOTICE_IS_DELETED: {
-    isSuccess: false,
-    code: 3026,
-    message: "삭제된 공지입니다.",
-  },
+  // NOTICE_IS_DELETED: {
+  //   isSuccess: false,
+  //   code: 3026,
+  //   message: "삭제된 공지입니다.",
+  // },
   ORDER_IS_NOT_EXIST: {
     isSuccess: false,
     code: 3027,
