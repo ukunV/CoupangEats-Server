@@ -176,11 +176,12 @@ async function modifyCashReceiptMethod(
   return row[0].info;
 }
 
-// 현금영수증 발급 정보 변경
+// 결제 관리 페이지 조회
 async function selectPayment(connection, userId) {
   const query1 = `
                   select id as paymentId, 
-                        concat('****', left(right(number, 4),3), '*') as number
+                        concat('****', left(right(number, 4),3), '*') as number,
+                        isChecked
                   from Payment
                   where type = 1
                   and isDeleted = 1
@@ -189,7 +190,8 @@ async function selectPayment(connection, userId) {
 
   const query2 = `
                   select p.id as paymentId, ab.bankName,
-                        concat('****', right(p.number, 4)) as number
+                        concat('****', right(p.number, 4)) as number,
+                        isChecked
                   from Payment p
                       left join AccountBank ab on p.bankId = ab.id
                   where type = 2
