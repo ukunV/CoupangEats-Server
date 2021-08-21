@@ -110,3 +110,27 @@ exports.cleanUpCart = async function (userId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 카트에서 쿠폰 변경
+exports.changeCoupon = async function (userId, couponObtainedId) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  try {
+    await connection.beginTransaction();
+
+    const result = await cartDao.changeCoupon(
+      connection,
+      userId,
+      couponObtainedId
+    );
+
+    await connection.commit();
+
+    connection.release();
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    logger.error(`Cart-changeCoupon Service error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

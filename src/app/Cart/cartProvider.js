@@ -215,3 +215,25 @@ exports.selectCartCoupon = async function (userId, storeId, totalPrice) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 쿠폰 획득 여부 check
+exports.checkCouponObtainedExist = async function (userId, couponObtainedId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await cartDao.checkCouponObtainedExist(
+      connection,
+      userId,
+      couponObtainedId
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(
+      `Cart-checkCouponObtainedExist Provider error: ${err.message}`
+    );
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

@@ -355,6 +355,41 @@ async function selectCartCoupon(connection, userId, storeId, totalPrice) {
   return row1[0];
 }
 
+// 쿠폰 획득 여부 check
+async function checkCouponObtainedExist(connection, userId, couponObtainedId) {
+  const query = `
+                select exists(select id
+                              from CouponObtained
+                              where userId = ?
+                              and id = ?) as exist;
+                `;
+
+  const row = await connection.query(query, [userId, couponObtainedId]);
+
+  return row[0][0]["exist"];
+}
+
+// 카트에서 쿠폰 변경
+async function changeCoupon(connection, userId, couponObtainedId) {
+  const query1 = `
+                  update CouponObtained
+                  set isChecked = 0
+                  where userId = ?
+                  `;
+
+  await connection.query(query1, userId);
+
+  const query2 = `
+                  update CouponObtained
+                  set isChecked = 1
+                  where id = ?;
+                  `;
+
+  const row2 = await connection.query(query2, couponObtainedId);
+
+  return row2[0].info;
+}
+
 module.exports = {
   checkUserExist,
   checkStoreExist,
@@ -370,4 +405,6 @@ module.exports = {
   selectCart,
   selectCartDeliveryFee,
   selectCartCoupon,
+  checkCouponObtainedExist,
+  changeCoupon,
 };
