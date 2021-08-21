@@ -127,7 +127,7 @@ async function checkCouponObtained(connection, userId, number) {
   const query1 = `
                   select id
                   from Coupon
-                  where number = ?
+                  where number = ?;
                   `;
 
   const row1 = await connection.query(query1, number);

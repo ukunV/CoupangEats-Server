@@ -261,7 +261,8 @@ async function checkReviewExistByReviewId(connection, reviewId) {
   const query = `
                 select exists(select id
                               from Review
-                              where id = ?) as exist;
+                              where id = ?
+                              and isDeleted = 1) as exist;
                 `;
 
   const row = await connection.query(query, reviewId);

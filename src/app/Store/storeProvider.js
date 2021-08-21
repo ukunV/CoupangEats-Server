@@ -238,7 +238,7 @@ exports.selectMainMenu = async function (menuId) {
 //   }
 // };
 
-// 음식점 즐겨찾기 존재 여부 check
+// 이미 좋아요 클릭 여부 check
 exports.checkStoreLike = async function (userId, storeId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);

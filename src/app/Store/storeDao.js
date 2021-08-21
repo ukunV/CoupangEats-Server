@@ -337,11 +337,14 @@ async function selectMainMenu(connection, menuId) {
 //   return row[0][0]["isDeleted"];
 // }
 
-// 음식점 즐겨찾기 추가
+// 이미 좋아요 클릭 여부 check
 async function checkStoreLike(connection, userId, storeId) {
   const query = `
-                select exists(select id from StoreLike
-                              where userId = ? and storeId = ?) as exist;
+                select exists(select id
+                              from StoreLike
+                              where userId = ?
+                              and storeId = ?
+                              and isDeleted = 1) as exist;
                 `;
 
   const row = await connection.query(query, [userId, storeId]);
