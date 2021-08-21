@@ -235,7 +235,7 @@ exports.deletePayment = async function (req, res) {
   );
 
   if (checkPaymentHost === 0)
-    return res.send(errResponse(baseResponse.PAYMENT_IS_NOT_EXIST)); // 3037
+    return res.send(errResponse(baseResponse.PAYMENT_IS_NOT_USERS)); // 3038
 
   // Response Error End
 
