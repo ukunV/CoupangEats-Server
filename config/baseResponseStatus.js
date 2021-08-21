@@ -355,6 +355,16 @@ module.exports = {
     code: 2068,
     message: "메뉴의 부모 아이디(rootId)를 입력해주세요.",
   },
+  TOTAL_PRICE_IS_EMPTY: {
+    isSuccess: false,
+    code: 2069,
+    message: "주문가격을 입력해주세요.",
+  },
+  TOTAL_PRICE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2070,
+    message: "주문가격이 올바르지 않습니다.",
+  },
 
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
