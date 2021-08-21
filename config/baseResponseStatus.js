@@ -240,6 +240,91 @@ module.exports = {
     code: 2045,
     message: "선택사유의 값이 유효하지 않습니다.",
   },
+  PAYMENT_TYPE_IS_EMPTY: {
+    isSuccess: false,
+    code: 2046,
+    message: "등록할 결제방식을 선택해주세요.",
+  },
+  CARD_NUM_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2047,
+    message: "카드번호가 올바르지 않습니다.",
+  },
+  VALID_MONTH_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2048,
+    message: "올바른 유효기간(월)을 입력해주세요.",
+  },
+  VALID_YEAR_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2049,
+    message: "올바른 유효기간(년)을 입력해주세요.",
+  },
+  CARD_IS_EXPIRED: {
+    isSuccess: false,
+    code: 2050,
+    message: "카드의 유효기간이 만료되었습니다.",
+  },
+  CARD_NUM_IS_EMPTY: {
+    isSuccess: false,
+    code: 2051,
+    message: "카드번호를 입력해주세요.",
+  },
+  VALID_MONTH_IS_EMPTY: {
+    isSuccess: false,
+    code: 2052,
+    message: "유효기간(월)을 입력해주세요.",
+  },
+  VALID_YEAR_IS_EMPTY: {
+    isSuccess: false,
+    code: 2053,
+    message: "유효기간(년)을 입력해주세요.",
+  },
+  CVC_NUM_IS_EMPTY: {
+    isSuccess: false,
+    code: 2054,
+    message: "cvc번호를 입력해주세요.",
+  },
+  CARD_PWD_IS_EMPTY: {
+    isSuccess: false,
+    code: 2055,
+    message: "카드 비밀번호 앞 두자리를 입력해주세요.",
+  },
+  CVC_NUM_LENGTH_ERROR: {
+    isSuccess: false,
+    code: 2056,
+    message: "cvc번호는 3자리입니다.",
+  },
+  CARD_PWD_LENGTH_ERROR: {
+    isSuccess: false,
+    code: 2057,
+    message: "카드 비밀번호는 2자리입니다.",
+  },
+  TYPE_IS_NOT_FOR_CARD: {
+    isSuccess: false,
+    code: 2058,
+    message: "카드등록을 위한 올바른 type을 입력해주세요.",
+  },
+  TYPE_IS_NOT_FOR_ACCOUNT: {
+    isSuccess: false,
+    code: 2059,
+    message: "계좌등록을 위한 올바른 type을 입력해주세요.",
+  },
+  BANK_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2060,
+    message: "bankId를 입력해주세요.",
+  },
+  ACCOUNT_NUM_IS_EMPTY: {
+    isSuccess: false,
+    code: 2061,
+    message: "계좌번호를 입력해주세요.",
+  },
+  PAYMENT_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2062,
+    message: "paymentId를 입력해주세요.",
+  },
 
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
@@ -411,6 +496,26 @@ module.exports = {
     isSuccess: false,
     code: 3034,
     message: "해당 리뷰는 이미 신고가 완료되었습니다.",
+  },
+  BANK_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3035,
+    message: "해당 은행은 존재하지 않습니다.",
+  },
+  NUMBER_LENGTH_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 3036,
+    message: "계좌번호의 길이가 올바르지 않습니다.",
+  },
+  PAYMENT_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3037,
+    message: "등록되지 않은 결제방식입니다.",
+  },
+  PAYMENT_IS_NOT_USERS: {
+    isSuccess: false,
+    code: 3038,
+    message: "해당 결제방식은 다른 유저의 결제방식입니다.",
   },
 
   // made by note

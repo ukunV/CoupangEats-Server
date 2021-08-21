@@ -22,7 +22,7 @@ module.exports = function () {
   require("../src/app/User/userRoute")(app);
   require("../src/app/Store/storeRoute")(app);
   require("../src/app/Address/addressRoute")(app);
-  require("../src/app/Cart/cartRoute")(app);
+  // require("../src/app/Cart/cartRoute")(app);
   require("../src/app/Coupon/couponRoute")(app);
   require("../src/app/Review/reviewRoute")(app);
   require("../src/app/Payment/paymentRoute")(app);

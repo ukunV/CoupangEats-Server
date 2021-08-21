@@ -17,7 +17,97 @@ exports.checkUserExist = async function (userId) {
 
     return result;
   } catch (err) {
-    logger.error(`payment-checkUserExist Provider error: ${err.message}`);
+    logger.error(`Payment-checkUserExist Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 결제방식(계좌) 등록 - 입금주명(유저명) 조회
+exports.selectUserNameAtAccount = async function (userId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await paymentDao.selectUserNameAtAccount(connection, userId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(
+      `Payment-selectUserNameAtAccount Provider error: ${err.message}`
+    );
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 은행 존재 여부 check
+exports.checkBankExist = async function (bankId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await paymentDao.checkBankExist(connection, bankId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Payment-checkBankExist Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 은행의 계좌번호 길이 check
+exports.checkAccountLength = async function (bankId, numLen) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await paymentDao.checkAccountLength(
+      connection,
+      bankId,
+      numLen
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Payment-checkAccountLength Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 결제방식 존재 여부 check
+exports.checkPaymentExist = async function (paymentId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await paymentDao.checkPaymentExist(connection, paymentId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Payment-checkPaymentExist Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 해당 유저의 결제방식이 맞는지 check
+exports.checkPaymentHost = async function (userId, paymentId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await paymentDao.checkPaymentHost(
+      connection,
+      userId,
+      paymentId
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Payment-checkPaymentHost Provider error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };

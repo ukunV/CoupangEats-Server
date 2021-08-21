@@ -246,7 +246,7 @@ exports.deleteReview = async function (req, res) {
 };
 
 /**
- * API No. 35
+ * API No. 36
  * API Name : 리뷰 신고 API
  * [POST] /reviews
  */
@@ -327,7 +327,7 @@ exports.reportReview = async function (req, res) {
 };
 
 /**
- * API No. 36
+ * API No. 37
  * API Name : 내가 작성한 리뷰 조회 API
  * [GET] /reviews/:orderId/review-detail
  */
@@ -380,7 +380,7 @@ exports.getMyReview = async function (req, res) {
 };
 
 /**
- * API No. 37
+ * API No. 38
  * API Name : 리뷰 수정 API
  * [PATCH] /reviews/detail
  */
