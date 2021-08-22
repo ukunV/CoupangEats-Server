@@ -369,25 +369,18 @@ async function checkCouponObtainedExist(connection, userId, couponObtainedId) {
   return row[0][0]["exist"];
 }
 
-// 카트에서 쿠폰 변경
+// 카트에서 쿠폰 선택
 async function changeCoupon(connection, userId, couponObtainedId) {
-  const query1 = `
-                  update CouponObtained
-                  set isChecked = 0
-                  where userId = ?
-                  `;
-
-  await connection.query(query1, userId);
-
-  const query2 = `
+  const query = `
                   update CouponObtained
                   set isChecked = 1
                   where id = ?;
                   `;
 
-  const row2 = await connection.query(query2, couponObtainedId);
+  const row = await connection.query(query, couponObtainedId);
 
-  return row2[0].info;
+  return row[0].info;
+}
 
 // 카트에서 쿠폰 변경
 async function selectCouponChoice(connection, userId) {

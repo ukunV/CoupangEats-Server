@@ -23,8 +23,9 @@ module.exports = function (app) {
   // 50. 카트 최대 할인 쿠폰 조회 API
   app.get("/carts/detail/coupon", jwtMiddleware, cart.getCartCoupon);
 
-  // 50. 카트에서 쿠폰 변경 API
-  app.patch("/carts/detail/coupon", jwtMiddleware, cart.changeCoupon);
+  // 51. 카트에서 쿠폰 선택 API
+  app.patch("/carts/detail/coupon-choice", jwtMiddleware, cart.changeCoupon);
+
   // 52. 카트에서 선택한 쿠폰 조회 API
   app.get("/carts/detail/coupon-choice", jwtMiddleware, cart.getCouponChoice);
 };

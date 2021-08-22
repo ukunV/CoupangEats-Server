@@ -111,7 +111,7 @@ exports.cleanUpCart = async function (userId) {
   }
 };
 
-// 카트에서 쿠폰 변경
+// 카트에서 쿠폰 선택
 exports.changeCoupon = async function (userId, couponObtainedId) {
   const connection = await pool.getConnection(async (conn) => conn);
   try {

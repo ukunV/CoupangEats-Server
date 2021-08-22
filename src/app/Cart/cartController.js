@@ -326,7 +326,44 @@ exports.getCartCoupon = async function (req, res) {
 
 /**
  * API No. 51
- * API Name : 카트에서 쿠폰 변경 API
+ * API Name : 카트에서 쿠폰 선택 API
+ * [PATCH] /carts/detail/coupon-choice
+ */
+exports.changeCoupon = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { couponObtainedId } = req.body;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  if (!couponObtainedId)
+    return res.send(errResponse(baseResponse.COUPON_ID_IS_EMPTY)); // 2071
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await cartProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(response(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkCouponObtainedExist = await cartProvider.checkCouponObtainedExist(
+    userId,
+    couponObtainedId
+  );
+
+  if (checkCouponObtainedExist === 0)
+    return res.send(response(baseResponse.COUPON_NOT_OBTAIN)); // 3041
+
+  // Response Error End
+
+  const result = await cartService.changeCoupon(userId, couponObtainedId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
 
 /**
  * API No. 52
@@ -355,6 +392,10 @@ exports.getCouponChoice = async function (req, res) {
 
   return res.send(response(baseResponse.SUCCESS, result));
 };
+
+/**
+ * API No. 53
+ * API Name : 카트에서 쿠폰 선택 제거 API
  * [PATCH] /carts/detail/coupon
  */
 exports.changeCoupon = async function (req, res) {
