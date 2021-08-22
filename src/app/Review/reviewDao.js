@@ -122,15 +122,12 @@ async function selectReviewList(
                   limit ${page}, ${size};
                 `;
 
-  const result1 = await connection.query(query1, storeId);
-  const result2 = await connection.query(query2, storeId);
+  const row1 = await connection.query(query1, storeId);
+  const row2 = await connection.query(query2, storeId);
 
-  const storeInfo = JSON.parse(JSON.stringify(result1[0]));
-  const reviewList = JSON.parse(JSON.stringify(result2[0]));
+  const result = { storeInfo: row1[0], reviewList: row2[0] };
 
-  const row = { storeInfo, reviewList };
-
-  return row;
+  return result;
 }
 
 // 주문과 회원 일치 여부 check
