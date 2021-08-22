@@ -297,7 +297,7 @@ async function selectCart(connection, userId) {
   const row2 = await connection.query(query2, userId);
 
   const query3 = `
-                  select
+                  select p.id as paymentId,
                         case
                             when p.bankId is null
                                 then '카드'
