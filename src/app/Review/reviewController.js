@@ -155,6 +155,16 @@ exports.createReview = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await reviewProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await reviewProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   const checkUsersOrder = await reviewProvider.checkUsersOrder(userId, orderId);
 
   if (checkUsersOrder === 0)
@@ -213,6 +223,16 @@ exports.deleteReview = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await reviewProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await reviewProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
   const checkReviewExistByReviewId =
     await reviewProvider.checkReviewExistByReviewId(reviewId);
@@ -282,6 +302,16 @@ exports.reportReview = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await reviewProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await reviewProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   const checkReviewExistByReviewId =
     await reviewProvider.checkReviewExistByReviewId(reviewId);
 
@@ -340,6 +370,16 @@ exports.getMyReview = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await reviewProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await reviewProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
   const checkOrderExist = await reviewProvider.checkOrderExist(orderId);
 
@@ -403,6 +443,16 @@ exports.modifyReview = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await reviewProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await reviewProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
   const checkReviewExistByReviewId =
     await reviewProvider.checkReviewExistByReviewId(reviewId);

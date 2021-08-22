@@ -53,6 +53,16 @@ exports.getNewStore = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await storeProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await storeProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   const checkCategoryExist = await storeProvider.checkCategoryExist(categoryId);
 
   if (checkCategoryExist === 0)
@@ -104,6 +114,21 @@ exports.getStoresByCategoryId = async function (req, res) {
   page = size * (page - 1);
 
   // Response Error Start
+
+  const checkUserExist = await storeProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await storeProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await storeProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
   const checkCategoryExist = await storeProvider.checkCategoryExist(categoryId);
 
@@ -315,6 +340,16 @@ exports.createStoreLike = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await storeProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await storeProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   const checkStoreExist = await storeProvider.checkStoreExist(storeId);
 
   if (checkStoreExist === 0)
@@ -354,6 +389,16 @@ exports.deleteStoreLike = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await storeProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await storeProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
   for (let i = 0; i < storeIdArr.length; i++) {
     const checkStoreExist = await storeProvider.checkStoreExist(storeIdArr[i]);
@@ -402,6 +447,16 @@ exports.getStoreLike = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await storeProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await storeProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
   // Response Error End
 

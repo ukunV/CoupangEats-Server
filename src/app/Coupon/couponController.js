@@ -35,6 +35,16 @@ exports.getMyEatsCoupons = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await couponProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await couponProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   // Response Error End
 
   const result = await couponProvider.selectMyEatsCoupons(userId);
@@ -74,6 +84,16 @@ exports.getCartCoupons = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await couponProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await couponProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   const checkStoreExist = await couponProvider.checkStoreExist(storeId);
 
   if (checkStoreExist === 0)
@@ -112,6 +132,16 @@ exports.createCoupons = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await couponProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await couponProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
   const checkCouponExist = await couponProvider.checkCouponExist(number);
 

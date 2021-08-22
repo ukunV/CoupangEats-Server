@@ -40,6 +40,16 @@ exports.createAddresses = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await addressProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await addressProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   // Response Error End
 
   const { lat, lng } = await kakaoMap(address);
@@ -92,6 +102,16 @@ exports.modifyAddresses = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await addressProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await addressProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
   const checkAddressExist = await addressProvider.checkAddressExist(addressId);
 
@@ -151,6 +171,16 @@ exports.deleteAddresses = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await addressProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await addressProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   const checkAddressExist = await addressProvider.checkAddressExist(addressId);
 
   if (checkAddressExist === 0)
@@ -184,6 +214,16 @@ exports.selectAddresses = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await addressProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await addressProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   // Response Error End
 
   const result = await addressProvider.selectAddress(userId);
@@ -216,6 +256,16 @@ exports.checkHouseCompany = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await addressProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await addressProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
   // Response Error End
 
@@ -251,6 +301,16 @@ exports.changeLocation = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await addressProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await addressProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
   const checkAddressExist = await addressProvider.checkAddressExist(addressId);
 

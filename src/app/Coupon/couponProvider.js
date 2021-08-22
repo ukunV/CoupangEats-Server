@@ -142,3 +142,33 @@ exports.checkCouponObtained = async function (userId, number) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 계정 정지 여부 확인
+exports.checkUserBlocked = async function (userId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await couponDao.checkUserBlocked(connection, userId);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Coupon-checkUserBlocked Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 계정 탈퇴 여부 확인
+exports.checkUserWithdrawn = async function (userId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await couponDao.checkUserWithdrawn(connection, userId);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Coupon-checkUserWithdrawn Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

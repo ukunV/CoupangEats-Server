@@ -96,6 +96,16 @@ exports.createCard = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await paymentProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await paymentProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   // Response Error End
 
   const result = await paymentService.createCard(
@@ -130,6 +140,16 @@ exports.getUserNameAtAccount = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await paymentProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await paymentProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
   // Response Error End
 
@@ -174,6 +194,16 @@ exports.createAccount = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await paymentProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await paymentProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
   const checkBankExist = await paymentProvider.checkBankExist(bankId);
 
@@ -223,6 +253,16 @@ exports.deletePayment = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await paymentProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await paymentProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   const checkPaymentExist = await paymentProvider.checkPaymentExist(paymentId);
 
   if (checkPaymentExist === 0)
@@ -263,6 +303,16 @@ exports.getCashReceiptInfo = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await paymentProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await paymentProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
   // Response Error End
 
@@ -308,6 +358,16 @@ exports.modifyCashReceiptMethod = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await paymentProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await paymentProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   // Response Error End
 
   const result = await paymentService.modifyCashReceiptMethod(
@@ -340,6 +400,16 @@ exports.getPayment = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await paymentProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await paymentProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
   // Response Error End
 

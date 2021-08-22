@@ -48,6 +48,16 @@ exports.createCarts = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(response(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await cartProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await cartProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   const checkStoreExist = await cartProvider.checkStoreExist(storeId);
 
   if (checkStoreExist === 0)
@@ -109,6 +119,16 @@ exports.deleteOtherStore = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(response(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await cartProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await cartProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   const checkStoreExist = await cartProvider.checkStoreExist(storeId);
 
   if (checkStoreExist === 0)
@@ -161,6 +181,16 @@ exports.changeMenuAmount = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(response(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await cartProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await cartProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   const checkMenuExistAtCart = await cartProvider.checkMenuExistAtCart(
     userId,
     rootId
@@ -197,6 +227,16 @@ exports.cleanUpCart = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(response(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await cartProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await cartProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   // Response Error End
 
   const result = await cartService.cleanUpCart(userId);
@@ -224,6 +264,16 @@ exports.getCart = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(response(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await cartProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await cartProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
   // Response Error End
 
@@ -263,6 +313,16 @@ exports.getCartDeliveryFee = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(response(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await cartProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await cartProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
   const checkStoreExist = await cartProvider.checkStoreExist(storeId);
 
@@ -308,6 +368,16 @@ exports.getCartCoupon = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(response(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await cartProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await cartProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   const checkStoreExist = await cartProvider.checkStoreExist(storeId);
 
   if (checkStoreExist === 0)
@@ -350,6 +420,16 @@ exports.changeCoupon = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(response(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await cartProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await cartProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   const checkCouponObtainedExist = await cartProvider.checkCouponObtainedExist(
     userId,
     couponObtainedId
@@ -386,6 +466,16 @@ exports.getCouponChoice = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(response(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await cartProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await cartProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   // Response Error End
 
   const result = await cartProvider.selectCouponChoice(userId);
@@ -413,6 +503,16 @@ exports.deleteCouponChoice = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(response(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await cartProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await cartProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
   // Response Error End
 

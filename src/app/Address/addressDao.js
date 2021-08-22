@@ -267,6 +267,34 @@ async function updateLocation(connection, addressId, userId, lat, lng) {
   };
 }
 
+// 계정 정지 여부 확인
+async function checkUserBlocked(connection, userId) {
+  const query = `
+                select exists(select id
+                              from User
+                              where id = ?
+                              and status = 2) as exist;
+                `;
+
+  const row = await connection.query(query, userId);
+
+  return row[0][0]["exist"];
+}
+
+// 계정 탈퇴 여부 확인
+async function checkUserWithdrawn(connection, userId) {
+  const query = `
+                select exists(select id
+                              from User
+                              where id = ?
+                              and status = 0) as exist;
+                `;
+
+  const row = await connection.query(query, userId);
+
+  return row[0][0]["exist"];
+}
+
 module.exports = {
   checkUserExist,
   insertAddress,
@@ -276,4 +304,6 @@ module.exports = {
   selectAddress,
   checkHouseCompany,
   updateLocation,
+  checkUserBlocked,
+  checkUserWithdrawn,
 };
