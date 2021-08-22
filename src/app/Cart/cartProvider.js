@@ -197,8 +197,9 @@ exports.selectCartDeliveryFee = async function (storeId, totalPrice) {
 
 // 카트 최대 할인 쿠폰 조회
 exports.selectCartCoupon = async function (userId, storeId, totalPrice) {
+  const connection = await pool.getConnection(async (conn) => conn);
   try {
-    const connection = await pool.getConnection(async (conn) => conn);
+    await connection.beginTransaction();
 
     const result = await cartDao.selectCartCoupon(
       connection,
@@ -207,10 +208,14 @@ exports.selectCartCoupon = async function (userId, storeId, totalPrice) {
       totalPrice
     );
 
+    await connection.commit();
+
     connection.release();
 
     return result;
   } catch (err) {
+    await connection.rollback();
+    connection.release();
     logger.error(`Cart-selectCartCoupon Provider error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
