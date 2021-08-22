@@ -28,4 +28,7 @@ module.exports = function (app) {
 
   // 52. 카트에서 선택한 쿠폰 조회 API
   app.get("/carts/detail/coupon-choice", jwtMiddleware, cart.getCouponChoice);
+
+  // 53. 카트에서 쿠폰 선택 제거 API
+  app.patch("/carts/detail/coupon", jwtMiddleware, cart.deleteCouponChoice);
 };

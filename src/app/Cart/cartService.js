@@ -134,3 +134,23 @@ exports.changeCoupon = async function (userId, couponObtainedId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 카트에서 쿠폰 선택 제거
+exports.deleteCouponChoice = async function (userId) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  try {
+    await connection.beginTransaction();
+
+    const result = await cartDao.deleteCouponChoice(connection, userId);
+
+    await connection.commit();
+
+    connection.release();
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    logger.error(`Cart-deleteCouponChoice Service error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

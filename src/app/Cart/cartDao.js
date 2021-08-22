@@ -397,6 +397,19 @@ async function selectCouponChoice(connection, userId) {
   return row[0];
 }
 
+// 카트에서 쿠폰 선택 제거
+async function deleteCouponChoice(connection, userId) {
+  const query = `
+                  update CouponObtained
+                  set isChecked = 0
+                  where userId = ?;
+                  `;
+
+  const row = await connection.query(query, userId);
+
+  return row[0].info;
+}
+
 module.exports = {
   checkUserExist,
   checkStoreExist,
@@ -415,4 +428,5 @@ module.exports = {
   checkCouponObtainedExist,
   changeCoupon,
   selectCouponChoice,
+  deleteCouponChoice,
 };
