@@ -78,10 +78,41 @@ async function createOrder(
 
   return row[0];
 }
+
+// 쿠폰 존재 여부 check
+async function checkCouponExist(connection, userId, couponObtainedId) {
+  const query = `
+                select exists(select id
+                              from CouponObtained
+                              where userId = ?
+                              and id = ?
+                              and status = 1) as exist;
+                `;
+
+  const row = await connection.query(query, [userId, couponObtainedId]);
+
+  return row[0][0]["exist"];
+}
+
+// 주문 정보 생성 -> 사용한 쿠폰 사용 처리
+async function changeCouponStatus(connection, couponObtainedId) {
+  const query = `
+                update CouponObtained
+                set status = 0
+                where id = ?;
+                `;
+
+  const row = await connection.query(query, couponObtainedId);
+
+  return row[0].info;
+}
+
 module.exports = {
   checkUserExist,
   checkUserBlocked,
   checkUserWithdrawn,
   checkPaymentExist,
   createOrder,
+  checkCouponExist,
+  changeCouponStatus,
 };

@@ -47,3 +47,26 @@ exports.createOrder = async function (
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 주문 정보 생성 -> 사용한 쿠폰 사용 처리
+exports.changeCouponStatus = async function (couponObtainedId) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  try {
+    await connection.beginTransaction();
+
+    const result = await orderDao.changeCouponStatus(
+      connection,
+      couponObtainedId
+    );
+
+    await connection.commit();
+
+    connection.release();
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    logger.error(`Order-changeCouponStatus Service error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

@@ -72,3 +72,23 @@ exports.checkPaymentExist = async function (userId, paymentId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 쿠폰 존재 여부 check
+exports.checkCouponExist = async function (userId, couponObtainedId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await orderDao.checkCouponExist(
+      connection,
+      userId,
+      couponObtainedId
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Order-checkCouponExist Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
