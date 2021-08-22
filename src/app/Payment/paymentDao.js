@@ -241,6 +241,18 @@ async function checkUserWithdrawn(connection, userId) {
   return row[0][0]["exist"];
 }
 
+// 계좌 은행 목록 조회
+async function selectBankList(connection) {
+  const query = `
+                select id as bankId, bankName
+                from AccountBank;
+                `;
+
+  const row = await connection.query(query);
+
+  return row[0];
+}
+
 module.exports = {
   checkUserExist,
   createCard,
@@ -256,4 +268,5 @@ module.exports = {
   selectPayment,
   checkUserBlocked,
   checkUserWithdrawn,
+  selectBankList,
 };

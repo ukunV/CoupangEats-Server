@@ -417,3 +417,41 @@ exports.getPayment = async function (req, res) {
 
   return res.send(response(baseResponse.SUCCESS, result));
 };
+
+/**
+ * API No. 54
+ * API Name : 계좌 은행 목록 조회 API
+ * [GET] /payments/account/bank-list
+ */
+exports.getBankList = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await paymentProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await paymentProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await paymentProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
+  // Response Error End
+
+  const result = await paymentProvider.selectBankList();
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};

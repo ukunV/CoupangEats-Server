@@ -175,3 +175,18 @@ exports.checkUserWithdrawn = async function (userId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 계좌 은행 목록 조회
+exports.selectBankList = async function () {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await paymentDao.selectBankList(connection);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Payment-selectBankList Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

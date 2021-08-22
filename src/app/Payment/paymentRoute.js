@@ -30,4 +30,7 @@ module.exports = function (app) {
 
   // 45. 결제 관리 페이지 조회
   app.get("/payments/detail", jwtMiddleware, payment.getPayment);
+
+  // 54. 계좌 은행 목록 조회 API
+  app.get("/payments/account/bank-list", jwtMiddleware, payment.getBankList);
 };
