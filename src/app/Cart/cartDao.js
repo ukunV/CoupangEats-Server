@@ -320,7 +320,7 @@ async function selectCartDeliveryFee(connection, storeId, totalPrice) {
 // 카트 최대 할인 쿠폰 조회
 async function selectCartCoupon(connection, userId, storeId, totalPrice) {
   const query1 = `
-                  select co.id, c.discount
+                  select co.id as couponObtainedId, c.discount
                   from Coupon c
                       left join CouponObtained co on c.id = co.couponId
                       left join Franchise f on c.franchiseId = f.id
@@ -335,6 +335,10 @@ async function selectCartCoupon(connection, userId, storeId, totalPrice) {
                   `;
 
   const row1 = await connection.query(query1, [userId, storeId, totalPrice]);
+
+  if (row1[0].length === 0) {
+    return { couponObtainedId: 0, discount: 0 };
+  }
 
   const query2 = `
                   update CouponObtained
