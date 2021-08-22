@@ -323,7 +323,7 @@ module.exports = {
   PAYMENT_ID_IS_EMPTY: {
     isSuccess: false,
     code: 2062,
-    message: "paymentId를 입력해주세요.",
+    message: "paymentId 값을 입력해주세요.",
   },
   IS_GET_IS_EMPTY: {
     isSuccess: false,
@@ -555,7 +555,7 @@ module.exports = {
   PAYMENT_IS_NOT_EXIST: {
     isSuccess: false,
     code: 3037,
-    message: "등록되지 않은 결제방식입니다.",
+    message: "등록되지 않은 결제수단입니다.",
   },
   PAYMENT_IS_NOT_USERS: {
     isSuccess: false,
