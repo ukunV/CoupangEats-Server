@@ -296,7 +296,29 @@ async function selectCart(connection, userId) {
 
   const row2 = await connection.query(query2, userId);
 
-  return { userInfo: row1[0], cartInfo: row2[0] };
+  const query3 = `
+                  select
+                        case
+                            when p.bankId is null
+                                then '카드'
+                            else
+                                ab.bankName
+                        end as type,
+                        case
+                            when p.bankId is null
+                                then concat('****', left(right(p.number, 4), 3), '*')
+                            else
+                                concat('****', right(p.number, 4))
+                        end as number
+                  from Payment p
+                      left join AccountBank ab on p.bankId = ab.id
+                  where p.userId = ?
+                  and p.isChecked = 1;
+                  `;
+
+  const row3 = await connection.query(query3, userId);
+
+  return { userInfo: row1[0], cartInfo: row2[0], paymentInfo: row3[0] };
 }
 
 // 카트 배달비 조회
