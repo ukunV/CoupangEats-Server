@@ -370,6 +370,26 @@ module.exports = {
     code: 2071,
     message: "couponId를 입력해주세요.",
   },
+  DELIVERY_FEE_PRICE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2072,
+    message: "배달비가 올바르지 않습니다.",
+  },
+  DISCOUNT_PRICE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2073,
+    message: "할인금액이 올바르지 않습니다.",
+  },
+  FINAL_PRICE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2074,
+    message: "최종 결제금액이 올바르지 않습니다.",
+  },
+  COUPON_OBTAINED_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2075,
+    message: "couponObtainedId 값을 입력해주세요.",
+  },
 
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
