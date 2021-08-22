@@ -84,7 +84,7 @@ exports.createOrder = async function (req, res) {
 
 /**
  * API No. 56
- * API Name : 주문 정보 생성 -> 사용한 쿠폰 사용 처리 API
+ * API Name : 주문 정보 생성 -> 쿠폰 상태 변경 API
  * [PATCH] /orders/order-detail/coupon
  * 사용한 쿠폰 없을 시 -> couponObtainedId: 0
  */
@@ -140,24 +140,18 @@ exports.changeCouponStatus = async function (req, res) {
 
 /**
  * API No. 56
- * API Name : 주문 정보 생성 -> 카트 orderId 변경 API
+ * API Name : 주문 정보 생성 -> 카트 상태 변경 API
  * [PATCH] /orders/order-detail/cart
+ * orderId, isDeleted 변경
  */
-exports.changeCouponStatus = async function (req, res) {
+exports.changeCartStatus = async function (req, res) {
   const { userId } = req.verifiedToken;
 
-  const { couponObtainedId } = req.body;
-
-  if (couponObtainedId === 0) {
-    return res.send(response(baseResponse.SUCCESS, "사용한 쿠폰이 없습니다."));
-  }
+  const { rootIdArr } = req.body;
 
   // Request Error Start
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
-
-  if (!couponObtainedId)
-    return res.send(errResponse(baseResponse.COUPON_OBTAINED_ID_IS_EMPTY)); // 2075
 
   // Request Error End
 
@@ -178,17 +172,9 @@ exports.changeCouponStatus = async function (req, res) {
   if (checkUserWithdrawn === 1)
     return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
-  const checkCouponExist = await orderProvider.checkCouponExist(
-    userId,
-    couponObtainedId
-  );
-
-  if (checkCouponExist === 0)
-    return res.send(errResponse(baseResponse.COUPON_IS_NOT_EXIST)); // 3015
-
   // Response Error End
 
-  const result = await orderService.changeCouponStatus(couponObtainedId);
+  const result = await orderService.changeCartStatus(userId, rootIdArr);
 
   return res.send(response(baseResponse.SUCCESS, result));
 };

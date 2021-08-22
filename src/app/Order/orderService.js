@@ -48,7 +48,7 @@ exports.createOrder = async function (
   }
 };
 
-// 주문 정보 생성 -> 사용한 쿠폰 사용 처리
+// 주문 정보 생성 -> 쿠폰 상태 변경
 exports.changeCouponStatus = async function (couponObtainedId) {
   const connection = await pool.getConnection(async (conn) => conn);
   try {
@@ -67,6 +67,30 @@ exports.changeCouponStatus = async function (couponObtainedId) {
     await connection.rollback();
     connection.release();
     logger.error(`Order-changeCouponStatus Service error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 주문 정보 생성 -> 카트 상태 변경
+exports.changeCartStatus = async function (userId, rootIdArr) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  try {
+    await connection.beginTransaction();
+
+    const result = await orderDao.changeCartStatus(
+      connection,
+      userId,
+      rootIdArr
+    );
+
+    await connection.commit();
+
+    connection.release();
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    logger.error(`Order-changeCartStatus Service error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };

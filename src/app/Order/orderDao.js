@@ -1,3 +1,5 @@
+const { errResponse } = require("../../../config/response");
+
 // 유저 존재 여부 check
 async function checkUserExist(connection, userId) {
   const query = `
@@ -94,7 +96,7 @@ async function checkCouponExist(connection, userId, couponObtainedId) {
   return row[0][0]["exist"];
 }
 
-// 주문 정보 생성 -> 사용한 쿠폰 사용 처리
+// 주문 정보 생성 -> 쿠폰 상태 변경
 async function changeCouponStatus(connection, couponObtainedId) {
   const query = `
                 update CouponObtained
@@ -107,6 +109,36 @@ async function changeCouponStatus(connection, couponObtainedId) {
   return row[0].info;
 }
 
+// 주문 정보 생성 -> 카트 상태 변경
+async function changeCartStatus(connection, userId, rootIdArr) {
+  const getOrderIdQuery = `
+                          select max(id) as orderId
+                          from OrderList
+                          where userId = ?;
+                          `;
+
+  const getOrderIdRow = await connection.query(getOrderIdQuery, userId);
+
+  const orderId = getOrderIdRow[0][0]["orderId"];
+
+  let affectedRows = 0;
+
+  for (let i = 0; i < rootIdArr.length; i++) {
+    const query = `
+                  update Cart
+                  set orderId = ?, isDeleted = 0
+                  where userId = ?
+                  and rootId = ?;
+                  `;
+
+    const row = await connection.query(query, [orderId, userId, rootIdArr[i]]);
+
+    affectedRows += row[0].affectedRows;
+  }
+
+  return { affectedRows };
+}
+
 module.exports = {
   checkUserExist,
   checkUserBlocked,
@@ -115,4 +147,5 @@ module.exports = {
   createOrder,
   checkCouponExist,
   changeCouponStatus,
+  changeCartStatus,
 };
