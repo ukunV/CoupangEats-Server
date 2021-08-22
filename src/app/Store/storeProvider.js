@@ -54,25 +54,48 @@ exports.checkCategoryExist = async function (categoryId) {
   }
 };
 
-// 새로 들어왔어요 목록 조회
-exports.selectNewStore = async function (userId, categoryId) {
+// 새로 들어왔어요 목록 조회 by userId
+exports.selectNewStoreByUserId = async function (userId, categoryId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
     const params = [userId, categoryId];
-    const result = await storeDao.selectNewStore(connection, params);
+    const result = await storeDao.selectNewStoreByUserId(connection, params);
 
     connection.release();
 
     return result;
   } catch (err) {
-    logger.error(`Store-selectNewStore Provider error: ${err.message}`);
+    logger.error(`Store-selectNewStoreByUserId Provider error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
 
-// 음식점 조회 by categoryId
-exports.selectStoresByCategoryId = async function (
+// 새로 들어왔어요 목록 조회 by address
+exports.selectNewStoreByAddress = async function (lat, lng, categoryId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await storeDao.selectNewStoreByAddress(
+      connection,
+      lat,
+      lng,
+      categoryId
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(
+      `Store-selectNewStoreByAddress Provider error: ${err.message}`
+    );
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 음식점 조회 by categoryId and userId
+exports.selectStoresByCategoryIdAndUserId = async function (
   userId,
   categoryCondition,
   page,
@@ -86,7 +109,7 @@ exports.selectStoresByCategoryId = async function (
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await storeDao.selectStoresByCategoryId(
+    const result = await storeDao.selectStoresByCategoryIdAndUserId(
       connection,
       userId,
       categoryCondition,
@@ -104,7 +127,48 @@ exports.selectStoresByCategoryId = async function (
     return result;
   } catch (err) {
     logger.error(
-      `Store-selectStoresByCategoryId Provider error: ${err.message}`
+      `Store-selectStoresByCategoryIdAndUserId Provider error: ${err.message}`
+    );
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 음식점 조회 by categoryId and address
+exports.selectStoresByCategoryIdAndAddress = async function (
+  lat,
+  lng,
+  categoryCondition,
+  page,
+  size,
+  filterCondition,
+  cheetahCondition,
+  deliveryFeeCondition,
+  minPriceCondition,
+  couponCondition
+) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await storeDao.selectStoresByCategoryIdAndAddress(
+      connection,
+      lat,
+      lng,
+      categoryCondition,
+      page,
+      size,
+      filterCondition,
+      cheetahCondition,
+      deliveryFeeCondition,
+      minPriceCondition,
+      couponCondition
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(
+      `Store-selectStoresByCategoryIdAndAddress Provider error: ${err.message}`
     );
     return errResponse(baseResponse.DB_ERROR);
   }

@@ -74,17 +74,37 @@ exports.checkUserExist = async function (userId) {
   }
 };
 
-// 홈 화면 조회
-exports.selectHome = async function (userId) {
+// 홈 화면 조회 by userId
+exports.selectHomeByUserId = async function (userId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await userDao.selectHome(connection, userId);
+    const result = await userDao.selectHomeByUserId(connection, userId);
     connection.release();
 
     return result;
   } catch (err) {
-    logger.error(`User-selectHome Provider error: ${err.message}`);
+    logger.error(`User-selectHomeByUserId Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 홈 화면 조회 by address
+exports.selectHomebyAddress = async function (address, lat, lng) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.selectHomebyAddress(
+      connection,
+      address,
+      lat,
+      lng
+    );
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-selectHomebyAddress Provider error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };

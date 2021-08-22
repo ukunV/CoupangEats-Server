@@ -11,6 +11,8 @@ const passport = require("passport");
 const regexEmail = require("regex-email");
 const { emit } = require("nodemon");
 
+const kakaoMap = require("../../../controllers/kakao_ctrl").getAddressInfo;
+
 // regular expression
 const regPage = /^[0-9]/;
 const regSize = /^[0-9]/;
@@ -32,14 +34,18 @@ exports.getFoodCategory = async function (req, res) {
  * 카테고리로 조회 시 (쿠팡이츠에 등록된지 30일 이하)
  * [GET] /stores/:categoryId/new-store
  * path variable: categoryId
+ * query string: encodedAddress
  */
 exports.getNewStore = async function (req, res) {
   const { userId } = req.verifiedToken;
+
   const { categoryId } = req.params;
 
-  // Request Error Start
+  const { encodedAddress } = req.query;
+  const address = decodeURIComponent(encodedAddress);
+  const { lat, lng } = kakaoMap(address);
 
-  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+  // Request Error Start
 
   if (!categoryId)
     return res.send(errResponse(baseResponse.CATEGORY_ID_IS_EMPTY)); // 2034
@@ -47,21 +53,22 @@ exports.getNewStore = async function (req, res) {
   // Request Error End
 
   // Response Error Start
+  if (userId) {
+    const checkUserExist = await storeProvider.checkUserExist(userId);
 
-  const checkUserExist = await storeProvider.checkUserExist(userId);
+    if (checkUserExist === 0)
+      return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
-  if (checkUserExist === 0)
-    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+    const checkUserBlocked = await storeProvider.checkUserBlocked(userId);
 
-  const checkUserBlocked = await storeProvider.checkUserBlocked(userId);
+    if (checkUserBlocked === 1)
+      return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
 
-  if (checkUserBlocked === 1)
-    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+    const checkUserWithdrawn = await storeProvider.checkUserWithdrawn(userId);
 
-  const checkUserWithdrawn = await storeProvider.checkUserWithdrawn(userId);
-
-  if (checkUserWithdrawn === 1)
-    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+    if (checkUserWithdrawn === 1)
+      return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+  }
 
   const checkCategoryExist = await storeProvider.checkCategoryExist(categoryId);
 
@@ -69,10 +76,22 @@ exports.getNewStore = async function (req, res) {
     return res.send(response(baseResponse.CATEGORY_NOT_EXIST)); // 3005
 
   // Response Error End
+  if (userId) {
+    const result = await storeProvider.selectNewStoreByUserId(
+      userId,
+      categoryId
+    );
 
-  const result = await storeProvider.selectNewStore(userId, categoryId);
+    return res.send(response(baseResponse.SUCCESS, result));
+  } else {
+    const result = await storeProvider.selectNewStoreByAddress(
+      lat,
+      lng,
+      categoryId
+    );
 
-  return res.send(response(baseResponse.SUCCESS, result));
+    return res.send(response(baseResponse.SUCCESS, result));
+  }
 };
 
 /**
@@ -81,7 +100,7 @@ exports.getNewStore = async function (req, res) {
  * [GET] /stores/:categoryId/list
  * categoryId: 0 = 골라먹는 맛집
  * path variable: categoryId
- * query string: ( page, size ), ( filter, cheetah, deliveryFee, minPrice, coupon )
+ * query string: (encodedAddress), ( page, size ), ( filter, cheetah, deliveryFee, minPrice, coupon )
  */
 exports.getStoresByCategoryId = async function (req, res) {
   const { userId } = req.verifiedToken;
@@ -92,9 +111,11 @@ exports.getStoresByCategoryId = async function (req, res) {
 
   const { filter, cheetah, deliveryFee, minPrice, coupon } = req.query;
 
-  // Request Error Start
+  const { encodedAddress } = req.query;
+  const address = decodeURIComponent(encodedAddress);
+  const { lat, lng } = kakaoMap(address);
 
-  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+  // Request Error Start
 
   if (!page) return res.send(response(baseResponse.PAGE_IS_EMPTY)); // 2017
 
@@ -115,20 +136,22 @@ exports.getStoresByCategoryId = async function (req, res) {
 
   // Response Error Start
 
-  const checkUserExist = await storeProvider.checkUserExist(userId);
+  if (userId) {
+    const checkUserExist = await storeProvider.checkUserExist(userId);
 
-  if (checkUserExist === 0)
-    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+    if (checkUserExist === 0)
+      return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
-  const checkUserBlocked = await storeProvider.checkUserBlocked(userId);
+    const checkUserBlocked = await storeProvider.checkUserBlocked(userId);
 
-  if (checkUserBlocked === 1)
-    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+    if (checkUserBlocked === 1)
+      return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
 
-  const checkUserWithdrawn = await storeProvider.checkUserWithdrawn(userId);
+    const checkUserWithdrawn = await storeProvider.checkUserWithdrawn(userId);
 
-  if (checkUserWithdrawn === 1)
-    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+    if (checkUserWithdrawn === 1)
+      return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+  }
 
   const checkCategoryExist = await storeProvider.checkCategoryExist(categoryId);
 
@@ -183,19 +206,36 @@ exports.getStoresByCategoryId = async function (req, res) {
 
   // Set Query Order Condition End
 
-  const result = await storeProvider.selectStoresByCategoryId(
-    userId,
-    categoryCondition,
-    page,
-    size,
-    filterCondition,
-    cheetahCondition,
-    deliveryFeeCondition,
-    minPriceCondition,
-    couponCondition
-  );
+  if (userId) {
+    const result = await storeProvider.selectStoresByCategoryIdAndUserId(
+      userId,
+      categoryCondition,
+      page,
+      size,
+      filterCondition,
+      cheetahCondition,
+      deliveryFeeCondition,
+      minPriceCondition,
+      couponCondition
+    );
 
-  return res.send(response(baseResponse.SUCCESS, result));
+    return res.send(response(baseResponse.SUCCESS, result));
+  } else {
+    const result = await storeProvider.selectStoresByCategoryIdAndAddress(
+      lat,
+      lng,
+      categoryCondition,
+      page,
+      size,
+      filterCondition,
+      cheetahCondition,
+      deliveryFeeCondition,
+      minPriceCondition,
+      couponCondition
+    );
+
+    return res.send(response(baseResponse.SUCCESS, result));
+  }
 };
 
 /**

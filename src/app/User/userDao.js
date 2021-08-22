@@ -28,8 +28,9 @@ async function checkPhoneNumExist(connection, phoneNum) {
 // 회원가입
 async function createUser(connection, params) {
   const query = `
-                insert into User(email, password, salt, name, phoneNum)
-                values (?, ?, ?, ?, ?);
+                insert into User(email, salt, password, name,
+                                phoneNum, userLatitude, userLongtitude)
+                values (?, ?, ?, ?, ?, ?, ?);
                 `;
 
   const row = await connection.query(query, params);
@@ -89,8 +90,8 @@ async function checkUserExist(connection, userId) {
 //   return row[0].info;
 // }
 
-// 홈 화면 조회
-async function selectHome(connection, userId) {
+// 홈 화면 조회 by userId
+async function selectHomeByUserId(connection, userId) {
   const query1 = `
                   select case
                           when a.nickname != '' and a.nickname is not null
@@ -111,10 +112,17 @@ async function selectHome(connection, userId) {
                   `;
 
   const query2 = `
-                  select subImageURL as eventImageURL, ROW_NUMBER() over (order by createdAt desc) AS number
-                  from Event
-                  where status = 1
-                  order by createdAt desc;
+                  select e.subImageURL as eventImageURL, ROW_NUMBER() over (order by e.createdAt desc) AS number
+                  from Event e
+                      left join Franchise f on e.franchiseId = f.id
+                      left join (select * from Store where isDeleted = 1) as s on s.franchiseId = f.id,
+                      User u
+                  where u.id = ?
+                  and e.status = 1
+                  and (getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude) <= 4
+                  or getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude) is null)
+                  group by e.id
+                  order by e.endDate is null asc, e.endDate asc, e.createdAt desc;
                   `;
 
   const query3 = `
@@ -252,33 +260,187 @@ async function selectHome(connection, userId) {
                 and s.isCheetah = 1;
                 `;
 
-  const result1 = await connection.query(query1, userId);
-  const result2 = await connection.query(query2);
-  const result3 = await connection.query(query3);
-  const result4 = await connection.query(query4, userId);
-  const result5 = await connection.query(query5, userId);
-  const result6 = await connection.query(query6, userId);
-  const result7 = await connection.query(query7, userId);
+  const row1 = await connection.query(query1, userId);
+  const row2 = await connection.query(query2, userId);
+  const row3 = await connection.query(query3);
+  const row4 = await connection.query(query4, userId);
+  const row5 = await connection.query(query5, userId);
+  const row6 = await connection.query(query6, userId);
+  const row7 = await connection.query(query7, userId);
 
-  const userAddress = JSON.parse(JSON.stringify(result1[0]));
-  const eventList = JSON.parse(JSON.stringify(result2[0]));
-  const categoryList = JSON.parse(JSON.stringify(result3[0]));
-  const bestStore = JSON.parse(JSON.stringify(result4[0]));
-  const bestFranchise = JSON.parse(JSON.stringify(result5[0]));
-  const newStore = JSON.parse(JSON.stringify(result6[0]));
-  const cheetahCount = JSON.parse(JSON.stringify(result7[0]));
-
-  const row = {
-    userAddress,
-    eventList,
-    categoryList,
-    bestStore,
-    bestFranchise,
-    newStore,
-    cheetahCount,
+  const result = {
+    userAddress: row1[0],
+    eventList: row2[0],
+    categoryList: row3[0],
+    bestStore: row4[0],
+    bestFranchise: row5[0],
+    newStore: row6[0],
+    cheetahCount: row7[0],
   };
 
-  return row;
+  return result;
+}
+
+// 홈 화면 조회 by address
+async function selectHomebyAddress(connection, lat, lng) {
+  const query1 = `
+                  select e.subImageURL as eventImageURL, ROW_NUMBER() over (order by e.createdAt desc) AS number
+                  from Event e
+                      left join Franchise f on e.franchiseId = f.id
+                      left join (select * from Store where isDeleted = 1) as s on s.franchiseId = f.id
+                  where e.status = 1
+                  and (getDistance(?, ?, s.storeLatitude, s.storeLongtitude) <= 4
+                  or getDistance(?, ?, s.storeLatitude, s.storeLongtitude) is null)
+                  group by e.id
+                  order by e.endDate is null asc, e.endDate asc, e.createdAt desc;
+                  `;
+
+  const query2 = `
+                  select id, categoryName, imageURL as categoryImageURL
+                  from StoreCategory;
+                  `;
+
+  const query3 = `
+                  select s.id as storeId, s.storeName, smi.imageURL,
+                        ifnull(rc.count, 0) as reviewCount, round(ifnull(rc.point, 0.0), 1) as avgPoint,
+                        concat(format(getDistance(?, ?, s.storeLatitude, s.storeLongtitude), 1), 'km') as distance,
+                        case
+                            when sdp.price = 0
+                                then '무료배달'
+                            else
+                                concat('배달비 ', format(sdp.price, 0), '원')
+                        end as deliveryFee,
+                        case
+                            when c.discount is not null
+                                then concat(format(c.discount, 0), '원 쿠폰')
+                            else
+                                '쿠폰 없음'
+                        end as coupon
+                  from Store s
+                      left join (select * from StoreMainImage where isDeleted = 1 and number = 1) as smi on s.id = smi.storeId
+                      left join (select storeId, count(storeId) as count
+                                from OrderList
+                                where isDeleted = 1 group by storeId) as oc on s.id = oc.storeId
+                      left join (select storeId, count(storeId) as count, avg(point) as point
+                                from Review
+                                where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
+                      left join (select storeId, min(price) as price
+                                from StoreDeliveryPrice
+                                where isDeleted = 1
+                                group by storeId) as sdp on s.id = sdp.storeId
+                      left join Franchise f on f.id = s.franchiseId
+                      left join (select * from Coupon where status = 1 or status is null) as c on c.franchiseId = f.id
+                  where getDistance(?, ?, s.storeLatitude, s.storeLongtitude) <= 4
+                  and s.isDeleted = 1
+                  and s.status = 1
+                  group by s.id
+                  order by oc.count desc;
+                  `;
+
+  const query4 = `
+                  select s.id as storeId, s.storeName,
+                        case
+                            when f.franchiseImageURL != '' or f.franchiseImageURL is not null
+                                then f.franchiseImageURL
+                            else
+                                smi.imageURL
+                        end as imageURL,
+                        ifnull(rc.count, 0) as reviewCount, round(ifnull(rc.point, 0.0), 1) as avgPoint,
+                        concat(format(getDistance(?, ?, s.storeLatitude, s.storeLongtitude), 1), 'km') as distance,
+                        case
+                            when sdp.price = 0
+                                then '무료배달'
+                            else
+                                concat('배달비 ', format(sdp.price, 0), '원')
+                        end as deliveryFee,
+                        case
+                            when c.discount is not null
+                                then concat(format(c.discount, 0), '원 쿠폰')
+                            else
+                                '쿠폰 없음'
+                        end as coupon
+                  from Store s
+                      left join (select * from StoreMainImage where isDeleted = 1 and number = 1) as smi on s.id = smi.storeId
+                      left join Franchise f on s.franchiseId = f.id
+                      left join (select storeId, count(storeId) as count
+                                from OrderList
+                                where isDeleted = 1 group by storeId) as oc on s.id = oc.storeId
+                      left join (select storeId, count(storeId) as count, avg(point) as point
+                                from Review
+                                where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
+                      left join (select storeId, min(price) as price
+                                from StoreDeliveryPrice
+                                where isDeleted = 1
+                                group by storeId) as sdp on s.id = sdp.storeId
+                      left join (select * from Coupon where status = 1 or status is null) as c on c.franchiseId = f.id
+                  where s.isDeleted = 1
+                  and s.status = 1
+                  and getDistance(?, ?, s.storeLatitude, s.storeLongtitude) <= 4
+                  and s.franchiseId != 0
+                  group by s.id
+                  order by oc.count desc
+                  limit 10;
+                  `;
+
+  const query5 = `
+                  select s.id as storeId, s.storeName, smi.imageURL,
+                        ifnull(rc.count, 0) as reviewCount, round(ifnull(rc.point, 0.0), 1) as avgPoint,
+                        concat(format(getDistance(?, ?, s.storeLatitude, s.storeLongtitude), 1), 'km') as distance,
+                        case
+                            when sdp.price = 0
+                                then '무료배달'
+                            else
+                                concat('배달비 ', format(sdp.price, 0), '원')
+                        end as deliveryFee,
+                        case
+                            when c.discount is not null
+                                then concat(format(c.discount, 0), '원 쿠폰')
+                            else
+                                '쿠폰 없음'
+                        end as coupon
+                  from Store s
+                      left join (select * from StoreMainImage where isDeleted = 1 and number = 1) as smi on s.id = smi.storeId
+                      left join (select storeId, min(price) as price
+                            from StoreDeliveryPrice
+                            where isDeleted = 1
+                            group by storeId) as sdp on s.id = sdp.storeId
+                      left join (select storeId, count(storeId) as count, avg(point) as point
+                            from Review
+                            where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
+                      left join Franchise f on f.id = s.franchiseId
+                      left join (select * from Coupon where status = 1 or status is null) as c on c.franchiseId = f.id
+                  where s.status = 1
+                  and s.isDeleted = 1
+                  and getDistance(?, ?, s.storeLatitude, s.storeLongtitude) <= 4
+                  order by s.createdAt desc
+                  limit 10;
+                  `;
+
+  const query6 = `
+                select count(*) as cheetahCount
+                from Store
+                where getDistance(?, ?, s.storeLatitude, s.storeLongtitude) <= 4
+                and isCheetah = 1;
+                `;
+
+  const row1 = await connection.query(query1, [lat, lng, lat, lng, lat, lng]);
+  const row2 = await connection.query(query2);
+  const row3 = await connection.query(query3, [lat, lng, lat, lng]);
+  const row4 = await connection.query(query4, [lat, lng, lat, lng]);
+  const row5 = await connection.query(query5, [lat, lng, lat, lng]);
+  const row6 = await connection.query(query6, [lat, lng]);
+
+  const result = {
+    currentAddress: address,
+    eventList: row1[0],
+    categoryList: row2[0],
+    bestStore: row3[0],
+    bestFranchise: row4[0],
+    newStore: row5[0],
+    cheetahCount: row6[0],
+  };
+
+  return result;
 }
 
 // 이벤트 목록 조회
@@ -288,7 +450,7 @@ async function selectEventList(connection, userId) {
                       min(format(getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude), 1)) as distance
                 from Event e
                     left join Franchise f on e.franchiseId = f.id
-                    left join Store s on s.franchiseId = f.id,
+                    left join (select * from Store where isDeleted = 1) as s on s.franchiseId = f.id,
                     User u
                 where u.id = ?
                 and e.status = 1
@@ -523,7 +685,8 @@ module.exports = {
   getSalt,
   checkPassword,
   checkUserExist,
-  selectHome,
+  selectHomeByUserId,
+  selectHomebyAddress,
   selectEventList,
   checkEventExist,
   selectEvent,

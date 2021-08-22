@@ -16,6 +16,8 @@ const user_ctrl = require("../../../controllers/user_ctrl");
 const kakao_key = require("../../../config/kakao_config").sercetKey;
 const KakaoStrategy = require("passport-kakao").Strategy;
 
+const kakaoMap = require("../../../controllers/kakao_ctrl").getAddressInfo;
+
 // regex
 // const regexName = /^[가-힣]+$/;
 const regPhoneNum = /^\d{10,11}$/;
@@ -37,6 +39,10 @@ const regDistance = /^[0-9]+(.[0-9]+)?$/;
  */
 exports.createUsers = async function (req, res) {
   const { email, password, name, phoneNum } = req.body;
+
+  const { address } = req.body;
+
+  const { lat, lng } = await kakaoMap(address);
 
   // Request Error Start
 
@@ -86,10 +92,12 @@ exports.createUsers = async function (req, res) {
 
   const result = await userService.createUser(
     email,
-    hashedPassword,
     salt,
+    hashedPassword,
     name,
-    phoneNum
+    phoneNum,
+    lat,
+    lng
   );
 
   const token = await jwt.sign(
@@ -245,39 +253,44 @@ exports.userLogOut = async function (req, res) {
  * API No. 9
  * API Name : 홈 화면 조회 API
  * [GET] /users/home
+ * query string: encodedAddress
  */
 
 exports.getHome = async function (req, res) {
   const { userId } = req.verifiedToken;
 
-  //Request Error Start
-
-  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
-
-  //Request Error End
+  const { encodedAddress } = req.query;
+  const address = decodeURIComponent(encodedAddress);
+  const { lat, lng } = kakaoMap(address);
 
   // Response Error Start
 
-  const checkUserExist = await userProvider.checkUserExist(userId);
+  if (userId) {
+    const checkUserExist = await userProvider.checkUserExist(userId);
 
-  if (checkUserExist === 0)
-    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+    if (checkUserExist === 0)
+      return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
-  const checkUserBlocked = await userProvider.checkUserBlocked(userId);
+    const checkUserBlocked = await userProvider.checkUserBlocked(userId);
 
-  if (checkUserBlocked === 1)
-    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+    if (checkUserBlocked === 1)
+      return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
 
-  const checkUserWithdrawn = await userProvider.checkUserWithdrawn(userId);
+    const checkUserWithdrawn = await userProvider.checkUserWithdrawn(userId);
 
-  if (checkUserWithdrawn === 1)
-    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+    if (checkUserWithdrawn === 1)
+      return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
-  // Response Error End
+    // Response Error End
 
-  const result = await userProvider.selectHome(userId);
+    const result = await userProvider.selectHomeByUserId(userId);
 
-  return res.send(response(baseResponse.SUCCESS, result));
+    return res.send(response(baseResponse.SUCCESS, result));
+  } else {
+    const result = await userProvider.selectHomebyAddress(address, lat, lng);
+
+    return res.send(response(baseResponse.SUCCESS, result));
+  }
 };
 
 /**

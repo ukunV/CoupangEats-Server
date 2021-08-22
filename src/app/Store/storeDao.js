@@ -32,8 +32,8 @@ async function checkCategoryExist(connection, categoryId) {
   return row[0][0]["exist"];
 }
 
-// 새로 들어왔어요 목록 조회
-async function selectNewStore(connection, params) {
+// 새로 들어왔어요 목록 조회 by userId
+async function selectNewStoreByUserId(connection, params) {
   const query = `
                 select s.id as storeId, s.storeName, smi.imageURL,
                       ifnull(rc.count, 0) as reviewCount, round(ifnull(rc.point, 0.0), 1) as avgPoint,
@@ -77,8 +77,51 @@ async function selectNewStore(connection, params) {
   return row[0];
 }
 
-// 음식점 조회 by categoryId
-async function selectStoresByCategoryId(
+// 새로 들어왔어요 목록 조회 by address
+async function selectNewStoreByAddress(connection, lat, lng, categoryId) {
+  const query = `
+                select s.id as storeId, s.storeName, smi.imageURL,
+                      ifnull(rc.count, 0) as reviewCount, round(ifnull(rc.point, 0.0), 1) as avgPoint,
+                      concat(format(getDistance(?, ?, s.storeLatitude, s.storeLongtitude), 1), 'km') as distance,
+                      case
+                          when sdp.price = 0
+                              then '무료배달'
+                          else
+                              concat('배달비 ', format(sdp.price, 0), '원')
+                      end as deliveryFee,
+                      case
+                          when c.discount is not null
+                              then concat(format(c.discount, 0), '원 쿠폰')
+                          else
+                              '쿠폰 없음'
+                      end as coupon
+                from Store s
+                    left join (select * from StoreMainImage where isDeleted = 1 and number = 1) as smi on s.id = smi.storeId
+                    left join (select *, row_number() over (partition by storeId order by price) as rn
+                              from StoreDeliveryPrice
+                              where isDeleted = 1) as sdp on s.id = sdp.storeId
+                    left join (select storeId, count(storeId) as count, avg(point) as point
+                              from Review
+                              where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
+                    left join Franchise f on f.id = s.franchiseId
+                    left join (select * from Coupon where status = 1) as c on c.franchiseId = f.id
+                where s.categoryId = ?
+                and sdp.rn = 1
+                and s.status = 1
+                and s.isDeleted = 1
+                and getDistance(?, ?, s.storeLatitude, s.storeLongtitude) <= 4
+                and timestampdiff(day, s.createdAt, now()) <= 30
+                order by s.createdAt desc
+                limit 10;
+                `;
+
+  const row = await connection.query(query, [lat, lng, categoryId, lat, lng]);
+
+  return row[0];
+}
+
+// 음식점 조회 by categoryId and userId
+async function selectStoresByCategoryIdAndUserId(
   connection,
   userId,
   categoryCondition,
@@ -147,6 +190,75 @@ async function selectStoresByCategoryId(
   return row[0];
 }
 
+// 음식점 조회 by categoryId and address
+async function selectStoresByCategoryIdAndAddress(
+  connection,
+  lat,
+  lng,
+  categoryCondition,
+  page,
+  size,
+  filterCondition,
+  cheetahCondition,
+  deliveryFeeCondition,
+  minPriceCondition,
+  couponCondition
+) {
+  const query = `
+                select s.id as storeId, group_concat(smi.imageURL) as imageArray,
+                      s.storeName, concat(s.deliveryTime, '-', s.deliveryTime + 10, '분') as deliveryTime,
+                      round(ifnull(rc.point, 0.0), 1) as avgPoint, ifnull(rc.count, 0) as reviewCount,
+                      concat(format(getDistance(?, ?, s.storeLatitude, s.storeLongtitude), 1), 'km') as distance,
+                      case
+                          when sdp.price = 0
+                              then '무료배달'
+                          else
+                              concat('배달비 ', format(sdp.price, 0), '원')
+                      end as deliveryFee,
+                      s.isCheetah,
+                      case
+                          when timestampdiff(day, s.createdAt, now()) <= 30
+                              then 1
+                          else
+                              0
+                      end as isNew,
+                      case
+                          when c.discount is not null
+                              then concat(format(c.discount, 0), '원 쿠폰')
+                          else
+                              '쿠폰 없음'
+                      end as coupon
+                from Store s
+                    left join (select *, row_number() over (partition by storeId order by price) as rn
+                              from StoreDeliveryPrice
+                              where isDeleted = 1) as sdp on s.id = sdp.storeId
+                    left join (select storeId, count(storeId) as count, avg(point) as point
+                              from Review
+                              where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
+                    left join (select storeId, count(storeId) as count
+                              from OrderList
+                              where isDeleted = 1 group by storeId) as oc on s.id = oc.storeId
+                    left join (select * from StoreMainImage where isDeleted = 1) as smi on s.id = smi.storeId
+                    left join Franchise f on f.id = s.franchiseId
+                    left join (select * from Coupon where status = 1) as c on c.franchiseId = f.id
+                where sdp.rn = 1
+                ${categoryCondition}
+                and s.isDeleted = 1
+                and getDistance(?, ?, s.storeLatitude, s.storeLongtitude) <= 4
+                ${cheetahCondition}
+                ${deliveryFeeCondition}
+                ${minPriceCondition}
+                ${couponCondition}
+                group by s.id
+                ${filterCondition}
+                limit ${page}, ${size};
+                `;
+
+  const row = await connection.query(query, [lat, lng, lat, lng]);
+
+  return row[0];
+}
+
 // 음식점 존재 여부 check
 async function checkStoreExist(connection, storeId) {
   const query = `
@@ -207,18 +319,15 @@ async function selectStore(connection, storeId) {
                   order by sm.menuCategoryNumber, sm.menuNumber;
                   `;
 
-  const result1 = await connection.query(query1, storeId);
-  const result2 = await connection.query(query2, storeId);
+  const row1 = await connection.query(query1, storeId);
+  const row2 = await connection.query(query2, storeId);
 
-  const info = JSON.parse(JSON.stringify(result1[0]));
-  const mainMenu = JSON.parse(JSON.stringify(result2[0]));
-
-  const row = {
-    info,
-    mainMenu,
+  const result = {
+    info: row1[0],
+    mainMenu: row2[0],
   };
 
-  return row;
+  return result;
 }
 
 // 음식점 배달비 자세히
@@ -313,15 +422,12 @@ async function selectMainMenu(connection, menuId) {
                   order by subMenuNumber, menuNumber;
                   `;
 
-  const result1 = await connection.query(query1, menuId);
-  const result2 = await connection.query(query2, menuId);
+  const row1 = await connection.query(query1, menuId);
+  const row2 = await connection.query(query2, menuId);
 
-  const mainMenu = JSON.parse(JSON.stringify(result1[0]));
-  const subMenu = JSON.parse(JSON.stringify(result2[0]));
+  const result = { mainMenu: row1[0], subMenu: row2[0] };
 
-  const row = { mainMenu, subMenu };
-
-  return row;
+  return result;
 }
 
 // // 메뉴 삭제 여부 check
@@ -497,8 +603,10 @@ module.exports = {
   selectFoodCategory,
   checkUserExist,
   checkCategoryExist,
-  selectNewStore,
-  selectStoresByCategoryId,
+  selectNewStoreByUserId,
+  selectNewStoreByAddress,
+  selectStoresByCategoryIdAndUserId,
+  selectStoresByCategoryIdAndAddress,
   checkStoreExist,
   selectStore,
   selectStoreDelivery,

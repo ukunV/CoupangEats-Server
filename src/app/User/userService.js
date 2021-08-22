@@ -16,16 +16,18 @@ const { connect } = require("http2");
 // 유저 회원가입
 exports.createUser = async function (
   email,
-  hashedPassword,
   salt,
+  hashedPassword,
   name,
-  phoneNum
+  phoneNum,
+  lat,
+  lng
 ) {
   const connection = await pool.getConnection(async (conn) => conn);
   try {
     await connection.beginTransaction();
 
-    const params = [email, hashedPassword, salt, name, phoneNum];
+    const params = [email, salt, hashedPassword, name, phoneNum, lat, lng];
     const result = await userDao.createUser(connection, params);
 
     await connection.commit();
