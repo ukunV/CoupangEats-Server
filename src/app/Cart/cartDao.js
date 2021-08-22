@@ -354,7 +354,7 @@ async function selectCartCoupon(connection, userId, storeId, totalPrice) {
                   where id = ?;
                   `;
 
-  await connection.query(query3, row1[0][0]["id"]);
+  await connection.query(query3, row1[0][0]["couponObtainedId"]);
 
   return row1[0];
 }
