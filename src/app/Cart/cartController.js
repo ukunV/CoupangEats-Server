@@ -327,6 +327,34 @@ exports.getCartCoupon = async function (req, res) {
 /**
  * API No. 51
  * API Name : 카트에서 쿠폰 변경 API
+
+/**
+ * API No. 52
+ * API Name : 카트에서 선택한 쿠폰 조회 API
+ * [GET] /carts/detail/coupon-choice
+ */
+exports.getCouponChoice = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await cartProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(response(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  // Response Error End
+
+  const result = await cartProvider.selectCouponChoice(userId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
  * [PATCH] /carts/detail/coupon
  */
 exports.changeCoupon = async function (req, res) {

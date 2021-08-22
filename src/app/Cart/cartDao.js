@@ -388,6 +388,20 @@ async function changeCoupon(connection, userId, couponObtainedId) {
   const row2 = await connection.query(query2, couponObtainedId);
 
   return row2[0].info;
+
+// 카트에서 쿠폰 변경
+async function selectCouponChoice(connection, userId) {
+  const query = `
+                select co.id as couponObtainedId, c.discount
+                from CouponObtained co
+                    left join Coupon c on co.couponId = c.id
+                where userId = ?
+                and isChecked = 1;
+                `;
+
+  const row = await connection.query(query, userId);
+
+  return row[0];
 }
 
 module.exports = {
@@ -407,4 +421,5 @@ module.exports = {
   selectCartCoupon,
   checkCouponObtainedExist,
   changeCoupon,
+  selectCouponChoice,
 };

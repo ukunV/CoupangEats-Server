@@ -237,3 +237,19 @@ exports.checkCouponObtainedExist = async function (userId, couponObtainedId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 카트에서 선택한 쿠폰 조회
+exports.selectCouponChoice = async function (userId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await cartDao.selectCouponChoice(connection, userId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Cart-selectCouponChoice Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
