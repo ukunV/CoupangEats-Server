@@ -370,7 +370,7 @@ async function checkCouponObtainedExist(connection, userId, couponObtainedId) {
 }
 
 // 카트에서 쿠폰 선택
-async function changeCoupon(connection, userId, couponObtainedId) {
+async function changeCoupon(connection, couponObtainedId) {
   const query = `
                   update CouponObtained
                   set isChecked = 1
