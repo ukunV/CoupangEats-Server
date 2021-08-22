@@ -288,3 +288,23 @@ exports.checkUserWithdrawn = async function (userId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 결제수단 존재 여부 check
+exports.checkPaymentExist = async function (userId, paymentId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await cartDao.checkPaymentExist(
+      connection,
+      userId,
+      paymentId
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Cart-checkPaymentExist Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

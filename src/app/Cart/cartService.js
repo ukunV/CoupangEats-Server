@@ -154,3 +154,23 @@ exports.deleteCouponChoice = async function (userId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 카트에서 결제수단 변경
+exports.changePayment = async function (userId, paymentId) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  try {
+    await connection.beginTransaction();
+
+    const result = await cartDao.changePayment(connection, userId, paymentId);
+
+    await connection.commit();
+
+    connection.release();
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    logger.error(`Cart-changePayment Service error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

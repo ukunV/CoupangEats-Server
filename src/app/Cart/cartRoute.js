@@ -31,4 +31,7 @@ module.exports = function (app) {
 
   // 53. 카트에서 쿠폰 선택 제거 API
   app.patch("/carts/detail/coupon", jwtMiddleware, cart.deleteCouponChoice);
+
+  // 55. 카트에서 결제수단 변경 API
+  app.patch("/carts/detail/payment-choice", jwtMiddleware, cart.changePayment);
 };

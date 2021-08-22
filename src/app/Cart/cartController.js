@@ -520,3 +520,54 @@ exports.deleteCouponChoice = async function (req, res) {
 
   return res.send(response(baseResponse.SUCCESS, result));
 };
+
+/**
+ * API No. 55
+ * API Name : 카트에서 결제수단 변경 API
+ * [PATCH] /carts/detail/payment-choice
+ */
+exports.changePayment = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { paymentId } = req.body;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  if (!paymentId)
+    return res.send(errResponse(baseResponse.PAYMENT_ID_IS_EMPTY)); // 2062
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await cartProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(response(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await cartProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await cartProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
+  const checkPaymentExist = await cartProvider.checkPaymentExist(
+    userId,
+    paymentId
+  );
+
+  if (checkPaymentExist === 0)
+    return res.send(errResponse(baseResponse.PAYMENT_IS_NOT_EXIST)); // 3037
+
+  // Response Error End
+
+  const result = await cartService.changePayment(userId, paymentId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};

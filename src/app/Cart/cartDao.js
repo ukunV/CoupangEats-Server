@@ -464,6 +464,42 @@ async function checkUserWithdrawn(connection, userId) {
   return row[0][0]["exist"];
 }
 
+// 결제수단 존재 여부 check
+async function checkPaymentExist(connection, userId, paymentId) {
+  const query = `
+                select exists(select id
+                              from Payment
+                              where userId = ?
+                              and id = ?
+                              and isDeleted = 1) as exist;
+                `;
+
+  const row = await connection.query(query, [userId, paymentId]);
+
+  return row[0][0]["exist"];
+}
+
+// 카트에서 결제수단 변경
+async function changePayment(connection, userId, paymentId) {
+  const query1 = `
+                update Payment
+                set isChecked = 0
+                where userId = ?;
+                `;
+
+  await connection.query(query1, userId);
+
+  const query2 = `
+                  update Payment
+                  set isChecked = 1
+                  where id = ?;
+                  `;
+
+  const row2 = await connection.query(query2, paymentId);
+
+  return row2[0].info;
+}
+
 module.exports = {
   checkUserExist,
   checkStoreExist,
@@ -485,4 +521,6 @@ module.exports = {
   deleteCouponChoice,
   checkUserBlocked,
   checkUserWithdrawn,
+  checkPaymentExist,
+  changePayment,
 };
