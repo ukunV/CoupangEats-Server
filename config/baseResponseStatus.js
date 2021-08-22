@@ -525,7 +525,7 @@ module.exports = {
   ORDER_IS_NOT_EXIST: {
     isSuccess: false,
     code: 3027,
-    message: "존재하지 않는 주문입니다.",
+    message: "주문내역이 존재하지 않습니다.",
   },
   ORDER_IS_DELETED: {
     isSuccess: false,
