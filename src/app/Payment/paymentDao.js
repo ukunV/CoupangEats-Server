@@ -19,12 +19,20 @@ async function createCard(
   cvc,
   pwd
 ) {
-  const query = `
-                insert into Payment (userId, type, number, validMonth, validYear, cvc, pwd)
-                values (?, 1, ?, ?, ?, ?, ?);
+  const query1 = `
+                update Payment
+                set isChecked = 0
+                where userId = ?;
                 `;
 
-  const row = await connection.query(query, [
+  await connection.query(query1, userId);
+
+  const query2 = `
+                insert into Payment (userId, type, number, validMonth, validYear, cvc, pwd, isChecked)
+                values (?, 1, ?, ?, ?, ?, ?, 1);
+                `;
+
+  const row2 = await connection.query(query2, [
     userId,
     number,
     validMonth,
@@ -33,7 +41,7 @@ async function createCard(
     pwd,
   ]);
 
-  return row[0];
+  return row2[0];
 }
 
 // 결제방식(계좌) 등록 - 입금주명(유저명) 조회
@@ -78,14 +86,22 @@ async function checkAccountLength(connection, bankId, numLen) {
 
 // 결제방식(계좌) 등록
 async function createAccount(connection, userId, bankId, number) {
-  const query = `
-                insert into Payment (userId, bankId, type, number)
-                values (?, ?, 2, ?);
+  const query1 = `
+                update Payment
+                set isChecked = 0
+                where userId = ?;
                 `;
 
-  const row = await connection.query(query, [userId, bankId, number]);
+  await connection.query(query1, userId);
 
-  return row[0];
+  const query2 = `
+                insert into Payment (userId, bankId, type, number, isChecked)
+                values (?, ?, 2, ?, 1);
+                `;
+
+  const row2 = await connection.query(query2, [userId, bankId, number]);
+
+  return row2[0];
 }
 
 // 결제방식 존재 여부 check
