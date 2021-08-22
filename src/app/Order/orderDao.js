@@ -139,6 +139,90 @@ async function changeCartStatus(connection, userId, rootIdArr) {
   return { affectedRows };
 }
 
+// 주문내역 조회
+async function selectOrderList(connection, userId) {
+  const query = `
+                select ol.id as orderId, s.storeName, smi.imageURL,
+                      case
+                          when instr(date_format(ol.createdAt, '%Y-%m-%d %p %h:%i'), 'PM') > 0
+                              then replace(date_format(ol.createdAt, '%Y-%m-%d %p %h:%i'), 'PM', '오후')
+                          else
+                              replace(DATE_FORMAT(ol.createdAt, '%Y-%m-%d %p %h:%i'), 'AM', '오전')
+                      end as createdAt,
+                      group_concat(case when c.rootId = c.menuId then concat(c.amount, '/', sm.menuName) else sm.menuName end order by c.rootId, c.menuId) as menuList,
+                      case
+                          when ol.isDeleted = 1
+                              then '배달 완료'
+                          else
+                              '주문 취소됨'
+                      end as status, comments, ol.finalPrice
+                from OrderList ol
+                    left join Store s on ol.storeId = s.id
+                    left join (select * from StoreMainImage where isDeleted = 1 and number = 1) as smi on s.id = smi.storeId
+                    left join Cart c on c.orderId = ol.id
+                    left join StoreMenu sm on sm.id = c.menuId
+                where ol.userId = ?
+                group by ol.id
+                order by ol.createdAt desc;
+                `;
+
+  const row = await connection.query(query, userId);
+
+  return row[0];
+}
+
+// 주문내역 존재 여부 check
+async function checkOrderExist(connection, userId, orderId) {
+  const query = `
+                select exists(select id
+                              from OrderList
+                              where userId = ?
+                              and id = ?) as exist;
+                `;
+
+  const row = await connection.query(query, [userId, orderId]);
+
+  return row[0][0]["exist"];
+}
+
+// 영수증 조회
+async function selectOrderReceipt(connection, orderId) {
+  const query = `
+                select s.storeName, date_format(ol.createdAt, '%Y-%m-%d %H:%m') as createdAt,
+                      group_concat(case when c.rootId = c.menuId then concat(c.amount, '/', sm.menuName, '/', sm.price) else concat(sm.menuName, '/', sm.price) end order by c.rootId, c.menuId) as menuList,
+                      (ol.finalPrice - ol.deliveryFee - ol.discount) as orderPrice, ol.deliveryFee, ol.discount, ol.finalPrice,
+                      case
+                          when p.bankId is null
+                              then '카드'
+                          else
+                              ab.bankName
+                      end as type,
+                      case
+                          when p.bankId is null
+                              then concat('****', left(right(p.number, 4), 3), '*')
+                          else
+                              concat('****', right(p.number, 4))
+                      end as number,
+                      case
+                          when ol.isDeleted = 1
+                              then '결제완료'
+                          else
+                              '환불예정'
+                      end as status, ol.isDeleted
+                from OrderList ol
+                    left join Store s on ol.storeId = s.id
+                    left join Payment p on ol.paymentId = p.id
+                    left join AccountBank ab on p.bankId = ab.id
+                    left join Cart c on c.orderId = ol.id
+                    left join StoreMenu sm on sm.id = c.menuId
+                where ol.id = ?;
+                `;
+
+  const row = await connection.query(query, orderId);
+
+  return row[0];
+}
+
 module.exports = {
   checkUserExist,
   checkUserBlocked,
@@ -148,4 +232,7 @@ module.exports = {
   checkCouponExist,
   changeCouponStatus,
   changeCartStatus,
+  selectOrderList,
+  checkOrderExist,
+  selectOrderReceipt,
 };

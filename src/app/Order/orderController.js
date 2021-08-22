@@ -10,11 +10,12 @@ const passport = require("passport");
 
 const regexEmail = require("regex-email");
 const { emit } = require("nodemon");
+
 // regular expression
 const regPrice = /^[0-9]/;
 
 /**
- * API No. 55
+ * API No. 56
  * API Name : 주문 정보 생성 API
  * [POST] /orders/order-detail
  */
@@ -83,7 +84,7 @@ exports.createOrder = async function (req, res) {
 };
 
 /**
- * API No. 56
+ * API No. 57
  * API Name : 주문 정보 생성 -> 쿠폰 상태 변경 API
  * [PATCH] /orders/order-detail/coupon
  * 사용한 쿠폰 없을 시 -> couponObtainedId: 0
@@ -139,7 +140,7 @@ exports.changeCouponStatus = async function (req, res) {
 };
 
 /**
- * API No. 56
+ * API No. 58
  * API Name : 주문 정보 생성 -> 카트 상태 변경 API
  * [PATCH] /orders/order-detail/cart
  * orderId, isDeleted 변경
@@ -175,6 +176,92 @@ exports.changeCartStatus = async function (req, res) {
   // Response Error End
 
   const result = await orderService.changeCartStatus(userId, rootIdArr);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 59
+ * API Name : 주문내역 조회 API
+ * [GET] /orders/order-list
+ */
+exports.getOrderList = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await orderProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await orderProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await orderProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
+  // Response Error End
+
+  const result = await orderProvider.selectOrderList(userId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 60
+ * API Name : 영수증 조회 API
+ * [GET] /orders/order-receipt
+ * query string: orderId
+ */
+exports.getOrderReceipt = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { orderId } = req.query;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  if (!orderId) return res.send(errResponse(baseResponse.ORDER_ID_IS_EMPTY)); // 2040
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await orderProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await orderProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await orderProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
+  const checkOrderExist = await orderProvider.checkOrderExist(userId, orderId);
+
+  if (checkOrderExist === 0)
+    return res.send(errResponse(baseResponse.ORDER_IS_NOT_EXIST)); // 3027
+
+  // Response Error End
+
+  const result = await orderProvider.selectOrderReceipt(orderId);
 
   return res.send(response(baseResponse.SUCCESS, result));
 };

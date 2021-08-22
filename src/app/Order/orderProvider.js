@@ -92,3 +92,51 @@ exports.checkCouponExist = async function (userId, couponObtainedId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 주문내역 조회
+exports.selectOrderList = async function (userId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await orderDao.selectOrderList(connection, userId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Order-selectOrderList Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 주문내역 존재 여부 check
+exports.checkOrderExist = async function (userId, orderId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await orderDao.checkOrderExist(connection, userId, orderId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Order-checkOrderExist Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 영수증 조회
+exports.selectOrderReceipt = async function (orderId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await orderDao.selectOrderReceipt(connection, orderId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Order-selectOrderReceipt Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
