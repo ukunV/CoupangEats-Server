@@ -1,10 +1,10 @@
 // 이메일 존재 여부 확인
 async function checkEmailExist(connection, email) {
   const query = `
-    select exists(select email
-                  from User
-                  where email = ?) as exist;
-    `;
+                select exists(select email
+                              from User
+                              where email = ?) as exist;
+                `;
 
   const row = await connection.query(query, email);
 
@@ -14,11 +14,11 @@ async function checkEmailExist(connection, email) {
 // 전화번호 존재 여부 확인
 async function checkPhoneNumExist(connection, phoneNum) {
   const query = `
-    select exists(select phoneNum
-                  from User
-                  where phoneNum = ?
-                  and status in (1, 2)) as exist;
-    `;
+                select exists(select phoneNum
+                              from User
+                              where phoneNum = ?
+                              and status in (1, 2)) as exist;
+                `;
 
   const row = await connection.query(query, phoneNum);
 
@@ -66,8 +66,10 @@ async function checkPassword(connection, params) {
 // 유저 존재 여부 확인
 async function checkUserExist(connection, userId) {
   const query = `
-    select exists(select id from User where id = ?) as exist;
-    `;
+                select exists(select id
+                              from User
+                              where id = ?) as exist;
+                `;
 
   const row = await connection.query(query, userId);
 
