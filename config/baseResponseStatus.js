@@ -640,7 +640,7 @@ module.exports = {
   AUTH_NUM_IS_NOT_MATCH: {
     isSuccess: false,
     code: 3047,
-    message: "해당 주문은 배달중 상태가 아닙니다.",
+    message: "인증번호가 일치하지 않습니다.",
   },
 
   //////////////////////////////////////////
