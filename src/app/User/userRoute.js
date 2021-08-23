@@ -46,7 +46,7 @@ module.exports = function (app) {
   // 62. 아이디 찾기 - 인증번호 전송 및 저장 API
   app.patch("/users/user-account", user.sendAuthMessage);
 
-  // 63. 아이디 찾기 - 인증번호 확인 및 아이디 제공 API
+  // 63. 아이디 찾기 - 인증번호 확인 및 이메일 제공 API
   app.get("/users/user-account", user.getEmail);
 
   // // 카카오 로그인 API

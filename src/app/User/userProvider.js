@@ -324,7 +324,7 @@ exports.checkAuthNum = async function (phoneNum, authNum) {
   }
 };
 
-// 아이디 찾기 - 인증번호 확인 및 아이디 제공
+// 아이디 찾기 - 인증번호 확인 및 이메일 제공
 exports.selectEmail = async function (phoneNum) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);

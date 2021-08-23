@@ -715,7 +715,7 @@ async function checkAuthNum(connection, phoneNum, authNum) {
   return row[0][0]["exist"];
 }
 
-// 아이디 찾기 - 인증번호 확인 및 아이디 제공
+// 아이디 찾기 - 인증번호 확인 및 이메일 제공
 async function selectEmail(connection, phoneNum) {
   const query = `
                 select concat(rpad(left(substring_index(email, '@', 1), 2),
@@ -727,7 +727,7 @@ async function selectEmail(connection, phoneNum) {
 
   const row = await connection.query(query, phoneNum);
 
-  return row[0][0]["email"];
+  return { email: row[0][0]["email"] };
 }
 
 // 계정 정지 여부 check - 로그인

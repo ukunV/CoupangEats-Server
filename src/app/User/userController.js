@@ -628,7 +628,7 @@ exports.sendAuthMessage = async function (req, res) {
 
 /**
  * API No. 63
- * API Name : 아이디 찾기 - 인증번호 확인 및 아이디 제공 API
+ * API Name : 아이디 찾기 - 인증번호 확인 및 이메일 제공 API
  * [GET] /users/user-account
  */
 exports.getEmail = async function (req, res) {
