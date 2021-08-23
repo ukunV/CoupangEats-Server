@@ -94,28 +94,3 @@ exports.changeCartStatus = async function (userId, rootIdArr) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
-
-// 라이더 위치 갱신
-exports.updateRiderLocation = async function (orderId, lat, lng) {
-  const connection = await pool.getConnection(async (conn) => conn);
-  try {
-    await connection.beginTransaction();
-
-    const result = await orderDao.updateRiderLocation(
-      connection,
-      orderId,
-      lat,
-      lng
-    );
-
-    await connection.commit();
-
-    connection.release();
-    return result;
-  } catch (err) {
-    await connection.rollback();
-    connection.release();
-    logger.error(`Order-updateRiderLocation Service error: ${err.message}`);
-    return errResponse(baseResponse.DB_ERROR);
-  }
-};
