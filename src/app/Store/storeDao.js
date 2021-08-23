@@ -166,7 +166,7 @@ async function selectStoresByCategoryIdAndUserId(
                               where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
                     left join (select storeId, count(storeId) as count
                               from OrderList
-                              where isDeleted = 1 group by storeId) as oc on s.id = oc.storeId
+                              where status != 0 group by storeId) as oc on s.id = oc.storeId
                     left join (select * from StoreMainImage where isDeleted = 1) as smi on s.id = smi.storeId
                     left join Franchise f on f.id = s.franchiseId
                     left join (select * from Coupon where status = 1) as c on c.franchiseId = f.id,
@@ -237,7 +237,7 @@ async function selectStoresByCategoryIdAndAddress(
                               where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
                     left join (select storeId, count(storeId) as count
                               from OrderList
-                              where isDeleted = 1 group by storeId) as oc on s.id = oc.storeId
+                              where status != 0 group by storeId) as oc on s.id = oc.storeId
                     left join (select * from StoreMainImage where isDeleted = 1) as smi on s.id = smi.storeId
                     left join Franchise f on f.id = s.franchiseId
                     left join (select * from Coupon where status = 1) as c on c.franchiseId = f.id
@@ -311,11 +311,12 @@ async function selectStore(connection, storeId) {
   const query2 = `
                   select sm.id as menuId, sm.menuCategoryName, sm.menuCategoryNumber,
                         sm.menuName, sm.menuNumber, concat(format(sm.price, 0), '원') as price,
-                        smi.imageURL, sm.description
+                        smi.imageURL, sm.description, sm.isSoldOut
                   from StoreMenu sm
                       left join StoreMenuImage smi on sm.id = smi.menuId
                   where sm.storeId = ?
-                  and smi.number = 1
+                  and sm.rootId = sm.id
+                  and (smi.number = 1 or smi.number is null)
                   order by sm.menuCategoryNumber, sm.menuNumber;
                   `;
 
@@ -388,7 +389,8 @@ async function checkMenuExist(connection, menuId) {
                 select exists(select id
                               from StoreMenu
                               where id = ?
-                              and isDeleted = 1) as exist;
+                              and isDeleted = 1
+                              and rootId = id) as exist;
                 `;
 
   const row = await connection.query(query, menuId);
@@ -399,7 +401,7 @@ async function checkMenuExist(connection, menuId) {
 // 메인 메뉴 조회
 async function selectMainMenu(connection, menuId) {
   const query1 = `
-                  select group_concat(smi.imageURL) as imageArray, sm.menuName, sm.description,
+                  select group_concat(smi.imageURL order by smi.number) as imageArray, sm.menuName, sm.description,
                         concat(format(sm.price, 0), '원') as price
                   from StoreMenu sm
                       left join StoreMenuImage smi on sm.id = smi.menuId
@@ -414,7 +416,7 @@ async function selectMainMenu(connection, menuId) {
                                 then ''
                             else
                                 concat('(+ ', price, ')')
-                        end as price
+                        end as price, isSoldOut
                   from StoreMenu
                   where isDeleted = 1
                   and subMenuNumber is not null
@@ -556,7 +558,7 @@ async function selectStoreLike(connection, userId, filterCondition) {
                     left join (select * from Coupon where status = 1 or status is null) as c on c.franchiseId = f.id
                     left join (select storeId, max(createdAt) as recentOrder, count(storeId) as orderCount
                               from OrderList
-                              where isDeleted = 1
+                              where status != 0
                               and userId = ?
                               group by storeId) as ol on ol.storeId = sl.storeId
                 where sl.userId = ?

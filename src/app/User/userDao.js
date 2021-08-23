@@ -150,7 +150,7 @@ async function selectHomeByUserId(connection, userId) {
                       left join (select * from StoreMainImage where isDeleted = 1 and number = 1) as smi on s.id = smi.storeId
                       left join (select storeId, count(storeId) as count
                                 from OrderList
-                                where isDeleted = 1 group by storeId) as oc on s.id = oc.storeId
+                                where status != 0 group by storeId) as oc on s.id = oc.storeId
                       left join (select storeId, count(storeId) as count, avg(point) as point
                                 from Review
                                 where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
@@ -166,7 +166,8 @@ async function selectHomeByUserId(connection, userId) {
                   and s.isDeleted = 1
                   and s.status = 1
                   group by s.id
-                  order by oc.count desc;
+                  order by oc.count desc
+                  limit 10;
                   `;
 
   const query5 = `
@@ -190,7 +191,7 @@ async function selectHomeByUserId(connection, userId) {
                       left join Franchise f on s.franchiseId = f.id
                       left join (select storeId, count(storeId) as count
                                 from OrderList
-                                where isDeleted = 1 group by storeId) as oc on s.id = oc.storeId
+                                where status != 0 group by storeId) as oc on s.id = oc.storeId
                       left join (select storeId, count(storeId) as count, avg(point) as point
                                 from Review
                                 where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
@@ -204,7 +205,7 @@ async function selectHomeByUserId(connection, userId) {
                   and s.isDeleted = 1
                   and s.status = 1
                   and getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude) <= 4
-                  and s.franchiseId != 0
+                  and s.franchiseId is not null
                   group by s.id
                   order by oc.count desc
                   limit 10;
@@ -314,7 +315,7 @@ async function selectHomebyAddress(connection, lat, lng) {
                       left join (select * from StoreMainImage where isDeleted = 1 and number = 1) as smi on s.id = smi.storeId
                       left join (select storeId, count(storeId) as count
                                 from OrderList
-                                where isDeleted = 1 group by storeId) as oc on s.id = oc.storeId
+                                where status != 0 group by storeId) as oc on s.id = oc.storeId
                       left join (select storeId, count(storeId) as count, avg(point) as point
                                 from Review
                                 where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
@@ -328,7 +329,8 @@ async function selectHomebyAddress(connection, lat, lng) {
                   and s.isDeleted = 1
                   and s.status = 1
                   group by s.id
-                  order by oc.count desc;
+                  order by oc.count desc
+                  limit 10;
                   `;
 
   const query4 = `
@@ -358,7 +360,7 @@ async function selectHomebyAddress(connection, lat, lng) {
                       left join Franchise f on s.franchiseId = f.id
                       left join (select storeId, count(storeId) as count
                                 from OrderList
-                                where isDeleted = 1 group by storeId) as oc on s.id = oc.storeId
+                                where status != 0 group by storeId) as oc on s.id = oc.storeId
                       left join (select storeId, count(storeId) as count, avg(point) as point
                                 from Review
                                 where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
