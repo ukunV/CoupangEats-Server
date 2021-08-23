@@ -637,6 +637,11 @@ module.exports = {
     code: 3046,
     message: "해당 주문은 배달중 상태가 아닙니다.",
   },
+  AUTH_NUM_IS_NOT_MATCH: {
+    isSuccess: false,
+    code: 3047,
+    message: "해당 주문은 배달중 상태가 아닙니다.",
+  },
 
   //////////////////////////////////////////
 
