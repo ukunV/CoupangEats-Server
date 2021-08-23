@@ -405,6 +405,31 @@ module.exports = {
     code: 2078,
     message: "주문상태가 올바르지 않습니다.",
   },
+  AUTH_TYPE_IS_EMPTY: {
+    isSuccess: false,
+    code: 2079,
+    message: "인증방식을 선택해주세요.",
+  },
+  AUTH_TYPE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2080,
+    message: "올바른 인증방식을 선택해주세요.",
+  },
+  AUTH_NUM_IS_EMPTY: {
+    isSuccess: false,
+    code: 2081,
+    message: "인증번호 입력해주세요.",
+  },
+  CHECK_PASSWORD_IS_EMPTY: {
+    isSuccess: false,
+    code: 2082,
+    message: "확인 비밀번호를 입력해주세요.",
+  },
+  PASSWORD_IS_DIFFERENT: {
+    isSuccess: false,
+    code: 2083,
+    message: "비밀번호가 일치하지 않습니다.",
+  },
 
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
