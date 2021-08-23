@@ -42,7 +42,7 @@ exports.createUsers = async function (req, res) {
 
   const { address } = req.body;
 
-  const { lat, lng } = await kakaoMap(address);
+  const location = await kakaoMap(address);
 
   // Request Error Start
 
@@ -68,6 +68,10 @@ exports.createUsers = async function (req, res) {
 
   if (!regPhoneNum.test(phoneNum))
     return res.send(response(baseResponse.SIGNUP_PHONENUM_TYPE)); // 2009
+
+  if (location.length) {
+    return res.send(errResponse(baseResponse.LOCATION_INFO_IS_NOT_VALID)); // 2076
+  }
 
   // Request Error End
 
@@ -96,8 +100,8 @@ exports.createUsers = async function (req, res) {
     hashedPassword,
     name,
     phoneNum,
-    lat,
-    lng
+    location.lat,
+    location.lng
   );
 
   const token = await jwt.sign(
@@ -261,7 +265,15 @@ exports.getHome = async function (req, res) {
 
   const { encodedAddress } = req.query;
   const address = decodeURIComponent(encodedAddress);
-  const { lat, lng } = kakaoMap(address);
+  const location = kakaoMap(address);
+
+  // Request Error Start
+
+  if (location.length) {
+    return res.send(errResponse(baseResponse.LOCATION_INFO_IS_NOT_VALID)); // 2076
+  }
+
+  // Request Error End
 
   // Response Error Start
 
@@ -287,7 +299,11 @@ exports.getHome = async function (req, res) {
 
     return res.send(response(baseResponse.SUCCESS, result));
   } else {
-    const result = await userProvider.selectHomebyAddress(address, lat, lng);
+    const result = await userProvider.selectHomebyAddress(
+      address,
+      location.lat,
+      location.lng
+    );
 
     return res.send(response(baseResponse.SUCCESS, result));
   }

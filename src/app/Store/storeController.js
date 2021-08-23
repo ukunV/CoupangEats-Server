@@ -43,12 +43,16 @@ exports.getNewStore = async function (req, res) {
 
   const { encodedAddress } = req.query;
   const address = decodeURIComponent(encodedAddress);
-  const { lat, lng } = kakaoMap(address);
+  const location = kakaoMap(address);
 
   // Request Error Start
 
   if (!categoryId)
     return res.send(errResponse(baseResponse.CATEGORY_ID_IS_EMPTY)); // 2034
+
+  if (location.length) {
+    return res.send(errResponse(baseResponse.LOCATION_INFO_IS_NOT_VALID)); // 2076
+  }
 
   // Request Error End
 
@@ -85,8 +89,8 @@ exports.getNewStore = async function (req, res) {
     return res.send(response(baseResponse.SUCCESS, result));
   } else {
     const result = await storeProvider.selectNewStoreByAddress(
-      lat,
-      lng,
+      location.lat,
+      location.lng,
       categoryId
     );
 
@@ -113,9 +117,13 @@ exports.getStoresByCategoryId = async function (req, res) {
 
   const { encodedAddress } = req.query;
   const address = decodeURIComponent(encodedAddress);
-  const { lat, lng } = kakaoMap(address);
+  const location = kakaoMap(address);
 
   // Request Error Start
+
+  if (location.length) {
+    return res.send(errResponse(baseResponse.LOCATION_INFO_IS_NOT_VALID)); // 2076
+  }
 
   if (!page) return res.send(response(baseResponse.PAGE_IS_EMPTY)); // 2017
 
@@ -222,8 +230,8 @@ exports.getStoresByCategoryId = async function (req, res) {
     return res.send(response(baseResponse.SUCCESS, result));
   } else {
     const result = await storeProvider.selectStoresByCategoryIdAndAddress(
-      lat,
-      lng,
+      location.lat,
+      location.lng,
       categoryCondition,
       page,
       size,

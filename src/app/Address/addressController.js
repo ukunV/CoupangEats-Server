@@ -22,11 +22,17 @@ exports.createAddresses = async function (req, res) {
   const { type, nickname, buildingName, address, detailAddress, information } =
     req.body;
 
+  const location = await kakaoMap(address);
+
   // Request Error Start
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
   if (!address) return res.send(errResponse(baseResponse.ADDRESS_IS_EMPTY)); // 2015
+
+  if (location.length) {
+    return res.send(errResponse(baseResponse.LOCATION_INFO_IS_NOT_VALID)); // 2076
+  }
 
   if ((type != 1) & (type != 2) & (type != 3))
     return res.send(errResponse(baseResponse.TYPE_IS_NOT_VALID)); // 2021
@@ -52,8 +58,6 @@ exports.createAddresses = async function (req, res) {
 
   // Response Error End
 
-  const { lat, lng } = await kakaoMap(address);
-
   const result = await addressService.insertAddress(
     userId,
     type,
@@ -62,8 +66,8 @@ exports.createAddresses = async function (req, res) {
     address,
     detailAddress,
     information,
-    lat,
-    lng
+    location.lat,
+    location.lng
   );
 
   return res.send(response(baseResponse.SUCCESS, result));
@@ -82,11 +86,17 @@ exports.modifyAddresses = async function (req, res) {
   const { type, nickname, buildingName, address, detailAddress, information } =
     req.body;
 
+  const location = await kakaoMap(address);
+
   // Request Error Start
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
   if (!address) return res.send(errResponse(baseResponse.ADDRESS_IS_EMPTY)); // 2015
+
+  if (location.length) {
+    return res.send(errResponse(baseResponse.LOCATION_INFO_IS_NOT_VALID)); // 2076
+  }
 
   if (!addressId)
     return res.send(errResponse(baseResponse.ADDRESS_ID_IS_EMPTY)); // 2022
@@ -127,8 +137,6 @@ exports.modifyAddresses = async function (req, res) {
 
   // Response Error End
 
-  const { lat, lng } = await kakaoMap(address);
-
   const result = await addressService.updateAddress(
     userId,
     type,
@@ -137,8 +145,8 @@ exports.modifyAddresses = async function (req, res) {
     address,
     detailAddress,
     information,
-    lat,
-    lng,
+    location.lat,
+    location.lng,
     addressId
   );
 
@@ -284,11 +292,17 @@ exports.changeLocation = async function (req, res) {
 
   const { addressId, address } = req.body;
 
+  const location = await kakaoMap(address);
+
   // Request Error Start
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
   if (!address) return res.send(errResponse(baseResponse.ADDRESS_IS_EMPTY)); // 2015
+
+  if (location.length) {
+    return res.send(errResponse(baseResponse.LOCATION_INFO_IS_NOT_VALID)); // 2076
+  }
 
   if (!addressId)
     return res.send(errResponse(baseResponse.ADDRESS_ID_IS_EMPTY)); // 2022
@@ -319,13 +333,11 @@ exports.changeLocation = async function (req, res) {
 
   // Response Error End
 
-  const { lat, lng } = await kakaoMap(address);
-
   const result = await addressService.updateLocation(
     addressId,
     userId,
-    lat,
-    lng
+    location.lat,
+    location.lng
   );
 
   return res.send(response(baseResponse.SUCCESS, result));
