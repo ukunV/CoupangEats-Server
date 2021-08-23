@@ -390,6 +390,11 @@ module.exports = {
     code: 2075,
     message: "couponObtainedId 값을 입력해주세요.",
   },
+  LOCATION_INFO_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2076,
+    message: "위치정보가 잘못되었습니다.",
+  },
 
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
@@ -596,6 +601,11 @@ module.exports = {
     isSuccess: false,
     code: 3041,
     message: "획득하지 못한 쿠폰입니다.",
+  },
+  ORDER_IS_FINISHED: {
+    isSuccess: false,
+    code: 3042,
+    message: "해당 주문은 취소 혹은 배달완료된 주문건입니다.",
   },
 
   ACCOUNT_IS_BLOCKED: {
