@@ -674,6 +674,46 @@ async function checkUserWithdrawn(connection, userId) {
   return row[0][0]["exist"];
 }
 
+// 유저 존재 여부 check - 아이디 찾기
+async function checkMatchUser(connection, userName, phoneNum) {
+  const query = `
+                select exists(select id
+                              from User
+                              where name = ?
+                              and phoneNum = ?) as exist;
+                `;
+
+  const row = await connection.query(query, [userName, phoneNum]);
+
+  return row[0][0]["exist"];
+}
+
+// 아이디 찾기 - 인증번호 전송 및 저장
+async function sendAuthMessage(connection, phoneNum, authNum) {
+  const query = `
+                update User
+                set authNum = ?
+                where phoneNum = ?;
+                `;
+
+  const row = await connection.query(query, [authNum, phoneNum]);
+
+  return row[0].info;
+}
+
+// 인증번호 일치여부 check
+async function checkAuthNum(connection, phoneNum, authNum) {
+  const query = `
+                select exists(select id
+                              from User
+                              where phoneNum = ?
+                              and authNum = ?) as exist;
+                `;
+
+  const row = await connection.query(query, [phoneNum, authNum]);
+
+  return row[0][0]["exist"];
+}
 
 // 아이디 찾기 - 인증번호 확인 및 아이디 제공
 async function selectEmail(connection, phoneNum) {
@@ -737,6 +777,10 @@ module.exports = {
   selectNotice,
   checkUserBlocked,
   checkUserWithdrawn,
+  checkMatchUser,
+  sendAuthMessage,
+  checkAuthNum,
+  selectEmail,
   checkEmailBlocked,
   checkEmailWithdrawn,
 };

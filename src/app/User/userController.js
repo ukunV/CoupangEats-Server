@@ -590,6 +590,74 @@ exports.getNotice = async function (req, res) {
 };
 
 /**
+ * API No. 62
+ * API Name : 아이디 찾기 - 인증번호 전송 및 저장 API
+ * [PATCH] /users/user-account
+ */
+exports.sendAuthMessage = async function (req, res) {
+  const { userName, phoneNum } = req.body;
+
+  //Request Error Start
+
+  if (!userName) return res.send(response(baseResponse.SIGNUP_NAME_EMPTY)); // 2006
+
+  if (!phoneNum) return res.send(response(baseResponse.SIGNUP_PHONENUM_EMPTY)); // 2008
+
+  if (!regPhoneNum.test(phoneNum))
+    return res.send(response(baseResponse.SIGNUP_PHONENUM_TYPE)); // 2009
+
+  //Request Error End
+
+  // Response Error Start
+
+  const checkMatchUser = await userProvider.checkMatchUser(userName, phoneNum);
+
+  if (checkMatchUser === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  // Response Error End
+
+  const authNum = createAuthNum();
+
+  messageAuth(phoneNum, authNum);
+
+  const result = await userService.sendAuthMessage(phoneNum, authNum);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 63
+ * API Name : 아이디 찾기 - 인증번호 확인 및 아이디 제공 API
+ * [GET] /users/user-account
+ */
+exports.getEmail = async function (req, res) {
+  const { phoneNum, authNum } = req.query;
+
+  //Request Error Start
+
+  if (!phoneNum) return res.send(response(baseResponse.SIGNUP_PHONENUM_EMPTY)); // 2008
+
+  if (!regPhoneNum.test(phoneNum))
+    return res.send(response(baseResponse.SIGNUP_PHONENUM_TYPE)); // 2009
+
+  //Request Error End
+
+  // Response Error Start
+
+  const checkAuthNum = await userProvider.checkAuthNum(phoneNum, authNum);
+
+  if (checkAuthNum === 0)
+    return res.send(errResponse(baseResponse.AUTH_NUM_IS_NOT_MATCH)); // 3047
+
+  // Response Error End
+
+  const result = await userProvider.selectEmail(phoneNum);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
  * API No.
  * API Name : 카카오 로그인 API
  *

@@ -62,3 +62,23 @@ exports.createUser = async function (
 //     return errResponse(baseResponse.DB_ERROR);
 //   }
 // };
+
+// 아이디 찾기 - 인증번호 전송 및 저장
+exports.sendAuthMessage = async function (phoneNum, authNum) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  try {
+    await connection.beginTransaction();
+
+    const result = await userDao.sendAuthMessage(connection, phoneNum, authNum);
+
+    await connection.commit();
+
+    connection.release();
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    logger.error(`User-sendAuthMessage Service error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

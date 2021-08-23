@@ -294,6 +294,51 @@ exports.checkUserWithdrawn = async function (userId) {
   }
 };
 
+// 유저 존재 여부 check - 아이디 찾기
+exports.checkMatchUser = async function (userName, phoneNum) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.checkMatchUser(connection, userName, phoneNum);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-checkMatchUser Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 인증번호 일치여부 check
+exports.checkAuthNum = async function (phoneNum, authNum) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.checkAuthNum(connection, phoneNum, authNum);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-checkAuthNum Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 아이디 찾기 - 인증번호 확인 및 아이디 제공
+exports.selectEmail = async function (phoneNum) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.selectEmail(connection, phoneNum);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-selectEmail Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
 // 계정 정지 여부 check - 로그인
 exports.checkEmailBlocked = async function (email) {
   try {
