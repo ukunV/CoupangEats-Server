@@ -18,10 +18,44 @@ const KakaoStrategy = require("passport-kakao").Strategy;
 
 const kakaoMap = require("../../../controllers/kakao_ctrl").getAddressInfo;
 
+const { NCPClient } = require("../../../controllers/ncp_ctrl");
+const sensKey = require("../../../config/ncp_config").sensSecret;
+
 // regex
 // const regexName = /^[가-힣]+$/;
 const regPhoneNum = /^\d{10,11}$/;
 const regDistance = /^[0-9]+(.[0-9]+)?$/;
+
+// 랜덤 인증번호 생성 함수
+function createAuthNum() {
+  const randNum = Math.floor(Math.random() * 900000) + 100000;
+
+  return randNum;
+}
+
+const messageAuth = async function (phoneNum, authNum) {
+  const ncp = new NCPClient({
+    ...sensKey,
+  });
+
+  const to = phoneNum;
+  const content = `쿠팡 휴대폰 인증번호 [${authNum}] 위 번호를 인증 창에 입력하세요.`;
+
+  const { success, status, msg } = await ncp.sendSMS({
+    to,
+    content,
+  });
+
+  if (!success) {
+    console.log(
+      `(ERROR) node-sens error: ${msg}, Status ${status} Date ${Date.now()}`
+    );
+  } else {
+    console.log(success);
+    console.log(status);
+    console.log(msg);
+  }
+};
 
 /**
  * API No. 0
