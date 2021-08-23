@@ -22,13 +22,17 @@ const regPrice = /^[0-9]/;
 exports.createOrder = async function (req, res) {
   const { userId } = req.verifiedToken;
 
-  const { storeId, paymentId, deliveryFee, discount, finalPrice } = req.body;
+  const { storeId, addressId, paymentId, deliveryFee, discount, finalPrice } =
+    req.body;
 
   // Request Error Start
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
   if (!storeId) return res.send(errResponse(baseResponse.STORE_ID_IS_EMPTY)); // 2026
+
+  if (!addressId)
+    return res.send(errResponse(baseResponse.ADDRESS_ID_IS_EMPTY)); // 2022
 
   if (!paymentId)
     return res.send(errResponse(baseResponse.PAYMENT_ID_IS_EMPTY)); // 2062
@@ -74,6 +78,7 @@ exports.createOrder = async function (req, res) {
   const result = await orderService.createOrder(
     userId,
     storeId,
+    addressId,
     paymentId,
     deliveryFee,
     discount,

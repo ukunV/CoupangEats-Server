@@ -57,19 +57,21 @@ async function createOrder(
   connection,
   userId,
   storeId,
+  addressId,
   paymentId,
   deliveryFee,
   discount,
   finalPrice
 ) {
   const query = `
-                insert into OrderList (userId, storeId, paymentId, deliveryFee, discount, finalPrice)
-                values (?, ?, ?, ?, ?, ?);
+                insert into OrderList (userId, storeId, addressId, paymentId, deliveryFee, discount, finalPrice)
+                values (?, ?, ?, ?, ?, ?, ?);
                 `;
 
   const row = await connection.query(query, [
     userId,
     storeId,
+    addressId,
     paymentId,
     deliveryFee,
     discount,

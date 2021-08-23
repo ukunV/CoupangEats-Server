@@ -17,6 +17,7 @@ const { connect } = require("http2");
 exports.createOrder = async function (
   userId,
   storeId,
+  addressId,
   paymentId,
   deliveryFee,
   discount,
@@ -30,6 +31,7 @@ exports.createOrder = async function (
       connection,
       userId,
       storeId,
+      addressId,
       paymentId,
       deliveryFee,
       discount,
