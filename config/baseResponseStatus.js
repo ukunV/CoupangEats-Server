@@ -515,7 +515,7 @@ module.exports = {
   COUPON_AlREADY_OBTAINED: {
     isSuccess: false,
     code: 3017,
-    message: "해당 쿠폰은 이미 등록되어 있습니다.",
+    message: "해당 쿠폰은 이미 발급되었습니다.",
   },
   STORE_LIKE_ALREADY_EXIST: {
     isSuccess: false,
