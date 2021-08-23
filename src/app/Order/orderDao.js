@@ -144,18 +144,26 @@ async function selectOrderList(connection, userId) {
   const query = `
                 select ol.id as orderId, s.storeName, smi.imageURL,
                       case
-                          when instr(date_format(ol.createdAt, '%Y-%m-%d %p %h:%i'), 'PM') > 0
-                              then replace(date_format(ol.createdAt, '%Y-%m-%d %p %h:%i'), 'PM', '오후')
-                          else
-                              replace(DATE_FORMAT(ol.createdAt, '%Y-%m-%d %p %h:%i'), 'AM', '오전')
+                        when instr(date_format(ol.createdAt, '%Y-%m-%d %p %h:%i'), 'PM') > 0
+                            then replace(date_format(ol.createdAt, '%Y-%m-%d %p %h:%i'), 'PM', '오후')
+                        else
+                            replace(DATE_FORMAT(ol.createdAt, '%Y-%m-%d %p %h:%i'), 'AM', '오전')
                       end as createdAt,
                       group_concat(case when c.rootId = c.menuId then concat(c.amount, '/', sm.menuName) else sm.menuName end order by c.rootId, c.menuId) as menuList,
                       case
-                          when ol.isDeleted = 1
-                              then '배달 완료'
-                          else
-                              '주문 취소됨'
-                      end as status, comments, ol.finalPrice
+                        when ol.status = 0
+                            then '결제 취소'
+                        when ol.status = 1
+                            then '주문 대기'
+                        when ol.status = 2
+                            then '주문 수락'
+                        when ol.status = 3
+                            then '메뉴 준비중'
+                        when ol.status = 4
+                            then '배달 중'
+                        when ol.status = 5
+                            then '배달완료'
+                      end as status, ol.reason, ol.finalPrice
                 from OrderList ol
                     left join Store s on ol.storeId = s.id
                     left join (select * from StoreMainImage where isDeleted = 1 and number = 1) as smi on s.id = smi.storeId
