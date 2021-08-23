@@ -674,6 +674,50 @@ async function checkUserWithdrawn(connection, userId) {
   return row[0][0]["exist"];
 }
 
+
+// 아이디 찾기 - 인증번호 확인 및 아이디 제공
+async function selectEmail(connection, phoneNum) {
+  const query = `
+                select concat(rpad(left(substring_index(email, '@', 1), 2),
+                                  char_length(substring_index(email, '@', 1)), '*'),
+                              '@', substring_index(email, '@', -1)) as email
+                from User
+                where phoneNum = ?;
+                `;
+
+  const row = await connection.query(query, phoneNum);
+
+  return row[0][0]["email"];
+}
+
+// 계정 정지 여부 check - 로그인
+async function checkEmailBlocked(connection, email) {
+  const query = `
+                select exists(select id
+                              from User
+                              where email = ?
+                              ans status = 1) as exist;
+                `;
+
+  const row = await connection.query(query, email);
+
+  return row[0][0]["exist"];
+}
+
+// 계정 탈퇴 여부 check - 로그인
+async function checkEmailWithdrawn(connection, email) {
+  const query = `
+                select exists(select id
+                              from User
+                              where email = ?
+                              ans status = 0) as exist;
+                `;
+
+  const row = await connection.query(query, email);
+
+  return row[0][0]["exist"];
+}
+
 module.exports = {
   checkEmailExist,
   checkPhoneNumExist,
@@ -693,4 +737,6 @@ module.exports = {
   selectNotice,
   checkUserBlocked,
   checkUserWithdrawn,
+  checkEmailBlocked,
+  checkEmailWithdrawn,
 };

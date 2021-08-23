@@ -187,6 +187,16 @@ exports.userLogIn = async function (req, res) {
   if (checkEmailExist === 0)
     return res.send(response(baseResponse.SIGNIN_EMAIL_NOT_EXIST)); // 3003
 
+  const checkEmailBlocked = await userProvider.checkEmailBlocked(email);
+
+  if (checkEmailBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkEmailWithdrawn = await userProvider.checkEmailWithdrawn(email);
+
+  if (checkEmailWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   const checkPassword = await userProvider.checkPassword(email, password);
 
   if (checkPassword === -1)

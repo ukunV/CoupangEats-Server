@@ -293,3 +293,33 @@ exports.checkUserWithdrawn = async function (userId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 계정 정지 여부 check - 로그인
+exports.checkEmailBlocked = async function (email) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.checkEmailBlocked(connection, email);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-checkEmailBlocked Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 계정 탈퇴 여부 check - 로그인
+exports.checkEmailWithdrawn = async function (email) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.checkEmailWithdrawn(connection, email);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-checkEmailWithdrawn Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
