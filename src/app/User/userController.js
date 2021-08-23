@@ -103,9 +103,8 @@ exports.createUsers = async function (req, res) {
   if (!regPhoneNum.test(phoneNum))
     return res.send(response(baseResponse.SIGNUP_PHONENUM_TYPE)); // 2009
 
-  if (location.length) {
+  if (location.length)
     return res.send(errResponse(baseResponse.LOCATION_INFO_IS_NOT_VALID)); // 2076
-  }
 
   // Request Error End
 

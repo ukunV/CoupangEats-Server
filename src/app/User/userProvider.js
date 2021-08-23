@@ -264,7 +264,7 @@ exports.checkNoticeExist = async function (noticeId) {
 //   }
 // };
 
-// 계정 정지 여부 확인
+// 계정 정지 여부 check
 exports.checkUserBlocked = async function (userId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
@@ -279,7 +279,7 @@ exports.checkUserBlocked = async function (userId) {
   }
 };
 
-// 계정 탈퇴 여부 확인
+// 계정 탈퇴 여부 check
 exports.checkUserWithdrawn = async function (userId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
