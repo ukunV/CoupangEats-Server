@@ -12,13 +12,13 @@ exports.checkOrderAlive = async function (orderId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await orderDao.checkOrderAlive(connection, orderId);
+    const result = await adminDao.checkOrderAlive(connection, orderId);
 
     connection.release();
 
     return result;
   } catch (err) {
-    logger.error(`Order-checkOrderAlive Provider error: ${err.message}`);
+    logger.error(`admin-checkOrderAlive Provider error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
@@ -28,13 +28,29 @@ exports.checkOrderStatus = async function (orderId, status) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await orderDao.checkOrderStatus(connection, orderId, status);
+    const result = await adminDao.checkOrderStatus(connection, orderId, status);
 
     connection.release();
 
     return result;
   } catch (err) {
-    logger.error(`Order-checkOrderStatus Provider error: ${err.message}`);
+    logger.error(`admin-checkOrderStatus Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 주문 존재 여부 check
+exports.checkOrderExist = async function (storeId, orderId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await adminDao.checkOrderExist(connection, storeId, orderId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`admin-checkOrderExist Provider error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
