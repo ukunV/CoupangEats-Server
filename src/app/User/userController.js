@@ -21,6 +21,8 @@ const kakaoMap = require("../../../controllers/kakao_ctrl").getAddressInfo;
 const { NCPClient } = require("../../../controllers/ncp_ctrl");
 const sensKey = require("../../../config/ncp_config").sensSecret;
 
+const mailer = require("../../../controllers/mail_ctrl").resetPasswordMail;
+
 // regex
 // const regexName = /^[가-힣]+$/;
 const regPhoneNum = /^\d{10,11}$/;
@@ -33,13 +35,18 @@ function createAuthNum() {
   return randNum;
 }
 
-const messageAuth = async function (phoneNum, authNum) {
+const messageAuth = async function (type, phoneNum, authNum) {
   const ncp = new NCPClient({
     ...sensKey,
   });
 
   const to = phoneNum;
-  const content = `쿠팡 휴대폰 인증번호 [${authNum}] 위 번호를 인증 창에 입력하세요.`;
+  let content;
+
+  if (type === 1)
+    content = `쿠팡 휴대폰 인증번호 [${authNum}] 위 번호를 인증 창에 입력하세요.`;
+  else
+    content = `비밀번호 변경을 위한 인증번호는 [${authNum}]입니다. 신규 비밀번호로 재설정해주세요.`;
 
   const { success, status, msg } = await ncp.sendSMS({
     to,
@@ -592,9 +599,9 @@ exports.getNotice = async function (req, res) {
 /**
  * API No. 62
  * API Name : 아이디 찾기 - 인증번호 전송 및 저장 API
- * [PATCH] /users/user-account
+ * [PATCH] /users/user-account/auth
  */
-exports.sendAuthMessage = async function (req, res) {
+exports.findEmail = async function (req, res) {
   const { userName, phoneNum } = req.body;
 
   //Request Error Start
@@ -610,18 +617,19 @@ exports.sendAuthMessage = async function (req, res) {
 
   // Response Error Start
 
-  const checkMatchUser = await userProvider.checkMatchUser(userName, phoneNum);
+  const checkMatchUserWithPhoneNum =
+    await userProvider.checkMatchUserWithPhoneNum(userName, phoneNum);
 
-  if (checkMatchUser === 0)
+  if (checkMatchUserWithPhoneNum === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
   // Response Error End
 
   const authNum = createAuthNum();
 
-  messageAuth(phoneNum, authNum);
+  messageAuth(1, phoneNum, authNum);
 
-  const result = await userService.sendAuthMessage(phoneNum, authNum);
+  const result = await userService.updateAuthNumByPhoneNum(phoneNum, authNum);
 
   return res.send(response(baseResponse.SUCCESS, result));
 };
@@ -638,6 +646,8 @@ exports.getEmail = async function (req, res) {
 
   if (!phoneNum) return res.send(response(baseResponse.SIGNUP_PHONENUM_EMPTY)); // 2008
 
+  if (!authNum) return res.send(response(baseResponse.AUTH_NUM_IS_EMPTY)); // 2081
+
   if (!regPhoneNum.test(phoneNum))
     return res.send(response(baseResponse.SIGNUP_PHONENUM_TYPE)); // 2009
 
@@ -645,7 +655,10 @@ exports.getEmail = async function (req, res) {
 
   // Response Error Start
 
-  const checkAuthNum = await userProvider.checkAuthNum(phoneNum, authNum);
+  const checkAuthNum = await userProvider.checkAuthNumByPhoneNum(
+    phoneNum,
+    authNum
+  );
 
   if (checkAuthNum === 0)
     return res.send(errResponse(baseResponse.AUTH_NUM_IS_NOT_MATCH)); // 3047
@@ -653,6 +666,101 @@ exports.getEmail = async function (req, res) {
   // Response Error End
 
   const result = await userProvider.selectEmail(phoneNum);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 64
+ * API Name : 비밀번호 찾기 - 인증번호 전송 및 저장 API
+ * [PATCH] /users/user-password/auth
+ * type: 1-휴대폰인증 / 2-이메일인증
+ */
+exports.findPassword = async function (req, res) {
+  const { userName, email, type } = req.body;
+
+  //Request Error Start
+
+  if (!userName) return res.send(response(baseResponse.SIGNUP_NAME_EMPTY)); // 2006
+
+  if (!email) return res.send(response(baseResponse.SIGNUP_EMAIL_EMPTY)); // 2001
+
+  if (!type) return res.send(response(baseResponse.AUTH_TYPE_IS_EMPTY)); // 2079
+
+  if ((type != 1) & (type != 2))
+    return res.send(response(baseResponse.AUTH_TYPE_IS_NOT_VALID)); // 2080
+
+  //Request Error End
+
+  // Response Error Start
+
+  const checkMatchUserWithEmail = await userProvider.checkMatchUserWithEmail(
+    userName,
+    email
+  );
+
+  if (checkMatchUserWithEmail === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  // Response Error End
+
+  const authNum = createAuthNum();
+
+  if (type === 1) {
+    const phoneNum = await userProvider.selectPhoneNum(email);
+
+    messageAuth(2, phoneNum, authNum);
+  } else mailer(authNum, email);
+
+  const result = await userService.updateAuthNumByEmail(email, authNum);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 65
+ * API Name : 비밀번호 찾기 - 인증번호 확인 및 비밀번호 재설정 API
+ * [PATCH] /users/user-password/reset
+ */
+exports.updatePassword = async function (req, res) {
+  const { authNum, password, checkPassword, email } = req.body;
+
+  //Request Error Start
+
+  if (!authNum) return res.send(response(baseResponse.AUTH_NUM_IS_EMPTY)); // 2081
+
+  if (!password) return res.send(response(baseResponse.SIGNUP_PASSWORD_EMPTY)); // 2004
+
+  if (password.length < 8 || password.length > 20)
+    return res.send(response(baseResponse.SIGNUP_PASSWORD_LENGTH)); // 2005
+
+  if (!checkPassword)
+    return res.send(response(baseResponse.CHECK_PASSWORD_IS_EMPTY)); // 2082
+
+  if (password != checkPassword)
+    return res.send(response(baseResponse.PASSWORD_IS_DIFFERENT)); // 2083
+
+  if (!email) return res.send(response(baseResponse.SIGNUP_PHONENUM_EMPTY)); // 2008
+
+  //Request Error End
+
+  // Response Error Start
+
+  const checkAuthNumByEmail = await userProvider.checkAuthNumByEmail(
+    email,
+    authNum
+  );
+
+  if (checkAuthNumByEmail === 0)
+    return res.send(errResponse(baseResponse.AUTH_NUM_IS_NOT_MATCH)); // 3047
+
+  // Response Error End
+
+  const { hashedPassword, salt } = await user_ctrl.createHashedPassword(
+    password
+  );
+
+  const result = await userService.updatePassword(hashedPassword, salt, email);
 
   return res.send(response(baseResponse.SUCCESS, result));
 };

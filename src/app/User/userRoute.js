@@ -44,10 +44,16 @@ module.exports = function (app) {
   );
 
   // 62. 아이디 찾기 - 인증번호 전송 및 저장 API
-  app.patch("/users/user-account", user.sendAuthMessage);
+  app.patch("/users/user-account/auth", user.findEmail);
 
   // 63. 아이디 찾기 - 인증번호 확인 및 이메일 제공 API
   app.get("/users/user-account", user.getEmail);
+
+  // 64. 비밀번호 찾기 - 인증번호 전송 및 저장 API
+  app.patch("/users/user-password/auth", user.findPassword);
+
+  // 64. 비밀번호 찾기 - 인증번호 전송 및 저장 API
+  app.patch("/users/user-password/reset", user.updatePassword);
 
   // // 카카오 로그인 API
   // app.post("/users/kakao-login", user.kakaoLogin);

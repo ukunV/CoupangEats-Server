@@ -675,7 +675,7 @@ async function checkUserWithdrawn(connection, userId) {
 }
 
 // 유저 존재 여부 check - 아이디 찾기
-async function checkMatchUser(connection, userName, phoneNum) {
+async function checkMatchUserWithPhoneNum(connection, userName, phoneNum) {
   const query = `
                 select exists(select id
                               from User
@@ -689,7 +689,7 @@ async function checkMatchUser(connection, userName, phoneNum) {
 }
 
 // 아이디 찾기 - 인증번호 전송 및 저장
-async function sendAuthMessage(connection, phoneNum, authNum) {
+async function updateAuthNumByPhoneNum(connection, phoneNum, authNum) {
   const query = `
                 update User
                 set authNum = ?
@@ -701,8 +701,8 @@ async function sendAuthMessage(connection, phoneNum, authNum) {
   return row[0].info;
 }
 
-// 인증번호 일치여부 check
-async function checkAuthNum(connection, phoneNum, authNum) {
+// 인증번호 일치여부 check - 아이디
+async function checkAuthNumByPhoneNum(connection, phoneNum, authNum) {
   const query = `
                 select exists(select id
                               from User
@@ -736,7 +736,7 @@ async function checkEmailBlocked(connection, email) {
                 select exists(select id
                               from User
                               where email = ?
-                              ans status = 1) as exist;
+                              and status = 2) as exist;
                 `;
 
   const row = await connection.query(query, email);
@@ -750,12 +750,79 @@ async function checkEmailWithdrawn(connection, email) {
                 select exists(select id
                               from User
                               where email = ?
-                              ans status = 0) as exist;
+                              and status = 0) as exist;
                 `;
 
   const row = await connection.query(query, email);
 
   return row[0][0]["exist"];
+}
+
+// 유저 존재 여부 check - 비밀번호 찾기
+async function checkMatchUserWithEmail(connection, userName, email) {
+  const query = `
+                select exists(select id
+                              from User
+                              where name = ?
+                              and email = ?) as exist;
+                `;
+
+  const row = await connection.query(query, [userName, email]);
+
+  return row[0][0]["exist"];
+}
+
+// 비밀번호 찾기 - 인증번호 전송 및 저장
+async function selectPhoneNum(connection, email) {
+  const query = `
+                select phoneNum
+                from User
+                where email = ?;
+                `;
+
+  const row = await connection.query(query, email);
+
+  return row[0][0]["phoneNum"];
+}
+
+// 비밀번호 찾기 - 인증번호 전송 및 저장
+async function updateAuthNumByEmail(connection, email, authNum) {
+  const query = `
+                update User
+                set authNum = ?
+                where email = ?;
+                `;
+
+  const row = await connection.query(query, [authNum, email]);
+
+  return row[0].info;
+}
+
+// 인증번호 일치여부 check - 비밀번호
+async function checkAuthNumByEmail(connection, email, authNum) {
+  const query = `
+                select exists(select id
+                              from User
+                              where email = ?
+                              and authNum = ?) as exist;
+                `;
+
+  const row = await connection.query(query, [email, authNum]);
+
+  return row[0][0]["exist"];
+}
+
+// 비밀번호 찾기 - 인증번호 확인 및 비밀번호 재설정
+async function updatePassword(connection, hashedPassword, salt, email) {
+  const query = `
+                update User
+                set password = ?, salt = ?
+                where email = ?;
+                `;
+
+  const row = await connection.query(query, [hashedPassword, salt, email]);
+
+  return row[0].info;
 }
 
 module.exports = {
@@ -777,10 +844,15 @@ module.exports = {
   selectNotice,
   checkUserBlocked,
   checkUserWithdrawn,
-  checkMatchUser,
-  sendAuthMessage,
-  checkAuthNum,
+  checkMatchUserWithPhoneNum,
+  updateAuthNumByPhoneNum,
+  checkAuthNumByPhoneNum,
   selectEmail,
   checkEmailBlocked,
   checkEmailWithdrawn,
+  checkMatchUserWithEmail,
+  selectPhoneNum,
+  updateAuthNumByEmail,
+  checkAuthNumByEmail,
+  updatePassword,
 };

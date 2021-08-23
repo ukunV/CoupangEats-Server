@@ -295,31 +295,41 @@ exports.checkUserWithdrawn = async function (userId) {
 };
 
 // 유저 존재 여부 check - 아이디 찾기
-exports.checkMatchUser = async function (userName, phoneNum) {
+exports.checkMatchUserWithPhoneNum = async function (userName, phoneNum) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await userDao.checkMatchUser(connection, userName, phoneNum);
+    const result = await userDao.checkMatchUserWithPhoneNum(
+      connection,
+      userName,
+      phoneNum
+    );
     connection.release();
 
     return result;
   } catch (err) {
-    logger.error(`User-checkMatchUser Provider error: ${err.message}`);
+    logger.error(
+      `User-checkMatchUserWithPhoneNum Provider error: ${err.message}`
+    );
     return errResponse(baseResponse.DB_ERROR);
   }
 };
 
-// 인증번호 일치여부 check
-exports.checkAuthNum = async function (phoneNum, authNum) {
+// 인증번호 일치여부 check - 아이디
+exports.checkAuthNumByPhoneNum = async function (phoneNum, authNum) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await userDao.checkAuthNum(connection, phoneNum, authNum);
+    const result = await userDao.checkAuthNumByPhoneNum(
+      connection,
+      phoneNum,
+      authNum
+    );
     connection.release();
 
     return result;
   } catch (err) {
-    logger.error(`User-checkAuthNum Provider error: ${err.message}`);
+    logger.error(`User-checkAuthNumByPhoneNum Provider error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
@@ -365,6 +375,59 @@ exports.checkEmailWithdrawn = async function (email) {
     return result;
   } catch (err) {
     logger.error(`User-checkEmailWithdrawn Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 유저 전화번호 조회 - 비밀번호 찾기
+exports.selectPhoneNum = async function (email) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.selectPhoneNum(connection, email);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-selectPhoneNum Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 유저 존재 여부 check - 비밀번호 찾기
+exports.checkMatchUserWithEmail = async function (userName, email) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.checkMatchUserWithEmail(
+      connection,
+      userName,
+      email
+    );
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-checkMatchUserWithEmail Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 인증번호 일치여부 check - 비밀번호
+exports.checkAuthNumByEmail = async function (email, authNum) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.checkAuthNumByEmail(
+      connection,
+      email,
+      authNum
+    );
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-checkAuthNumByEmail Provider error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
