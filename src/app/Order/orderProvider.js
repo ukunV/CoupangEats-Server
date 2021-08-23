@@ -140,3 +140,19 @@ exports.selectOrderReceipt = async function (orderId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 배달 현황 조회
+exports.getDeliveryStatus = async function (orderId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await orderDao.getDeliveryStatus(connection, orderId);
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Order-getDeliveryStatus Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

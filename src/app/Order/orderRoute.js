@@ -20,4 +20,7 @@ module.exports = function (app) {
 
   // 60. 영수증 조회 API
   app.get("/orders/order-receipt", jwtMiddleware, order.getOrderReceipt);
+
+  // 61. 배달 현황 조회 API
+  app.get("/orders/delivery-status", jwtMiddleware, order.getDeliveryStatus);
 };

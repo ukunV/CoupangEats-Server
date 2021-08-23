@@ -221,6 +221,54 @@ async function selectOrderReceipt(connection, orderId) {
   return row[0];
 }
 
+// 배달 현황 조회
+async function getDeliveryStatus(connection, orderId) {
+  const query = `
+                select ol.id as orderId, timestampdiff(minute, now(), date_add(ol.createdAt, interval 30 + 10 + s.deliveryTime minute)) as restTime,
+                      date_format(date_add(ol.createdAt, interval 30 + 10 + s.deliveryTime minute), '%H:%i %p 도착예정') as arrival,
+                      case
+                          when ol.status = 0
+                              then '결제 취소'
+                          when ol.status = 1
+                              then '주문 대기'
+                          when ol.status = 2
+                              then '주문 수락'
+                          when ol.status = 3
+                              then '메뉴 준비중'
+                          when ol.status = 4
+                              then '배달 중'
+                          when ol.status = 5
+                              then '배달완료'
+                      end as status, date_format(ol.updatedAt, '%H:%i %p') as statusChange, concat(a.address, a.detailAddress) as address,
+                      s.storeName, finalPrice,
+                      case
+                          when p.bankId is null
+                              then '카드'
+                          else
+                              ab.bankName
+                      end as type,
+                      case
+                          when p.bankId is null
+                              then concat('****', left(right(p.number, 4), 3), '*')
+                          else
+                              concat('****', right(p.number, 4))
+                      end as number,
+                      group_concat(case when c.rootId = c.menuId then concat(c.amount, '/', sm.menuName) else sm.menuName end order by c.rootId, c.menuId) as menuList
+                from OrderList ol
+                    left join Store s on s.id = ol.storeId
+                    left join Address a on ol.addressId = a.id
+                    left join Cart c on c.orderId = ol.id
+                    left join StoreMenu sm on sm.id = c.menuId
+                    left join Payment p on ol.paymentId = p.id
+                    left join AccountBank ab on ab.id = p.bankId
+                where ol.id = ?;
+                `;
+
+  const row = await connection.query(query, orderId);
+
+  return row[0];
+}
+
 module.exports = {
   checkUserExist,
   checkUserBlocked,
@@ -233,4 +281,5 @@ module.exports = {
   selectOrderList,
   checkOrderExist,
   selectOrderReceipt,
+  getDeliveryStatus,
 };

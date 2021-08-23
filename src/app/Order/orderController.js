@@ -265,3 +265,51 @@ exports.getOrderReceipt = async function (req, res) {
 
   return res.send(response(baseResponse.SUCCESS, result));
 };
+
+/**
+ * API No. 61
+ * API Name : 배달 현황 조회 API
+ * [GET] /orders/delivery-status
+ * query string: orderId
+ */
+exports.getDeliveryStatus = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { orderId } = req.query;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  if (!orderId) return res.send(errResponse(baseResponse.ORDER_ID_IS_EMPTY)); // 2040
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await orderProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await orderProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await orderProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
+  const checkOrderExist = await orderProvider.checkOrderExist(userId, orderId);
+
+  if (checkOrderExist === 0)
+    return res.send(errResponse(baseResponse.ORDER_IS_NOT_EXIST)); // 3027
+
+  // Response Error End
+
+  const result = await orderProvider.getDeliveryStatus(orderId);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
