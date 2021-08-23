@@ -134,7 +134,7 @@ async function selectStoresByCategoryIdAndUserId(
   couponCondition
 ) {
   const query = `
-                select s.id as storeId, group_concat(smi.imageURL) as imageArray,
+                select s.id as storeId, group_concat(smi.imageURL order by smi.number) as imageArray,
                       s.storeName, concat(s.deliveryTime, '-', s.deliveryTime + 10, '분') as deliveryTime,
                       round(ifnull(rc.point, 0.0), 1) as avgPoint, ifnull(rc.count, 0) as reviewCount,
                       concat(format(getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude), 1), 'km') as distance,
@@ -205,7 +205,7 @@ async function selectStoresByCategoryIdAndAddress(
   couponCondition
 ) {
   const query = `
-                select s.id as storeId, group_concat(smi.imageURL) as imageArray,
+                select s.id as storeId, group_concat(smi.imageURL order by smi.number) as imageArray,
                       s.storeName, concat(s.deliveryTime, '-', s.deliveryTime + 10, '분') as deliveryTime,
                       round(ifnull(rc.point, 0.0), 1) as avgPoint, ifnull(rc.count, 0) as reviewCount,
                       concat(format(getDistance(?, ?, s.storeLatitude, s.storeLongtitude), 1), 'km') as distance,
@@ -276,7 +276,7 @@ async function checkStoreExist(connection, storeId) {
 // 음식점 상세페이지 조회
 async function selectStore(connection, storeId) {
   const query1 = `
-                  select s.id as storeId, group_concat(smi.imageURL) as imageArray, s.storeName,
+                  select s.id as storeId, group_concat(smi.imageURL order by smi.number) as imageArray, s.storeName,
                         case
                             when c.discount is not null
                                 then concat(format(c.discount, 0), '원 쿠폰 받기')
@@ -562,7 +562,7 @@ async function selectStoreLike(connection, userId, filterCondition) {
                 where sl.userId = ?
                 and s.isDeleted = 1
                 and sl.isDeleted = 1
-                group by s.id;
+                group by s.id
                 ${filterCondition};
                 `;
 
