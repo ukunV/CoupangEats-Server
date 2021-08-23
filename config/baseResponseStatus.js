@@ -607,7 +607,12 @@ module.exports = {
     code: 3042,
     message: "해당 주문은 취소 혹은 배달완료된 주문건입니다.",
   },
-
+  ORDER_IS_NOT_WAITING_STATUS: {
+    isSuccess: false,
+    code: 3043,
+    message: "탈퇴된 계정입니다. 고객센터에 문의해주세요.",
+  },
+  //////////////////////////////////////////
   ACCOUNT_IS_BLOCKED: {
     isSuccess: false,
     code: 3998,
