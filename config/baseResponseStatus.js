@@ -395,6 +395,16 @@ module.exports = {
     code: 2076,
     message: "위치정보가 잘못되었습니다.",
   },
+  ORDER_STATUS_IS_EMPTY: {
+    isSuccess: false,
+    code: 2077,
+    message: "변경을 원하는 주문상태를 입력해주세요.",
+  },
+  ORDER_STATUS_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2078,
+    message: "주문상태가 올바르지 않습니다.",
+  },
 
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
@@ -607,12 +617,29 @@ module.exports = {
     code: 3042,
     message: "해당 주문은 취소 혹은 배달완료된 주문건입니다.",
   },
-  ORDER_IS_NOT_WAITING_STATUS: {
+  ORDER_IS_NOT_WAIT_STATUS: {
     isSuccess: false,
     code: 3043,
-    message: "탈퇴된 계정입니다. 고객센터에 문의해주세요.",
+    message: "해당 주문은 주문 대기 상태가 아닙니다.",
   },
+  ORDER_IS_NOT_ACCEPT_STATUS: {
+    isSuccess: false,
+    code: 3044,
+    message: "해당 주문은 주문 수락 상태가 아닙니다.",
+  },
+  ORDER_IS_NOT_PREPARE_STATUS: {
+    isSuccess: false,
+    code: 3045,
+    message: "해당 주문은 메뉴 준비중 상태가 아닙니다.",
+  },
+  ORDER_IS_NOT_DELIVERY_STATUS: {
+    isSuccess: false,
+    code: 3046,
+    message: "해당 주문은 배달중 상태가 아닙니다.",
+  },
+
   //////////////////////////////////////////
+
   ACCOUNT_IS_BLOCKED: {
     isSuccess: false,
     code: 3998,
