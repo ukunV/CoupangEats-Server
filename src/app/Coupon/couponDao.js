@@ -137,9 +137,10 @@ async function checkCouponObtained(connection, userId, number) {
   const couponId = row1[0][0]["id"];
 
   const query2 = `
-                select exists(select id from CouponObtained
-                              where userId = ? and couponId = ?
-                              and status = 1) as exist;
+                select exists(select id
+                              from CouponObtained
+                              where userId = ?
+                              and couponId = ?) as exist;
                 `;
 
   const row2 = await connection.query(query2, [userId, couponId]);
