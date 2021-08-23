@@ -265,39 +265,3 @@ exports.getOrderReceipt = async function (req, res) {
 
   return res.send(response(baseResponse.SUCCESS, result));
 };
-
-/**
- * API No. 61
- * API Name : 라이더 위치 갱신 API
- * [POST] /orders/delivery/rider-location
- */
-exports.updateRiderLocation = async function (req, res) {
-  const { orderId, address } = req.body;
-
-  const location = await kakaoMap(address);
-
-  // Request Error Start
-
-  if (location.length) {
-    return res.send(errResponse(baseResponse.LOCATION_INFO_IS_NOT_VALID)); // 2076
-  }
-
-  // Request Error End
-
-  // Response Error Start
-
-  const checkOrderAlive = await orderProvider.checkOrderAlive(orderId);
-
-  if (checkOrderAlive === 0)
-    return res.send(errResponse(baseResponse.ORDER_IS_FINISHED)); // 3042
-
-  // Response Error End
-
-  const result = await storeService.updateRiderLocation(
-    orderId,
-    location.lat,
-    location.lng
-  );
-
-  return res.send(response(baseResponse.SUCCESS, result));
-};

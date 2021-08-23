@@ -20,11 +20,4 @@ module.exports = function (app) {
 
   // 60. 영수증 조회 API
   app.get("/orders/order-receipt", jwtMiddleware, order.getOrderReceipt);
-
-  // 61. 라이더 위치 갱신 API
-  app.post(
-    "/orders/delivery/rider-location",
-    jwtMiddleware,
-    order.updateRiderLocation
-  );
 };

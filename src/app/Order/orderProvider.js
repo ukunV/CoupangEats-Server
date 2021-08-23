@@ -140,19 +140,3 @@ exports.selectOrderReceipt = async function (orderId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
-
-// 주문 배달완료 여부 check
-exports.checkOrderAlive = async function (orderId) {
-  try {
-    const connection = await pool.getConnection(async (conn) => conn);
-
-    const result = await orderDao.checkOrderAlive(connection, orderId);
-
-    connection.release();
-
-    return result;
-  } catch (err) {
-    logger.error(`Order-checkOrderAlive Provider error: ${err.message}`);
-    return errResponse(baseResponse.DB_ERROR);
-  }
-};
