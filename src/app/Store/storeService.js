@@ -28,7 +28,7 @@ exports.createStoreLike = async function (userId, storeId) {
   } catch (err) {
     await connection.rollback();
     connection.release();
-    logger.error(`Coupon-createStoreLike Service error: ${err.message}`);
+    logger.error(`Store-createStoreLike Service error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
@@ -52,7 +52,7 @@ exports.deleteStoreLike = async function (userId, storeIdArr) {
   } catch (err) {
     await connection.rollback();
     connection.release();
-    logger.error(`Coupon-deleteStoreLike Service error: ${err.message}`);
+    logger.error(`Store-deleteStoreLike Service error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
