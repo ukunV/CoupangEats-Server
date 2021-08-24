@@ -431,3 +431,18 @@ exports.checkAuthNumByEmail = async function (email, authNum) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 유저 고유 아이디 조회
+exports.selectUserId = async function (email) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await userDao.selectUserId(connection, email);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`User-selectUserId Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

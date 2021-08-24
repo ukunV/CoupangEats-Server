@@ -11,16 +11,21 @@ const passport = require("passport");
 const regexEmail = require("regex-email");
 const { emit } = require("nodemon");
 
+// salt
 const user_ctrl = require("../../../controllers/user_ctrl");
 
+// 카카오 로그인
 const kakao_key = require("../../../config/kakao_config").sercetKey;
 const KakaoStrategy = require("passport-kakao").Strategy;
 
+// 카카오 주소 검색
 const kakaoMap = require("../../../controllers/kakao_ctrl").getAddressInfo;
 
+// ncp-sens
 const { NCPClient } = require("../../../controllers/ncp_ctrl");
 const sensKey = require("../../../config/ncp_config").sensSecret;
 
+// nodemailer
 const mailer = require("../../../controllers/mail_ctrl").resetPasswordMail;
 
 // regex
@@ -35,6 +40,7 @@ function createAuthNum() {
   return randNum;
 }
 
+// ncp-sens 문자전송 함수
 const messageAuth = async function (type, phoneNum, authNum) {
   const ncp = new NCPClient({
     ...sensKey,
@@ -210,9 +216,11 @@ exports.userLogIn = async function (req, res) {
 
   // Response Error End
 
+  const selectUserId = await userProvider.selectUserId(email);
+
   const token = await jwt.sign(
     {
-      userId: checkPassword,
+      userId: selectUserId,
     }, // 토큰의 내용(payload)
     secret_config.jwtsecret, // 비밀키
     {
@@ -766,89 +774,85 @@ exports.updatePassword = async function (req, res) {
 };
 
 /**
- * API No.
+ * API No. 66
  * API Name : 카카오 로그인 API
- *
+ * [POST] /users/kakao-login
  */
 
-// passport.use(
-//   "kakao-login",
-//   new KakaoStrategy(
-//     {
-//       clientID: kakao_key,
-//       callbackURL: "/auth/kakao/callback",
-//     },
-//     async (accessToken, refreshToken, profile, done) => {
-//       console.log(accessToken);
-//       console.log(profile);
-//     }
-//   )
-// );
+// client start
+passport.use(
+  "kakao-login",
+  new KakaoStrategy(
+    {
+      clientID: kakao_key,
+      callbackURL: "/auth/kakao/callback",
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      console.log(accessToken);
+      console.log(profile);
+    }
+  )
+);
+// client end
 
-// exports.kakaoLogin = async function (req, res) {
-//   const { accessToken } = req.body;
+exports.kakaoLogin = async function (req, res) {
+  const { accessToken } = req.body;
 
-//   if (!accessToken)
-//     return res.send(errResponse(baseResponse.ACCESS_TOKEN_EMPTY)); // 2052 : accessToken을 입력해주세요.
+  if (!accessToken)
+    return res.send(errResponse(baseResponse.ACCESS_TOKEN_IS_EMPTY)); // 2084
 
-//   try {
-//     let kakao_profile;
+  try {
+    let kakao_profile;
 
-//     try {
-//       kakao_profile = await axios.get("https://kapi.kakao.com/v2/user/me", {
-//         headers: {
-//           Authorization: `Bearer ${accessToken}`,
-//           "Content-Type": "application/json",
-//         },
-//       });
-//     } catch (err) {
-//       return res.send(errResponse(baseResponse.ACCESS_TOKEN)); // 2053 : 유효하지 않는 엑세스 토큰입니다.
-//     }
+    try {
+      kakao_profile = await axios.get("https://kapi.kakao.com/v2/user/me", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+    } catch (err) {
+      return res.send(errResponse(baseResponse.ACCESS_TOKEN_IS_NOT_VALID)); // 2085
+    }
 
-//     const data = kakao_profile.data.kakao_account;
-//     const name = data.profile.nickname;
-//     const email = data.email;
+    const kakao_data = kakao_profile.data.kakao_account;
+    const kakao_name = kakao_data.profile.nickname;
+    const kakao_email = kakao_data.email;
 
-//     const emailCheckResult = await userProvider.emailCheck(email);
+    const checkEmailExist = await userProvider.checkEmailExist(kakao_email);
 
-//     if (emailCheckResult[0].exist === 1) {
-//       const userInfoRow = await userProvider.getUserInfo(email);
+    if (checkEmailExist === 1) {
+      const selectUserId = await userProvider.selectUserId(kakao_email);
 
-//       let token = await jwt.sign(
-//         {
-//           userIdx: userInfoRow.userIdx,
-//         },
-//         secret_config.jwtsecret,
-//         {
-//           expiresIn: "365d",
-//           subject: "userInfo",
-//         }
-//       );
-//       return res.send(
-//         response(baseResponse.SUCCESS, {
-//           userIdx: userInfoRow.userIdx,
-//           jwt: token,
-//           message: "소셜로그인에 성공하셨습니다.",
-//         })
-//       );
-//     } else {
-//       const result = {
-//         name: name,
-//         email: email,
-//       };
-//       return res.send(
-//         response(baseResponse.SUCCESS, {
-//           message: "회원가입이 가능합니다.",
-//           result,
-//         })
-//       );
-//     }
-//   } catch (err) {
-//     logger.error(
-//       `App - postSignIn Service error\n: ${err.message} \n${JSON.stringify(
-//         err
-//       )}`
-//     );
-//     return errResponse(baseResponse.DB_ERROR);
-//   }
-// };
+      let token = await jwt.sign(
+        {
+          userId: selectUserId,
+        },
+        secret_config.jwtsecret,
+        {
+          expiresIn: "365d",
+          subject: "userInfo",
+        }
+      );
+      return res.send(
+        response(baseResponse.SUCCESS, {
+          userId: selectUserId,
+          jwt: token,
+          message: "소셜로그인에 성공하셨습니다.",
+        })
+      );
+    } else {
+      const result = { name: kakao_name, email: kakao_email };
+
+      return res.send(
+        response(baseResponse.SUCCESS, {
+          message: "회원가입이 가능합니다.",
+          result,
+        })
+      );
+    }
+  } catch (err) {
+    res.send(errResponse(baseResponse.SUCCESS, err));
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

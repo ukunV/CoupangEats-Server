@@ -825,6 +825,19 @@ async function updatePassword(connection, hashedPassword, salt, email) {
   return row[0].info;
 }
 
+// 유저 고유 아이디 조회
+async function selectUserId(connection, email) {
+  const query = `
+                select id
+                from User
+                where email = ?;
+                `;
+
+  const row = await connection.query(query, email);
+
+  return row[0][0]["id"];
+}
+
 module.exports = {
   checkEmailExist,
   checkPhoneNumExist,
@@ -855,4 +868,5 @@ module.exports = {
   updateAuthNumByEmail,
   checkAuthNumByEmail,
   updatePassword,
+  selectUserId,
 };

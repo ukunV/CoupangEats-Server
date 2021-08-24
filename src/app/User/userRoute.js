@@ -1,6 +1,7 @@
 module.exports = function (app) {
   const user = require("./userController");
   const jwtMiddleware = require("../../../config/jwtMiddleware");
+  const passport = require("passport");
 
   // 0. 테스트 API
   // app.get("/app/test", user.getTest);
@@ -55,17 +56,19 @@ module.exports = function (app) {
   // 64. 비밀번호 찾기 - 인증번호 전송 및 저장 API
   app.patch("/users/user-password/reset", user.updatePassword);
 
-  // // 카카오 로그인 API
-  // app.post("/users/kakao-login", user.kakaoLogin);
-  // app.get("/kakao", passport.authenticate("kakao-login"));
-  // app.get(
-  //   "/auth/kakao/callback",
-  //   passport.authenticate("kakao-login", {
-  //     successRedirect: "/",
-  //     failureRedirect: "/",
-  //   }),
-  //   (req, res) => {
-  //     res.redirect("/");
-  //   }
-  // );
+  // 65. 카카오 로그인 API
+  // client start
+  app.get("/kakao", passport.authenticate("kakao-login"));
+  app.get(
+    "/auth/kakao/callback",
+    passport.authenticate("kakao-login", {
+      successRedirect: "/",
+      failureRedirect: "/",
+    }),
+    (req, res) => {
+      res.redirect("/");
+    }
+  );
+  // client end
+  app.post("/users/kakao-login", user.kakaoLogin);
 };
