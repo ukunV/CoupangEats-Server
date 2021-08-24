@@ -430,6 +430,16 @@ module.exports = {
     code: 2083,
     message: "비밀번호가 일치하지 않습니다.",
   },
+  ACCESS_TOKEN_IS_EMPTY: {
+    isSuccess: false,
+    code: 2084,
+    message: "accessToken 값을 입력해주세요.",
+  },
+  ACCESS_TOKEN_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2085,
+    message: "유효하지 않는 Access Token 입니다.",
+  },
 
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
