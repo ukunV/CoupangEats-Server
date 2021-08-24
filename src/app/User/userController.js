@@ -740,7 +740,7 @@ exports.updatePassword = async function (req, res) {
   if (password != checkPassword)
     return res.send(response(baseResponse.PASSWORD_IS_DIFFERENT)); // 2083
 
-  if (!email) return res.send(response(baseResponse.SIGNUP_PHONENUM_EMPTY)); // 2008
+  if (!email) return res.send(response(baseResponse.SIGNUP_EMAIL_EMPTY)); // 2001
 
   //Request Error End
 
