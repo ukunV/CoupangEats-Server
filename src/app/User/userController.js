@@ -29,7 +29,7 @@ const KakaoStrategy = require("passport-kakao").Strategy;
 const kakaoMap = require("../../../controllers/kakao_ctrl").getAddressInfo;
 
 // ncp-sens
-const { NCPClient } = require("../../../controllers/ncp_ctrl");
+const { NCPClient } = require("../../../controllers/sens_ctrl");
 const sensKey = require("../../../config/sens_config").sensSecret;
 
 // nodemailer
