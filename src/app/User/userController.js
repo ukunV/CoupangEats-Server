@@ -11,6 +11,13 @@ const passport = require("passport");
 const regexEmail = require("regex-email");
 const { emit } = require("nodemon");
 
+// const firebaseAdmin = require("firebase-admin");
+// const serviceAccount = require("../../../config/firebase_key.json");
+
+// firebaseAdmin.intiallizeApp({
+//   Credential: firebaseAdmin.credentail.cert(serviceAccount),
+// });
+
 // salt
 const user_ctrl = require("../../../controllers/user_ctrl");
 
