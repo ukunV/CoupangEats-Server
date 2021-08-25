@@ -174,3 +174,28 @@ exports.changePayment = async function (userId, paymentId) {
     return errResponse(baseResponse.DB_ERROR);
   }
 };
+
+// 카트에서 특정 메뉴 삭제
+exports.deleteCartMenu = async function (userId, menuId, createdAt) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  try {
+    await connection.beginTransaction();
+
+    const result = await cartDao.deleteCartMenu(
+      connection,
+      userId,
+      menuId,
+      createdAt
+    );
+
+    await connection.commit();
+
+    connection.release();
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    logger.error(`Cart-deleteCartMenu Service error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

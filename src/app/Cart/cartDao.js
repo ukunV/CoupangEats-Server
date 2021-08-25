@@ -523,6 +523,20 @@ async function changePayment(connection, userId, paymentId) {
 
   return row2[0].info;
 }
+// 카트에서 특정 메뉴 삭제
+async function deleteCartMenu(connection, userId, menuId, createdAt) {
+  const query = `
+                update Cart
+                set isDeleted = 0
+                where userId = ?
+                and rootId = ?
+                and createdAt = ?;
+                `;
+
+  const row = await connection.query(query, [userId, menuId, createdAt]);
+
+  return row[0].info;
+}
 
 module.exports = {
   checkUserExist,
@@ -546,4 +560,5 @@ module.exports = {
   checkUserWithdrawn,
   checkPaymentExist,
   changePayment,
+  deleteCartMenu,
 };

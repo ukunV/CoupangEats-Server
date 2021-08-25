@@ -571,3 +571,50 @@ exports.changePayment = async function (req, res) {
 
   return res.send(response(baseResponse.SUCCESS, result));
 };
+
+/**
+ * API No. 67
+ * API Name : 카트에서 특정 메뉴 삭제 API
+ * [PATCH] /carts/menu
+ */
+exports.deleteCartMenu = async function (req, res) {
+  const { userId } = req.verifiedToken;
+
+  const { menuId, createdAt } = req.body;
+
+  // Request Error Start
+
+  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+
+  if (!menuId) return res.send(errResponse(baseResponse.MENU_ID_IS_EMPTY)); // 2033
+
+  // Request Error End
+
+  // Response Error Start
+
+  const checkUserExist = await cartProvider.checkUserExist(userId);
+
+  if (checkUserExist === 0)
+    return res.send(response(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await cartProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await cartProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
+  const checkMenuExist = await cartProvider.checkMenuExist(menuId);
+
+  if (checkMenuExist === 0)
+    return res.send(errResponse(baseResponse.MENU_IS_NOT_EXIST)); // 3011
+
+  // Response Error End
+
+  const result = await cartService.deleteCartMenu(userId, menuId, createdAt);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};

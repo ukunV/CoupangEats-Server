@@ -34,4 +34,7 @@ module.exports = function (app) {
 
   // 55. 카트에서 결제수단 변경 API
   app.patch("/carts/detail/payment-choice", jwtMiddleware, cart.changePayment);
+
+  // 67. 카트에서 특정 메뉴 삭제 API
+  app.patch("/carts/menu", jwtMiddleware, cart.deleteCartMenu);
 };
