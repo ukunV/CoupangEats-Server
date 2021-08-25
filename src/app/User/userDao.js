@@ -544,10 +544,11 @@ async function eventToStore(connection, userId, franchiseId, distance) {
                       left join (select storeId, count(storeId) as count, avg(point) as point
                                 from Review
                                 where isDeleted = 1 group by storeId) as rc on s.id = rc.storeId
-                      left join (select * from Franchise where id = ?) as f on f.id = s.franchiseId
+                      left join Franchise as f on f.id = s.franchiseId
                       left join (select * from Coupon where status = 1) as c on c.franchiseId = f.id,
                         User u
                   where u.id = ?
+                  and f.id = ?
                   and format(getDistance(u.userLatitude, u.userLongtitude, s.storeLatitude, s.storeLongtitude), 1) = ?
                   and sdp.rn = 1
                   and s.isDeleted = 1
@@ -555,8 +556,8 @@ async function eventToStore(connection, userId, franchiseId, distance) {
                   `;
 
   const result1 = await connection.query(query1, [
-    franchiseId,
     userId,
+    franchiseId,
     distance,
   ]);
 
