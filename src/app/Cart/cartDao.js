@@ -310,7 +310,7 @@ async function selectCart(connection, userId) {
   const query2 = `
                   select c.rootId, c.menuId, c.storeId,
                         s.storeName, s.isCheetah, sm.menuName,
-                        (sm.price * c.amount) as totalPrice, c.amount
+                        (sm.price * c.amount) as totalPrice, c.amount, c.createdAt
                   from Cart c
                       left join StoreMenu sm on c.menuId = sm.id
                       left join Store s on c.storeId = s.id
