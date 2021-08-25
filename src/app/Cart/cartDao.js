@@ -531,7 +531,6 @@ module.exports = {
   createCart,
   checkCartExist,
   checkSameStore,
-  deleteOtherStore,
   checkOtherStoreExist,
   checkMenuExistAtCart,
   changeMenuAmount,
