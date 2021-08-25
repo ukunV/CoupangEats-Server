@@ -73,12 +73,12 @@ async function createCart(
   subIdArr
 ) {
   const existCheckQuery = `
-                          select rootId, menuId
+                          select rootId, menuId, createdAt
                           from Cart
                           where rootId = ?
                           and isDeleted = 1
                           and userId = ?
-                          order by menuId;
+                          order by createdAt, menuId;
                           `;
 
   const existCheckRow = await connection.query(existCheckQuery, [
@@ -86,27 +86,45 @@ async function createCart(
     userId,
   ]);
 
+  //////////////////////////////////////////////
   let existMainId;
-  let existSubArr = [];
+  let existSubArr;
+  let existCreatedAt;
+  let same;
+  let count = existCheckRow[0].length;
+  let i = 0;
+  //////////////////////////////////////////////
+  while (true) {
+    if (count === 0) break;
 
-  if (existCheckRow[0].length !== 0) {
-    existMainId = existCheckRow[0][0]["rootId"];
+    existMainId = 0;
+    existSubArr = [];
 
-    for (let i = 1; i < existCheckRow[0].length; i++) {
-      existSubArr.push(existCheckRow[0][i]["menuId"]);
-    }
-  }
+    existMainId = existCheckRow[0][i]["rootId"];
+    existCreatedAt = existCheckRow[0][i]["createdAt"];
+    count -= 1;
+    i += 1;
 
-  let same = 1;
-
-  if ((existMainId === menuId) & (existSubArr.length === subIdArr.length)) {
-    for (let i = 0; i < subIdArr.length; i++) {
-      if (existSubArr[i] !== subIdArr[i]) {
-        same = 0;
+    for (i; i < existCheckRow[0].length; i++) {
+      if (existCheckRow[0][i]["rootId"] == existCheckRow[0][i]["menuId"]) {
         break;
       }
+      existSubArr.push(existCheckRow[0][i]["menuId"]);
+      count -= 1;
     }
+
+    if ((existMainId == menuId) & (existSubArr.length === subIdArr.length)) {
+      for (let i = 0; i < subIdArr.length; i++) {
+        if (existSubArr[i] != subIdArr[i]) {
+          same = 0;
+          break;
+        }
+        same = 1;
+      }
+    }
+    if (same === 1) break;
   }
+  //////////////////////////////////////////////
 
   if (same === 1) {
     const query = `
@@ -114,10 +132,16 @@ async function createCart(
                   set amount = amount + ?
                   where userId = ?
                   and rootId = ?
-                  and isDeleted = 1;
+                  and isDeleted = 1
+                  and createdAt = ?;
                   `;
 
-    const row = await connection.query(query, [amount, userId, menuId]);
+    await connection.query(query, [
+      amount,
+      userId,
+      existMainId,
+      existCreatedAt,
+    ]);
 
     return `Same Menu -> add mount: ${amount}`;
   }
@@ -147,7 +171,7 @@ async function createCart(
       userId,
       storeId,
       menuId,
-      menuId,
+      subIdArr[i],
       amount,
     ]);
 
