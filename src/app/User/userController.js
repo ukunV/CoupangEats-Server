@@ -30,7 +30,7 @@ const kakaoMap = require("../../../controllers/kakao_ctrl").getAddressInfo;
 
 // ncp-sens
 const { NCPClient } = require("../../../controllers/ncp_ctrl");
-const sensKey = require("../../../config/ncp_config").sensSecret;
+const sensKey = require("../../../config/sens_config").sensSecret;
 
 // nodemailer
 const mailer = require("../../../controllers/mail_ctrl").resetPasswordMail;
