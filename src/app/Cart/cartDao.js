@@ -348,7 +348,7 @@ async function selectCart(connection, userId) {
 // 카트 배달비 조회
 async function selectCartDeliveryFee(connection, storeId, totalPrice) {
   const query = `
-                select ifnull(price, max(price)) as deliveryFee
+                select price as deliveryFee
                 from StoreDeliveryPrice
                 where storeId = ?
                 and orderPrice <= ?
@@ -359,6 +359,8 @@ async function selectCartDeliveryFee(connection, storeId, totalPrice) {
   //            보다 작은 경우 가장 비싼 배달비 반환
 
   const row = await connection.query(query, [storeId, totalPrice]);
+
+  if (row[0].length === 0) return null;
 
   return row[0];
 }
