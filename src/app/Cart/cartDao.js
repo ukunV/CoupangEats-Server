@@ -212,18 +212,18 @@ async function checkSameStore(connection, userId, storeId) {
   return row[0][0]["exist"];
 }
 
-// 타 음식점 메뉴 카트에 담을 시 카트 항목 삭제
-async function deleteOtherStore(connection, userId) {
-  const query = `
-                update Cart
-                set isDeleted = 0
-                where userId = ?;
-                `;
+// // 타 음식점 메뉴 카트에 담을 시 카트 항목 삭제
+// async function deleteOtherStore(connection, userId) {
+//   const query = `
+//                 update Cart
+//                 set isDeleted = 0
+//                 where userId = ?;
+//                 `;
 
-  const row = await connection.query(query, userId);
+//   const row = await connection.query(query, userId);
 
-  return row[0].info;
-}
+//   return row[0].info;
+// }
 
 // 카트에 다른 상점이 이미 있는지 check
 async function checkOtherStoreExist(connection, userId, storeId) {

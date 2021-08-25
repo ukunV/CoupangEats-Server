@@ -96,60 +96,60 @@ exports.createCarts = async function (req, res) {
   return res.send(response(baseResponse.SUCCESS, result));
 };
 
-/**
- * API No. 20
- * API Name : 타 음식점 메뉴 카트에 담을 시 카트 항목 삭제 API
- * [PATCH] /carts/:storeId/menu
- */
-exports.deleteOtherStore = async function (req, res) {
-  const { userId } = req.verifiedToken;
+// /**
+//  * API No. 20
+//  * API Name : 타 음식점 메뉴 카트에 담을 시 카트 항목 삭제 API
+//  * [PATCH] /carts/:storeId/menu
+//  */
+// exports.deleteOtherStore = async function (req, res) {
+//   const { userId } = req.verifiedToken;
 
-  const { storeId } = req.params;
+//   const { storeId } = req.params;
 
-  // Request Error Start
+//   // Request Error Start
 
-  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+//   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
-  // Request Error End
+//   // Request Error End
 
-  // Response Error Start
+//   // Response Error Start
 
-  const checkUserExist = await cartProvider.checkUserExist(userId);
+//   const checkUserExist = await cartProvider.checkUserExist(userId);
 
-  if (checkUserExist === 0)
-    return res.send(response(baseResponse.USER_IS_NOT_EXIST)); // 3006
+//   if (checkUserExist === 0)
+//     return res.send(response(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
-  const checkUserBlocked = await cartProvider.checkUserBlocked(userId);
+//   const checkUserBlocked = await cartProvider.checkUserBlocked(userId);
 
-  if (checkUserBlocked === 1)
-    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+//   if (checkUserBlocked === 1)
+//     return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
 
-  const checkUserWithdrawn = await cartProvider.checkUserWithdrawn(userId);
+//   const checkUserWithdrawn = await cartProvider.checkUserWithdrawn(userId);
 
-  if (checkUserWithdrawn === 1)
-    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+//   if (checkUserWithdrawn === 1)
+//     return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
-  const checkStoreExist = await cartProvider.checkStoreExist(storeId);
+//   const checkStoreExist = await cartProvider.checkStoreExist(storeId);
 
-  if (checkStoreExist === 0)
-    return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
+//   if (checkStoreExist === 0)
+//     return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
 
-  const checkCartExist = await cartProvider.checkCartExist(userId);
+//   const checkCartExist = await cartProvider.checkCartExist(userId);
 
-  if (checkCartExist === 0)
-    return res.send(response(baseResponse.CART_IS_EMPTY)); // 3013
+//   if (checkCartExist === 0)
+//     return res.send(response(baseResponse.CART_IS_EMPTY)); // 3013
 
-  const checkSameStore = await cartProvider.checkSameStore(userId, storeId);
+//   const checkSameStore = await cartProvider.checkSameStore(userId, storeId);
 
-  if (checkSameStore === 1)
-    return res.send(response(baseResponse.SAME_STORE_MENU)); // 3014
+//   if (checkSameStore === 1)
+//     return res.send(response(baseResponse.SAME_STORE_MENU)); // 3014
 
-  // Response Error End
+//   // Response Error End
 
-  const result = await cartService.deleteOtherStore(userId);
+//   const result = await cartService.deleteOtherStore(userId);
 
-  return res.send(response(baseResponse.SUCCESS, result));
-};
+//   return res.send(response(baseResponse.SUCCESS, result));
+// };
 
 /**
  * API No. 46

@@ -46,25 +46,25 @@ exports.createCart = async function (
   }
 };
 
-// 타 음식점 메뉴 카트에 담을 시 카트 항목 삭제
-exports.deleteOtherStore = async function (userId, storeId) {
-  const connection = await pool.getConnection(async (conn) => conn);
-  try {
-    await connection.beginTransaction();
+// // 타 음식점 메뉴 카트에 담을 시 카트 항목 삭제
+// exports.deleteOtherStore = async function (userId, storeId) {
+//   const connection = await pool.getConnection(async (conn) => conn);
+//   try {
+//     await connection.beginTransaction();
 
-    const result = await cartDao.deleteOtherStore(connection, userId, storeId);
+//     const result = await cartDao.deleteOtherStore(connection, userId, storeId);
 
-    await connection.commit();
+//     await connection.commit();
 
-    connection.release();
-    return result;
-  } catch (err) {
-    await connection.rollback();
-    connection.release();
-    logger.error(`Cart-deleteOtherStore Service error: ${err.message}`);
-    return errResponse(baseResponse.DB_ERROR);
-  }
-};
+//     connection.release();
+//     return result;
+//   } catch (err) {
+//     await connection.rollback();
+//     connection.release();
+//     logger.error(`Cart-deleteOtherStore Service error: ${err.message}`);
+//     return errResponse(baseResponse.DB_ERROR);
+//   }
+// };
 
 // 메뉴 수량 변경
 exports.changeMenuAmount = async function (userId, rootId, amount) {

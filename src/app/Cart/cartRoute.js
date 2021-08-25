@@ -5,8 +5,8 @@ module.exports = function (app) {
   // 19. 카트에 담기 API
   app.post("/carts/:storeId/menu", jwtMiddleware, cart.createCarts);
 
-  // 20. 타 음식점 메뉴 카트에 담을 시 카트 항목 삭제 API
-  app.patch("/carts/:storeId/menu", jwtMiddleware, cart.deleteOtherStore);
+  // // 20. 타 음식점 메뉴 카트에 담을 시 카트 항목 삭제 API
+  // app.patch("/carts/:storeId/menu", jwtMiddleware, cart.deleteOtherStore);
 
   // 46. 메뉴 수량 변경 API
   app.patch("/carts/amount", jwtMiddleware, cart.changeMenuAmount);
