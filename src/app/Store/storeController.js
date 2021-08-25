@@ -193,18 +193,18 @@ exports.getStoresByCategoryId = async function (req, res) {
 
   let deliveryFeeCondition = "and sdp.price <= ";
 
-  if (deliveryFee === "3000") deliveryFeeCondition = "3000";
-  else if (deliveryFee === "2000") deliveryFeeCondition = "2000";
-  else if (deliveryFee === "1000") deliveryFeeCondition = "1000";
+  if (deliveryFee === "3000") deliveryFeeCondition += "3000";
+  else if (deliveryFee === "2000") deliveryFeeCondition += "2000";
+  else if (deliveryFee === "1000") deliveryFeeCondition += "1000";
   else if (deliveryFee === "0") deliveryFeeCondition = "and sdp.price = 0";
   else deliveryFeeCondition = "";
 
   let minPriceCondition = "and sdp.orderPrice <= ";
 
-  if (minPrice === "15000") minPriceCondition = "15000";
-  else if (minPrice === "12000") minPriceCondition = "12000";
-  else if (minPrice === "10000") minPriceCondition = "10000";
-  else if (minPrice === "5000") minPriceCondition = "5000";
+  if (minPrice === "15000") minPriceCondition += "15000";
+  else if (minPrice === "12000") minPriceCondition += "12000";
+  else if (minPrice === "10000") minPriceCondition += "10000";
+  else if (minPrice === "5000") minPriceCondition += "5000";
   else minPriceCondition = "";
 
   let couponCondition;
