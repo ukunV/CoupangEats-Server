@@ -334,13 +334,7 @@ async function selectHomebyAddress(connection, lat, lng) {
                   `;
 
   const query4 = `
-                  select s.id as storeId, s.storeName,
-                        case
-                            when f.franchiseImageURL != '' or f.franchiseImageURL is not null
-                                then f.franchiseImageURL
-                            else
-                                smi.imageURL
-                        end as imageURL,
+                  select s.id as storeId, s.storeName, smi.imageURL,
                         ifnull(rc.count, 0) as reviewCount, round(ifnull(rc.point, 0.0), 1) as avgPoint,
                         concat(format(getDistance(?, ?, s.storeLatitude, s.storeLongtitude), 1), 'km') as distance,
                         case
