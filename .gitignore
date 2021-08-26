@@ -3,6 +3,8 @@ node_modules
 package-lock.json
 log
 .DS_Store
-a.js
-dist_ctrl.js
-src/app/data
+config/secret.js
+config/firebase_key.json
+config/kakao_config.js
+config/mail_config.js
+config/sens_config.js
