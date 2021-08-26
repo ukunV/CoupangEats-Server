@@ -12,7 +12,10 @@ async function checkUserExist(connection, userId) {
 // 음식점 존재 여부 check
 async function checkStoreExist(connection, storeId) {
   const query = `
-                select exists(select id from Store where id = ?) as exist;
+                select exists(select id
+                              from Store
+                              where id = ?
+                              and isDeleted = 1) as exist;
                 `;
 
   const row = await connection.query(query, storeId);
@@ -20,23 +23,23 @@ async function checkStoreExist(connection, storeId) {
   return row[0][0]["exist"];
 }
 
-// 음식점 삭제 여부 check
-async function checkStoreDeleted(connection, storeId) {
-  const query = `
-                select isDeleted
-                from Store
-                where id = ?;
-                `;
+// // 음식점 삭제 여부 check
+// async function checkStoreDeleted(connection, storeId) {
+//   const query = `
+//                 select isDeleted
+//                 from Store
+//                 where id = ?;
+//                 `;
 
-  const row = await connection.query(query, storeId);
+//   const row = await connection.query(query, storeId);
 
-  return row[0][0]["isDeleted"];
-}
+//   return row[0][0]["isDeleted"];
+// }
 
 // My 이츠에서 쿠폰 목록 조회
 async function selectMyEatsCoupons(connection, userId) {
   const query = `
-            select c.id as couponId, c.couponName,
+            select co.id as couponObtainedId, c.couponName,
                   concat(format(c.discount, 0), '원 할인') as discount,
                   concat(format(c.orderPrice, 0), '원 이상 주문 시') as orderPrice,
                   case
@@ -48,6 +51,7 @@ async function selectMyEatsCoupons(connection, userId) {
             from Coupon c
                 left join (select * from CouponObtained where status = 1) as co on c.id = co.couponId
             where co.userId = ?
+            and c.status = 1
             order by co.createdAt desc;
             `;
 
@@ -59,7 +63,7 @@ async function selectMyEatsCoupons(connection, userId) {
 // 카트에서 쿠폰 목록 조회
 async function selectCartCoupons(connection, userId, storeId, totalPrice) {
   const query = `
-            select c.id as couponId, c.couponName,
+            select co.id as couponObtainedId, c.couponName,
                   concat(format(c.discount, 0), '원 할인') as discount,
                   concat(format(c.orderPrice, 0), '원 이상 주문 시') as orderPrice,
                   case
@@ -80,12 +84,13 @@ async function selectCartCoupons(connection, userId, storeId, totalPrice) {
                           then 0
                       else
                           s.franchiseId
-                  end as storeFranchiseId
+                  end as storeFranchiseId, co.isChecked
             from Coupon c
                 left join (select * from CouponObtained where status = 1) as co on c.id = co.couponId
                 left join Franchise f on c.franchiseId = f.id
                 left join (select * from Store where id = ?) as s on s.franchiseId = f.id
             where co.userId = ?
+            and c.status = 1
             group by co.createdAt
             order by co.createdAt desc;
             `;
@@ -124,7 +129,7 @@ async function checkCouponObtained(connection, userId, number) {
   const query1 = `
                   select id
                   from Coupon
-                  where number = ?
+                  where number = ?;
                   `;
 
   const row1 = await connection.query(query1, number);
@@ -132,9 +137,10 @@ async function checkCouponObtained(connection, userId, number) {
   const couponId = row1[0][0]["id"];
 
   const query2 = `
-                select exists(select id from CouponObtained
-                              where userId = ? and couponId = ?
-                              and status = 1) as exist;
+                select exists(select id
+                              from CouponObtained
+                              where userId = ?
+                              and couponId = ?) as exist;
                 `;
 
   const row2 = await connection.query(query2, [userId, couponId]);
@@ -164,14 +170,43 @@ async function createCoupons(connection, userId, number) {
   return row2[0];
 }
 
+// 계정 정지 여부 확인
+async function checkUserBlocked(connection, userId) {
+  const query = `
+                select exists(select id
+                              from User
+                              where id = ?
+                              and status = 2) as exist;
+                `;
+
+  const row = await connection.query(query, userId);
+
+  return row[0][0]["exist"];
+}
+
+// 계정 탈퇴 여부 확인
+async function checkUserWithdrawn(connection, userId) {
+  const query = `
+                select exists(select id
+                              from User
+                              where id = ?
+                              and status = 0) as exist;
+                `;
+
+  const row = await connection.query(query, userId);
+
+  return row[0][0]["exist"];
+}
+
 module.exports = {
   checkUserExist,
   checkStoreExist,
-  checkStoreDeleted,
   selectMyEatsCoupons,
   selectCartCoupons,
   checkCouponExist,
   checkCouponAlive,
   checkCouponObtained,
   createCoupons,
+  checkUserBlocked,
+  checkUserWithdrawn,
 };

@@ -1,8 +1,8 @@
 const { logger } = require("../../../config/winston");
 const { pool } = require("../../../config/database");
 const secret_config = require("../../../config/secret");
-const reviewProvider = require("./reviewProvider");
-const reviewDao = require("./reviewDao");
+const orderProvider = require("./orderProvider");
+const orderDao = require("./orderDao");
 const baseResponse = require("../../../config/baseResponseStatus");
 const { response } = require("../../../config/response");
 const { errResponse } = require("../../../config/response");
@@ -13,25 +13,29 @@ const { connect } = require("http2");
 
 // Service: Create, Update, Delete 비즈니스 로직 처리
 
-// 리뷰 작성
-exports.createReview = async function (
+// 주문 정보 생성
+exports.createOrder = async function (
   userId,
-  orderId,
-  imageURL,
-  contents,
-  point
+  storeId,
+  addressId,
+  paymentId,
+  deliveryFee,
+  discount,
+  finalPrice
 ) {
   const connection = await pool.getConnection(async (conn) => conn);
   try {
     await connection.beginTransaction();
 
-    const result = await reviewDao.createReview(
+    const result = await orderDao.createOrder(
       connection,
       userId,
-      orderId,
-      imageURL,
-      contents,
-      point
+      storeId,
+      addressId,
+      paymentId,
+      deliveryFee,
+      discount,
+      finalPrice
     );
 
     await connection.commit();
@@ -41,18 +45,21 @@ exports.createReview = async function (
   } catch (err) {
     await connection.rollback();
     connection.release();
-    logger.error(`Review-createReview Service error: ${err.message}`);
+    logger.error(`Order-createOrder Service error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
 
-// 리뷰 삭제
-exports.deleteReview = async function (reviewId) {
+// 주문 정보 생성 -> 쿠폰 상태 변경
+exports.changeCouponStatus = async function (couponObtainedId) {
   const connection = await pool.getConnection(async (conn) => conn);
   try {
     await connection.beginTransaction();
 
-    const result = await reviewDao.deleteReview(connection, reviewId);
+    const result = await orderDao.changeCouponStatus(
+      connection,
+      couponObtainedId
+    );
 
     await connection.commit();
 
@@ -61,28 +68,21 @@ exports.deleteReview = async function (reviewId) {
   } catch (err) {
     await connection.rollback();
     connection.release();
-    logger.error(`Review-deleteReview Service error: ${err.message}`);
+    logger.error(`Order-changeCouponStatus Service error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
 
-// 리뷰 신고
-exports.reportReview = async function (
-  userId,
-  reviewId,
-  selectReasonArr,
-  commentReason
-) {
+// 주문 정보 생성 -> 카트 상태 변경
+exports.changeCartStatus = async function (userId, rootIdArr) {
   const connection = await pool.getConnection(async (conn) => conn);
   try {
     await connection.beginTransaction();
 
-    const result = await reviewDao.reportReview(
+    const result = await orderDao.changeCartStatus(
       connection,
       userId,
-      reviewId,
-      selectReasonArr,
-      commentReason
+      rootIdArr
     );
 
     await connection.commit();
@@ -92,33 +92,7 @@ exports.reportReview = async function (
   } catch (err) {
     await connection.rollback();
     connection.release();
-    logger.error(`Review-reportReview Service error: ${err.message}`);
-    return errResponse(baseResponse.DB_ERROR);
-  }
-};
-
-// 리뷰 수정
-exports.modifyReview = async function (reviewId, point, contents, imageURL) {
-  const connection = await pool.getConnection(async (conn) => conn);
-  try {
-    await connection.beginTransaction();
-
-    const result = await reviewDao.modifyReview(
-      connection,
-      reviewId,
-      point,
-      contents,
-      imageURL
-    );
-
-    await connection.commit();
-
-    connection.release();
-    return result;
-  } catch (err) {
-    await connection.rollback();
-    connection.release();
-    logger.error(`Review-modifyReview Service error: ${err.message}`);
+    logger.error(`Order-changeCartStatus Service error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };

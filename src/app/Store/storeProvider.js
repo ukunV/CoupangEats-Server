@@ -54,25 +54,48 @@ exports.checkCategoryExist = async function (categoryId) {
   }
 };
 
-// 새로 들어왔어요 목록 조회
-exports.selectNewStore = async function (userId, categoryId) {
+// 새로 들어왔어요 목록 조회 by userId
+exports.selectNewStoreByUserId = async function (userId, categoryId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
     const params = [userId, categoryId];
-    const result = await storeDao.selectNewStore(connection, params);
+    const result = await storeDao.selectNewStoreByUserId(connection, params);
 
     connection.release();
 
     return result;
   } catch (err) {
-    logger.error(`Store-selectNewStore Provider error: ${err.message}`);
+    logger.error(`Store-selectNewStoreByUserId Provider error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
 
-// 음식점 조회 by categoryId
-exports.selectStoresByCategoryId = async function (
+// 새로 들어왔어요 목록 조회 by address
+exports.selectNewStoreByAddress = async function (lat, lng, categoryId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await storeDao.selectNewStoreByAddress(
+      connection,
+      lat,
+      lng,
+      categoryId
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(
+      `Store-selectNewStoreByAddress Provider error: ${err.message}`
+    );
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 음식점 조회 by categoryId and userId
+exports.selectStoresByCategoryIdAndUserId = async function (
   userId,
   categoryCondition,
   page,
@@ -86,7 +109,7 @@ exports.selectStoresByCategoryId = async function (
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await storeDao.selectStoresByCategoryId(
+    const result = await storeDao.selectStoresByCategoryIdAndUserId(
       connection,
       userId,
       categoryCondition,
@@ -104,7 +127,48 @@ exports.selectStoresByCategoryId = async function (
     return result;
   } catch (err) {
     logger.error(
-      `Store-selectStoresByCategoryId Provider error: ${err.message}`
+      `Store-selectStoresByCategoryIdAndUserId Provider error: ${err.message}`
+    );
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 음식점 조회 by categoryId and address
+exports.selectStoresByCategoryIdAndAddress = async function (
+  lat,
+  lng,
+  categoryCondition,
+  page,
+  size,
+  filterCondition,
+  cheetahCondition,
+  deliveryFeeCondition,
+  minPriceCondition,
+  couponCondition
+) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await storeDao.selectStoresByCategoryIdAndAddress(
+      connection,
+      lat,
+      lng,
+      categoryCondition,
+      page,
+      size,
+      filterCondition,
+      cheetahCondition,
+      deliveryFeeCondition,
+      minPriceCondition,
+      couponCondition
+    );
+
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(
+      `Store-selectStoresByCategoryIdAndAddress Provider error: ${err.message}`
     );
     return errResponse(baseResponse.DB_ERROR);
   }
@@ -174,21 +238,21 @@ exports.selectStoreInfo = async function (storeId) {
   }
 };
 
-// 음식점 삭제 여부 check
-exports.checkStoreDeleted = async function (storeId) {
-  try {
-    const connection = await pool.getConnection(async (conn) => conn);
+// // 음식점 삭제 여부 check
+// exports.checkStoreDeleted = async function (storeId) {
+//   try {
+//     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await storeDao.checkStoreDeleted(connection, storeId);
+//     const result = await storeDao.checkStoreDeleted(connection, storeId);
 
-    connection.release();
+//     connection.release();
 
-    return result;
-  } catch (err) {
-    logger.error(`Store-checkStoreDeleted Provider error: ${err.message}`);
-    return errResponse(baseResponse.DB_ERROR);
-  }
-};
+//     return result;
+//   } catch (err) {
+//     logger.error(`Store-checkStoreDeleted Provider error: ${err.message}`);
+//     return errResponse(baseResponse.DB_ERROR);
+//   }
+// };
 
 // 메뉴 존재 여부 check
 exports.checkMenuExist = async function (menuId) {
@@ -222,23 +286,23 @@ exports.selectMainMenu = async function (menuId) {
   }
 };
 
-// 메뉴 삭제 여부 check
-exports.checkMenuDeleted = async function (menuId) {
-  try {
-    const connection = await pool.getConnection(async (conn) => conn);
+// // 메뉴 삭제 여부 check
+// exports.checkMenuDeleted = async function (menuId) {
+//   try {
+//     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await storeDao.checkMenuDeleted(connection, menuId);
+//     const result = await storeDao.checkMenuDeleted(connection, menuId);
 
-    connection.release();
+//     connection.release();
 
-    return result;
-  } catch (err) {
-    logger.error(`Store-checkMenuDeleted Provider error: ${err.message}`);
-    return errResponse(baseResponse.DB_ERROR);
-  }
-};
+//     return result;
+//   } catch (err) {
+//     logger.error(`Store-checkMenuDeleted Provider error: ${err.message}`);
+//     return errResponse(baseResponse.DB_ERROR);
+//   }
+// };
 
-// 음식점 즐겨찾기 존재 여부 check
+// 이미 좋아요 클릭 여부 check
 exports.checkStoreLike = async function (userId, storeId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
@@ -270,6 +334,36 @@ exports.selectStoreLike = async function (userId, filterCondition) {
     return result;
   } catch (err) {
     logger.error(`Store-selectStoreLike Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 계정 정지 여부 확인
+exports.checkUserBlocked = async function (userId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await storeDao.checkUserBlocked(connection, userId);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Store-checkUserBlocked Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 계정 탈퇴 여부 확인
+exports.checkUserWithdrawn = async function (userId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await storeDao.checkUserWithdrawn(connection, userId);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Store-checkUserWithdrawn Provider error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };

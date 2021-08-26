@@ -16,16 +16,18 @@ const { connect } = require("http2");
 // 유저 회원가입
 exports.createUser = async function (
   email,
-  hashedPassword,
   salt,
+  hashedPassword,
   name,
-  phoneNum
+  phoneNum,
+  lat,
+  lng
 ) {
   const connection = await pool.getConnection(async (conn) => conn);
   try {
     await connection.beginTransaction();
 
-    const params = [email, hashedPassword, salt, name, phoneNum];
+    const params = [email, salt, hashedPassword, name, phoneNum, lat, lng];
     const result = await userDao.createUser(connection, params);
 
     await connection.commit();
@@ -60,3 +62,76 @@ exports.createUser = async function (
 //     return errResponse(baseResponse.DB_ERROR);
 //   }
 // };
+
+// 아이디 찾기 - 인증번호 전송 및 저장
+exports.updateAuthNumByPhoneNum = async function (phoneNum, authNum) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  try {
+    await connection.beginTransaction();
+
+    const result = await userDao.updateAuthNumByPhoneNum(
+      connection,
+      phoneNum,
+      authNum
+    );
+
+    await connection.commit();
+
+    connection.release();
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    logger.error(`User-updateAuthNumByPhoneNum Service error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 비밀번호 찾기 - 인증번호 전송 및 저장
+exports.updateAuthNumByEmail = async function (email, authNum) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  try {
+    await connection.beginTransaction();
+
+    const result = await userDao.updateAuthNumByEmail(
+      connection,
+      email,
+      authNum
+    );
+
+    await connection.commit();
+
+    connection.release();
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    logger.error(`User-updateAuthNumByEmail Service error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 비밀번호 찾기 - 인증번호 확인 및 비밀번호 재설정
+exports.updatePassword = async function (hashedPassword, salt, email) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  try {
+    await connection.beginTransaction();
+
+    const result = await userDao.updatePassword(
+      connection,
+      hashedPassword,
+      salt,
+      email
+    );
+
+    await connection.commit();
+
+    connection.release();
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    logger.error(`User-updatePassword Service error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

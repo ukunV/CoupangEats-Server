@@ -1,8 +1,8 @@
 const { logger } = require("../../../config/winston");
 const { pool } = require("../../../config/database");
 const secret_config = require("../../../config/secret");
-const reviewProvider = require("./reviewProvider");
-const reviewDao = require("./reviewDao");
+const paymentProvider = require("./paymentProvider");
+const paymentDao = require("./paymentDao");
 const baseResponse = require("../../../config/baseResponseStatus");
 const { response } = require("../../../config/response");
 const { errResponse } = require("../../../config/response");
@@ -13,25 +13,27 @@ const { connect } = require("http2");
 
 // Service: Create, Update, Delete 비즈니스 로직 처리
 
-// 리뷰 작성
-exports.createReview = async function (
+// 결제방식(카드) 등록
+exports.createCard = async function (
   userId,
-  orderId,
-  imageURL,
-  contents,
-  point
+  number,
+  validMonth,
+  validYear,
+  cvc,
+  pwd
 ) {
   const connection = await pool.getConnection(async (conn) => conn);
   try {
     await connection.beginTransaction();
 
-    const result = await reviewDao.createReview(
+    const result = await paymentDao.createCard(
       connection,
       userId,
-      orderId,
-      imageURL,
-      contents,
-      point
+      number,
+      validMonth,
+      validYear,
+      cvc,
+      pwd
     );
 
     await connection.commit();
@@ -41,18 +43,23 @@ exports.createReview = async function (
   } catch (err) {
     await connection.rollback();
     connection.release();
-    logger.error(`Review-createReview Service error: ${err.message}`);
+    logger.error(`Payment-createCard Service error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
 
-// 리뷰 삭제
-exports.deleteReview = async function (reviewId) {
+// 결제방식(계좌) 등록
+exports.createAccount = async function (userId, bankId, number) {
   const connection = await pool.getConnection(async (conn) => conn);
   try {
     await connection.beginTransaction();
 
-    const result = await reviewDao.deleteReview(connection, reviewId);
+    const result = await paymentDao.createAccount(
+      connection,
+      userId,
+      bankId,
+      number
+    );
 
     await connection.commit();
 
@@ -61,28 +68,48 @@ exports.deleteReview = async function (reviewId) {
   } catch (err) {
     await connection.rollback();
     connection.release();
-    logger.error(`Review-deleteReview Service error: ${err.message}`);
+    logger.error(`Payment-createAccount Service error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
 
-// 리뷰 신고
-exports.reportReview = async function (
+// 결제방식 삭제
+exports.deletePayment = async function (paymentId) {
+  const connection = await pool.getConnection(async (conn) => conn);
+  try {
+    await connection.beginTransaction();
+
+    const result = await paymentDao.deletePayment(connection, paymentId);
+
+    await connection.commit();
+
+    connection.release();
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    logger.error(`Payment-deletePayment Service error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 현금영수증 발급 정보 변경
+exports.modifyCashReceiptMethod = async function (
   userId,
-  reviewId,
-  selectReasonArr,
-  commentReason
+  isGet,
+  cashReceiptMethod,
+  cashReceiptNum
 ) {
   const connection = await pool.getConnection(async (conn) => conn);
   try {
     await connection.beginTransaction();
 
-    const result = await reviewDao.reportReview(
+    const result = await paymentDao.modifyCashReceiptMethod(
       connection,
       userId,
-      reviewId,
-      selectReasonArr,
-      commentReason
+      isGet,
+      cashReceiptMethod,
+      cashReceiptNum
     );
 
     await connection.commit();
@@ -92,33 +119,9 @@ exports.reportReview = async function (
   } catch (err) {
     await connection.rollback();
     connection.release();
-    logger.error(`Review-reportReview Service error: ${err.message}`);
-    return errResponse(baseResponse.DB_ERROR);
-  }
-};
-
-// 리뷰 수정
-exports.modifyReview = async function (reviewId, point, contents, imageURL) {
-  const connection = await pool.getConnection(async (conn) => conn);
-  try {
-    await connection.beginTransaction();
-
-    const result = await reviewDao.modifyReview(
-      connection,
-      reviewId,
-      point,
-      contents,
-      imageURL
+    logger.error(
+      `Payment-modifyCashReceiptMethod Service error: ${err.message}`
     );
-
-    await connection.commit();
-
-    connection.release();
-    return result;
-  } catch (err) {
-    await connection.rollback();
-    connection.release();
-    logger.error(`Review-modifyReview Service error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };

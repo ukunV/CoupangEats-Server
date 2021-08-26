@@ -35,6 +35,16 @@ exports.getMyEatsCoupons = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await couponProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await couponProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   // Response Error End
 
   const result = await couponProvider.selectMyEatsCoupons(userId);
@@ -46,7 +56,7 @@ exports.getMyEatsCoupons = async function (req, res) {
  * API No. 22
  * API Name : 카트에서 쿠폰 목록 조회 API
  * [GET] /coupons/cart/coupon-list
- * query string: storeId, totalPrice(format 해제하고 받아야함)
+ * query string: storeId, totalPrice
  */
 exports.getCartCoupons = async function (req, res) {
   const { userId } = req.verifiedToken;
@@ -74,15 +84,20 @@ exports.getCartCoupons = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await couponProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await couponProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   const checkStoreExist = await couponProvider.checkStoreExist(storeId);
 
   if (checkStoreExist === 0)
     return res.send(response(baseResponse.STORE_IS_NOT_EXIST)); // 3008
-
-  const checkStoreDeleted = await couponProvider.checkStoreDeleted(storeId);
-
-  if (checkStoreDeleted === 0)
-    return res.send(response(baseResponse.STORE_IS_DELETED)); // 3010
 
   // Response Error End
 
@@ -117,6 +132,16 @@ exports.createCoupons = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await couponProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await couponProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
   const checkCouponExist = await couponProvider.checkCouponExist(number);
 

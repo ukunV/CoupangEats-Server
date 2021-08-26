@@ -190,6 +190,256 @@ module.exports = {
     code: 2035,
     message: "franchiseId 값을 입력해주세요.",
   },
+  PHOTO_FILTER_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2036,
+    message: "photoFilter 값이 올바르지 않습니다.",
+  },
+  POINT_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2037,
+    message: "point 값을 입력해주세요.",
+  },
+  POINT_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2038,
+    message: "point 값이 올바르지 않습니다.",
+  },
+  POINT_IS_EMPTY: {
+    isSuccess: false,
+    code: 2039,
+    message: "point 값을 입력해주세요.",
+  },
+  ORDER_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2040,
+    message: "orderId 값을 입력해주세요.",
+  },
+  CONTENTS_IS_SHORT: {
+    isSuccess: false,
+    code: 2041,
+    message: "리뷰는 10자 이상 작성해주세요.",
+  },
+  REVIEW_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2042,
+    message: "reviewId 값을 입력해주세요.",
+  },
+  CHOOSE_MORE_THAN_ONE_SELECT_REASON: {
+    isSuccess: false,
+    code: 2043,
+    message: "선택사유를 선택해주세요.",
+  },
+  COMMENT_REASON_IS_SHORT: {
+    isSuccess: false,
+    code: 2044,
+    message: "기재사유는 10자 이상 작성해주세요.",
+  },
+  SELECT_REASON_TYPE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2045,
+    message: "선택사유의 값이 유효하지 않습니다.",
+  },
+  PAYMENT_TYPE_IS_EMPTY: {
+    isSuccess: false,
+    code: 2046,
+    message: "등록할 결제방식을 선택해주세요.",
+  },
+  CARD_NUM_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2047,
+    message: "카드번호가 올바르지 않습니다.",
+  },
+  VALID_MONTH_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2048,
+    message: "올바른 유효기간(월)을 입력해주세요.",
+  },
+  VALID_YEAR_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2049,
+    message: "올바른 유효기간(년)을 입력해주세요.",
+  },
+  CARD_IS_EXPIRED: {
+    isSuccess: false,
+    code: 2050,
+    message: "카드의 유효기간이 만료되었습니다.",
+  },
+  CARD_NUM_IS_EMPTY: {
+    isSuccess: false,
+    code: 2051,
+    message: "카드번호를 입력해주세요.",
+  },
+  VALID_MONTH_IS_EMPTY: {
+    isSuccess: false,
+    code: 2052,
+    message: "유효기간(월)을 입력해주세요.",
+  },
+  VALID_YEAR_IS_EMPTY: {
+    isSuccess: false,
+    code: 2053,
+    message: "유효기간(년)을 입력해주세요.",
+  },
+  CVC_NUM_IS_EMPTY: {
+    isSuccess: false,
+    code: 2054,
+    message: "cvc번호를 입력해주세요.",
+  },
+  CARD_PWD_IS_EMPTY: {
+    isSuccess: false,
+    code: 2055,
+    message: "카드 비밀번호 앞 두자리를 입력해주세요.",
+  },
+  CVC_NUM_LENGTH_ERROR: {
+    isSuccess: false,
+    code: 2056,
+    message: "cvc번호는 3자리입니다.",
+  },
+  CARD_PWD_LENGTH_ERROR: {
+    isSuccess: false,
+    code: 2057,
+    message: "카드 비밀번호는 2자리입니다.",
+  },
+  TYPE_IS_NOT_FOR_CARD: {
+    isSuccess: false,
+    code: 2058,
+    message: "카드등록을 위한 올바른 type을 입력해주세요.",
+  },
+  TYPE_IS_NOT_FOR_ACCOUNT: {
+    isSuccess: false,
+    code: 2059,
+    message: "계좌등록을 위한 올바른 type을 입력해주세요.",
+  },
+  BANK_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2060,
+    message: "bankId를 입력해주세요.",
+  },
+  ACCOUNT_NUM_IS_EMPTY: {
+    isSuccess: false,
+    code: 2061,
+    message: "계좌번호를 입력해주세요.",
+  },
+  PAYMENT_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2062,
+    message: "paymentId 값을 입력해주세요.",
+  },
+  IS_GET_IS_EMPTY: {
+    isSuccess: false,
+    code: 2063,
+    message: "현금영수증 발급 여부를 선택해주세요.",
+  },
+  IS_GET_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2064,
+    message: "현금영수증 발급 여부가 올바르지 않습니다.",
+  },
+  CASH_RECEIPT_METHOD_IS_EMPTY: {
+    isSuccess: false,
+    code: 2065,
+    message: "현금영수증 발급 방식을 선택해주세요.",
+  },
+  CASH_RECEIPT_METHOD_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2066,
+    message: "현금영수증 발급 방식이 올바르지 않습니다.",
+  },
+  CASH_RECEIPT_NUM_IS_EMPTY: {
+    isSuccess: false,
+    code: 2067,
+    message: "현금영수증 발급 번호를 입력해주세요.",
+  },
+  ROOT_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2068,
+    message: "메뉴의 부모 아이디(rootId)를 입력해주세요.",
+  },
+  TOTAL_PRICE_IS_EMPTY: {
+    isSuccess: false,
+    code: 2069,
+    message: "주문가격을 입력해주세요.",
+  },
+  TOTAL_PRICE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2070,
+    message: "주문가격이 올바르지 않습니다.",
+  },
+  COUPON_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2071,
+    message: "couponId를 입력해주세요.",
+  },
+  DELIVERY_FEE_PRICE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2072,
+    message: "배달비가 올바르지 않습니다.",
+  },
+  DISCOUNT_PRICE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2073,
+    message: "할인금액이 올바르지 않습니다.",
+  },
+  FINAL_PRICE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2074,
+    message: "최종 결제금액이 올바르지 않습니다.",
+  },
+  COUPON_OBTAINED_ID_IS_EMPTY: {
+    isSuccess: false,
+    code: 2075,
+    message: "couponObtainedId 값을 입력해주세요.",
+  },
+  LOCATION_INFO_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2076,
+    message: "위치정보가 잘못되었습니다.",
+  },
+  ORDER_STATUS_IS_EMPTY: {
+    isSuccess: false,
+    code: 2077,
+    message: "변경을 원하는 주문상태를 입력해주세요.",
+  },
+  ORDER_STATUS_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2078,
+    message: "주문상태가 올바르지 않습니다.",
+  },
+  AUTH_TYPE_IS_EMPTY: {
+    isSuccess: false,
+    code: 2079,
+    message: "인증방식을 선택해주세요.",
+  },
+  AUTH_TYPE_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2080,
+    message: "올바른 인증방식을 선택해주세요.",
+  },
+  AUTH_NUM_IS_EMPTY: {
+    isSuccess: false,
+    code: 2081,
+    message: "인증번호 입력해주세요.",
+  },
+  CHECK_PASSWORD_IS_EMPTY: {
+    isSuccess: false,
+    code: 2082,
+    message: "확인 비밀번호를 입력해주세요.",
+  },
+  PASSWORD_IS_DIFFERENT: {
+    isSuccess: false,
+    code: 2083,
+    message: "비밀번호가 일치하지 않습니다.",
+  },
+  ACCESS_TOKEN_IS_EMPTY: {
+    isSuccess: false,
+    code: 2084,
+    message: "accessToken 값을 입력해주세요.",
+  },
+  ACCESS_TOKEN_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 2085,
+    message: "유효하지 않는 Access Token 입니다.",
+  },
 
   // Response error
   SIGNUP_REDUNDANT_EMAIL: {
@@ -232,26 +482,26 @@ module.exports = {
     code: 3008,
     message: "존재하지 않는 음식점입니다.",
   },
-  ADDRESS_IS_DELETED: {
-    isSuccess: false,
-    code: 3009,
-    message: "삭제된 주소입니다.",
-  },
-  STORE_IS_DELETED: {
-    isSuccess: false,
-    code: 3010,
-    message: "삭제된 음식점입니다.",
-  },
+  // ADDRESS_IS_DELETED: {
+  //   isSuccess: false,
+  //   code: 3009,
+  //   message: "삭제된 주소입니다.",
+  // },
+  // STORE_IS_DELETED: {
+  //   isSuccess: false,
+  //   code: 3010,
+  //   message: "삭제된 음식점입니다.",
+  // },
   MENU_IS_NOT_EXIST: {
     isSuccess: false,
     code: 3011,
     message: "존재하지 않는 메뉴입니다.",
   },
-  MENU_IS_DELETED: {
-    isSuccess: false,
-    code: 3012,
-    message: "삭제된 메뉴입니다.",
-  },
+  // MENU_IS_DELETED: {
+  //   isSuccess: false,
+  //   code: 3012,
+  //   message: "삭제된 메뉴입니다.",
+  // },
   CART_IS_EMPTY: {
     isSuccess: false,
     code: 3013,
@@ -275,7 +525,7 @@ module.exports = {
   COUPON_AlREADY_OBTAINED: {
     isSuccess: false,
     code: 3017,
-    message: "해당 쿠폰은 이미 등록되어 있습니다.",
+    message: "해당 쿠폰은 이미 발급되었습니다.",
   },
   STORE_LIKE_ALREADY_EXIST: {
     isSuccess: false,
@@ -317,24 +567,129 @@ module.exports = {
     code: 3025,
     message: "존재하지 않는 공지입니다.",
   },
-  NOTICE_IS_DELETED: {
+  // NOTICE_IS_DELETED: {
+  //   isSuccess: false,
+  //   code: 3026,
+  //   message: "삭제된 공지입니다.",
+  // },
+  ORDER_IS_NOT_EXIST: {
     isSuccess: false,
-    code: 3026,
-    message: "삭제된 공지입니다.",
+    code: 3027,
+    message: "주문내역이 존재하지 않습니다.",
+  },
+  ORDER_IS_DELETED: {
+    isSuccess: false,
+    code: 3028,
+    message: "결제취소된 주문입니다.",
+  },
+  REVIEW_ALREADY_EXIST: {
+    isSuccess: false,
+    code: 3029,
+    message: "해당 주문의 리뷰는 이미 존재합니다.",
+  },
+  ORDER_IS_NOT_USERS: {
+    isSuccess: false,
+    code: 3030,
+    message: "해당 주문은 다른 유저의 주문입니다.",
+  },
+  REVIEW_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3031,
+    message: "존재하지 않는 리뷰입니다.",
+  },
+  USER_IS_NOT_REVIEW_HOST: {
+    isSuccess: false,
+    code: 3032,
+    message: "리뷰 수정/삭제는 작성자만 가능합니다.",
+  },
+  REVIEW_CAN_REPORTED_BY_OTHERS: {
+    isSuccess: false,
+    code: 3033,
+    message: "자신의 리뷰는 신고가 불가능합니다.",
+  },
+  USER_ALREADY_REPORT: {
+    isSuccess: false,
+    code: 3034,
+    message: "해당 리뷰는 이미 신고가 완료되었습니다.",
+  },
+  BANK_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3035,
+    message: "해당 은행은 존재하지 않습니다.",
+  },
+  NUMBER_LENGTH_IS_NOT_VALID: {
+    isSuccess: false,
+    code: 3036,
+    message: "계좌번호의 길이가 올바르지 않습니다.",
+  },
+  PAYMENT_IS_NOT_EXIST: {
+    isSuccess: false,
+    code: 3037,
+    message: "등록되지 않은 결제수단입니다.",
+  },
+  PAYMENT_IS_NOT_USERS: {
+    isSuccess: false,
+    code: 3038,
+    message: "해당 결제방식은 다른 유저의 결제방식입니다.",
+  },
+  OTHER_STORE_EXIST: {
+    isSuccess: false,
+    code: 3039,
+    message: "이미 다른 상점의 메뉴가 카트에 존재합니다.",
+  },
+  MENU_IS_NOT_EXIST_AT_CART: {
+    isSuccess: false,
+    code: 3040,
+    message: "해당 메뉴는 카트에 존재하지 않습니다.",
+  },
+  COUPON_NOT_OBTAIN: {
+    isSuccess: false,
+    code: 3041,
+    message: "획득하지 못한 쿠폰입니다.",
+  },
+  ORDER_IS_FINISHED: {
+    isSuccess: false,
+    code: 3042,
+    message: "해당 주문은 취소 혹은 배달완료된 주문건입니다.",
+  },
+  ORDER_IS_NOT_WAIT_STATUS: {
+    isSuccess: false,
+    code: 3043,
+    message: "해당 주문은 주문 대기 상태가 아닙니다.",
+  },
+  ORDER_IS_NOT_ACCEPT_STATUS: {
+    isSuccess: false,
+    code: 3044,
+    message: "해당 주문은 주문 수락 상태가 아닙니다.",
+  },
+  ORDER_IS_NOT_PREPARE_STATUS: {
+    isSuccess: false,
+    code: 3045,
+    message: "해당 주문은 메뉴 준비중 상태가 아닙니다.",
+  },
+  ORDER_IS_NOT_DELIVERY_STATUS: {
+    isSuccess: false,
+    code: 3046,
+    message: "해당 주문은 배달중 상태가 아닙니다.",
+  },
+  AUTH_NUM_IS_NOT_MATCH: {
+    isSuccess: false,
+    code: 3047,
+    message: "인증번호가 일치하지 않습니다.",
   },
 
-  // made by note
+  //////////////////////////////////////////
 
-  // SIGNIN_INACTIVE_ACCOUNT: {
-  //   isSuccess: false,
-  //   code: 3005,
-  //   message: "비활성화 된 계정입니다. 고객센터에 문의해주세요.",
-  // },
-  // SIGNIN_WITHDRAWAL_ACCOUNT: {
-  //   isSuccess: false,
-  //   code: 3006,
-  //   message: "탈퇴 된 계정입니다. 고객센터에 문의해주세요.",
-  // },
+  ACCOUNT_IS_BLOCKED: {
+    isSuccess: false,
+    code: 3998,
+    message: "정지된 계정입니다. 고객센터에 문의해주세요.",
+  },
+  ACCOUNT_IS_WITHDRAWN: {
+    isSuccess: false,
+    code: 3999,
+    message: "탈퇴된 계정입니다. 고객센터에 문의해주세요.",
+  },
 
   //Connection, Transaction 등의 서버 오류
   DB_ERROR: { isSuccess: false, code: 4000, message: "데이터 베이스 에러" },

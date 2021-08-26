@@ -11,15 +11,71 @@ const passport = require("passport");
 const regexEmail = require("regex-email");
 const { emit } = require("nodemon");
 
+// const firebaseAdmin = require("firebase-admin");
+// const serviceAccount = require("../../../config/firebase_key.json");
+
+// firebaseAdmin.intiallizeApp({
+//   Credential: firebaseAdmin.credentail.cert(serviceAccount),
+// });
+
+// salt
 const user_ctrl = require("../../../controllers/user_ctrl");
 
+// 카카오 로그인
 const kakao_key = require("../../../config/kakao_config").sercetKey;
 const KakaoStrategy = require("passport-kakao").Strategy;
+
+// 카카오 주소 검색
+const kakaoMap = require("../../../controllers/kakao_ctrl").getAddressInfo;
+
+// ncp-sens
+const { NCPClient } = require("../../../controllers/sens_ctrl");
+const sensKey = require("../../../config/sens_config").sensSecret;
+
+// nodemailer
+const mailer = require("../../../controllers/mail_ctrl").resetPasswordMail;
 
 // regex
 // const regexName = /^[가-힣]+$/;
 const regPhoneNum = /^\d{10,11}$/;
 const regDistance = /^[0-9]+(.[0-9]+)?$/;
+
+// 랜덤 인증번호 생성 함수
+function createAuthNum() {
+  const randNum = Math.floor(Math.random() * 900000) + 100000;
+
+  return randNum;
+}
+
+// ncp-sens 문자전송 함수
+const messageAuth = async function (type, phoneNum, authNum) {
+  const ncp = new NCPClient({
+    ...sensKey,
+  });
+
+  const to = phoneNum;
+  let content;
+
+  if (type === 1)
+    content = `쿠팡 휴대폰 인증번호 [${authNum}] 위 번호를 인증 창에 입력하세요.`;
+  else
+    content = `비밀번호 변경을 위한 인증번호는 [${authNum}]입니다. 신규 비밀번호로 재설정해주세요.`;
+
+  const { success, status, msg } = await ncp.sendSMS({
+    to,
+    content,
+  });
+
+  if (!success) {
+    console.log(
+      `(ERROR) node-sens error: ${msg}, Status ${status} Date ${Date.now()}`
+    );
+  } else {
+    console.log(success);
+    console.log(status);
+    console.log(msg);
+  }
+};
 
 /**
  * API No. 0
@@ -37,6 +93,10 @@ const regDistance = /^[0-9]+(.[0-9]+)?$/;
  */
 exports.createUsers = async function (req, res) {
   const { email, password, name, phoneNum } = req.body;
+
+  const { address } = req.body;
+
+  const location = await kakaoMap(address);
 
   // Request Error Start
 
@@ -63,6 +123,9 @@ exports.createUsers = async function (req, res) {
   if (!regPhoneNum.test(phoneNum))
     return res.send(response(baseResponse.SIGNUP_PHONENUM_TYPE)); // 2009
 
+  if (location.length)
+    return res.send(errResponse(baseResponse.LOCATION_INFO_IS_NOT_VALID)); // 2076
+
   // Request Error End
 
   // Response Error Start
@@ -86,10 +149,12 @@ exports.createUsers = async function (req, res) {
 
   const result = await userService.createUser(
     email,
-    hashedPassword,
     salt,
+    hashedPassword,
     name,
-    phoneNum
+    phoneNum,
+    location.lat,
+    location.lng
   );
 
   const token = await jwt.sign(
@@ -141,6 +206,16 @@ exports.userLogIn = async function (req, res) {
   if (checkEmailExist === 0)
     return res.send(response(baseResponse.SIGNIN_EMAIL_NOT_EXIST)); // 3003
 
+  const checkEmailBlocked = await userProvider.checkEmailBlocked(email);
+
+  if (checkEmailBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkEmailWithdrawn = await userProvider.checkEmailWithdrawn(email);
+
+  if (checkEmailWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   const checkPassword = await userProvider.checkPassword(email, password);
 
   if (checkPassword === -1)
@@ -148,9 +223,11 @@ exports.userLogIn = async function (req, res) {
 
   // Response Error End
 
+  const selectUserId = await userProvider.selectUserId(email);
+
   const token = await jwt.sign(
     {
-      userId: checkPassword,
+      userId: selectUserId,
     }, // 토큰의 내용(payload)
     secret_config.jwtsecret, // 비밀키
     {
@@ -185,6 +262,16 @@ exports.userLogOut = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await userProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await userProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
   // Response Error End
 
@@ -235,29 +322,56 @@ exports.userLogOut = async function (req, res) {
  * API No. 9
  * API Name : 홈 화면 조회 API
  * [GET] /users/home
+ * query string: encodedAddress
  */
 
 exports.getHome = async function (req, res) {
   const { userId } = req.verifiedToken;
 
-  //Request Error Start
+  const { encodedAddress } = req.query;
+  const address = decodeURIComponent(encodedAddress);
+  const location = kakaoMap(address);
 
-  if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
+  // Request Error Start
 
-  //Request Error End
+  if (location.length) {
+    return res.send(errResponse(baseResponse.LOCATION_INFO_IS_NOT_VALID)); // 2076
+  }
+
+  // Request Error End
 
   // Response Error Start
 
-  const checkUserExist = await userProvider.checkUserExist(userId);
+  if (userId) {
+    const checkUserExist = await userProvider.checkUserExist(userId);
 
-  if (checkUserExist === 0)
-    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+    if (checkUserExist === 0)
+      return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
-  // Response Error End
+    const checkUserBlocked = await userProvider.checkUserBlocked(userId);
 
-  const result = await userProvider.selectHome(userId);
+    if (checkUserBlocked === 1)
+      return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
 
-  return res.send(response(baseResponse.SUCCESS, result));
+    const checkUserWithdrawn = await userProvider.checkUserWithdrawn(userId);
+
+    if (checkUserWithdrawn === 1)
+      return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
+    // Response Error End
+
+    const result = await userProvider.selectHomeByUserId(userId);
+
+    return res.send(response(baseResponse.SUCCESS, result));
+  } else {
+    const result = await userProvider.selectHomebyAddress(
+      address,
+      location.lat,
+      location.lng
+    );
+
+    return res.send(response(baseResponse.SUCCESS, result));
+  }
 };
 
 /**
@@ -281,6 +395,16 @@ exports.getEventList = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await userProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await userProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
   // Response Error End
 
@@ -321,15 +445,20 @@ exports.getEvent = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await userProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await userProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   const checkEventExist = await userProvider.checkEventExist(eventId);
 
   if (checkEventExist === 0)
     return res.send(errResponse(baseResponse.EVENT_IS_NOT_EXIST)); // 3022
-
-  const checkEventStatus = await userProvider.checkEventStatus(eventId);
-
-  if (checkEventStatus === 0)
-    return res.send(errResponse(baseResponse.EVENT_IS_DELETED)); // 3023
 
   // Response Error End
 
@@ -370,6 +499,16 @@ exports.eventToStore = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await userProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await userProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   const checkFranchiseExist = await userProvider.checkFranchiseExist(
     franchiseId
   );
@@ -406,6 +545,16 @@ exports.getNoticeList = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await userProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await userProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   // Response Error End
 
   const result = await userProvider.selectNoticeList();
@@ -440,15 +589,20 @@ exports.getNotice = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await userProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await userProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   const checkNoticeExist = await userProvider.checkNoticeExist(noticeId);
 
   if (checkNoticeExist === 0)
     return res.send(errResponse(baseResponse.NOTICE_IS_NOT_EXIST)); // 3025
-
-  const checkNoticeDeleted = await userProvider.checkNoticeDeleted(noticeId);
-
-  if (checkNoticeDeleted === 0)
-    return res.send(errResponse(baseResponse.NOTICE_IS_DELETED)); // 3026
 
   // Response Error End
 
@@ -458,89 +612,254 @@ exports.getNotice = async function (req, res) {
 };
 
 /**
- * API No.
+ * API No. 62
+ * API Name : 아이디 찾기 - 인증번호 전송 및 저장 API
+ * [PATCH] /users/user-account/auth
+ */
+exports.findEmail = async function (req, res) {
+  const { userName, phoneNum } = req.body;
+
+  //Request Error Start
+
+  if (!userName) return res.send(response(baseResponse.SIGNUP_NAME_EMPTY)); // 2006
+
+  if (!phoneNum) return res.send(response(baseResponse.SIGNUP_PHONENUM_EMPTY)); // 2008
+
+  if (!regPhoneNum.test(phoneNum))
+    return res.send(response(baseResponse.SIGNUP_PHONENUM_TYPE)); // 2009
+
+  //Request Error End
+
+  // Response Error Start
+
+  const checkMatchUserWithPhoneNum =
+    await userProvider.checkMatchUserWithPhoneNum(userName, phoneNum);
+
+  if (checkMatchUserWithPhoneNum === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  // Response Error End
+
+  const authNum = createAuthNum();
+
+  messageAuth(1, phoneNum, authNum);
+
+  const result = await userService.updateAuthNumByPhoneNum(phoneNum, authNum);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 63
+ * API Name : 아이디 찾기 - 인증번호 확인 및 이메일 제공 API
+ * [GET] /users/user-account
+ */
+exports.getEmail = async function (req, res) {
+  const { phoneNum, authNum } = req.query;
+
+  //Request Error Start
+
+  if (!phoneNum) return res.send(response(baseResponse.SIGNUP_PHONENUM_EMPTY)); // 2008
+
+  if (!authNum) return res.send(response(baseResponse.AUTH_NUM_IS_EMPTY)); // 2081
+
+  if (!regPhoneNum.test(phoneNum))
+    return res.send(response(baseResponse.SIGNUP_PHONENUM_TYPE)); // 2009
+
+  //Request Error End
+
+  // Response Error Start
+
+  const checkAuthNum = await userProvider.checkAuthNumByPhoneNum(
+    phoneNum,
+    authNum
+  );
+
+  if (checkAuthNum === 0)
+    return res.send(errResponse(baseResponse.AUTH_NUM_IS_NOT_MATCH)); // 3047
+
+  // Response Error End
+
+  const result = await userProvider.selectEmail(phoneNum);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 64
+ * API Name : 비밀번호 찾기 - 인증번호 전송 및 저장 API
+ * [PATCH] /users/user-password/auth
+ * type: 1-휴대폰인증 / 2-이메일인증
+ */
+exports.findPassword = async function (req, res) {
+  const { userName, email, type } = req.body;
+
+  //Request Error Start
+
+  if (!userName) return res.send(response(baseResponse.SIGNUP_NAME_EMPTY)); // 2006
+
+  if (!email) return res.send(response(baseResponse.SIGNUP_EMAIL_EMPTY)); // 2001
+
+  if (!type) return res.send(response(baseResponse.AUTH_TYPE_IS_EMPTY)); // 2079
+
+  if ((type != 1) & (type != 2))
+    return res.send(response(baseResponse.AUTH_TYPE_IS_NOT_VALID)); // 2080
+
+  //Request Error End
+
+  // Response Error Start
+
+  const checkMatchUserWithEmail = await userProvider.checkMatchUserWithEmail(
+    userName,
+    email
+  );
+
+  if (checkMatchUserWithEmail === 0)
+    return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  // Response Error End
+
+  const authNum = createAuthNum();
+
+  if (type === 1) {
+    const phoneNum = await userProvider.selectPhoneNum(email);
+
+    messageAuth(2, phoneNum, authNum);
+  } else mailer(authNum, email);
+
+  const result = await userService.updateAuthNumByEmail(email, authNum);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 65
+ * API Name : 비밀번호 찾기 - 인증번호 확인 및 비밀번호 재설정 API
+ * [PATCH] /users/user-password/reset
+ */
+exports.updatePassword = async function (req, res) {
+  const { authNum, password, checkPassword, email } = req.body;
+
+  //Request Error Start
+
+  if (!authNum) return res.send(response(baseResponse.AUTH_NUM_IS_EMPTY)); // 2081
+
+  if (!password) return res.send(response(baseResponse.SIGNUP_PASSWORD_EMPTY)); // 2004
+
+  if (password.length < 8 || password.length > 20)
+    return res.send(response(baseResponse.SIGNUP_PASSWORD_LENGTH)); // 2005
+
+  if (!checkPassword)
+    return res.send(response(baseResponse.CHECK_PASSWORD_IS_EMPTY)); // 2082
+
+  if (password != checkPassword)
+    return res.send(response(baseResponse.PASSWORD_IS_DIFFERENT)); // 2083
+
+  if (!email) return res.send(response(baseResponse.SIGNUP_EMAIL_EMPTY)); // 2001
+
+  //Request Error End
+
+  // Response Error Start
+
+  const checkAuthNumByEmail = await userProvider.checkAuthNumByEmail(
+    email,
+    authNum
+  );
+
+  if (checkAuthNumByEmail === 0)
+    return res.send(errResponse(baseResponse.AUTH_NUM_IS_NOT_MATCH)); // 3047
+
+  // Response Error End
+
+  const { hashedPassword, salt } = await user_ctrl.createHashedPassword(
+    password
+  );
+
+  const result = await userService.updatePassword(hashedPassword, salt, email);
+
+  return res.send(response(baseResponse.SUCCESS, result));
+};
+
+/**
+ * API No. 66
  * API Name : 카카오 로그인 API
- *
+ * [POST] /users/kakao-login
  */
 
-// passport.use(
-//   "kakao-login",
-//   new KakaoStrategy(
-//     {
-//       clientID: kakao_key,
-//       callbackURL: "/auth/kakao/callback",
-//     },
-//     async (accessToken, refreshToken, profile, done) => {
-//       console.log(accessToken);
-//       console.log(profile);
-//     }
-//   )
-// );
+// client start
+passport.use(
+  "kakao-login",
+  new KakaoStrategy(
+    {
+      clientID: kakao_key,
+      callbackURL: "/auth/kakao/callback",
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      console.log(accessToken);
+      console.log(profile);
+    }
+  )
+);
+// client end
 
-// exports.kakaoLogin = async function (req, res) {
-//   const { accessToken } = req.body;
+exports.kakaoLogin = async function (req, res) {
+  const { accessToken } = req.body;
 
-//   if (!accessToken)
-//     return res.send(errResponse(baseResponse.ACCESS_TOKEN_EMPTY)); // 2052 : accessToken을 입력해주세요.
+  if (!accessToken)
+    return res.send(errResponse(baseResponse.ACCESS_TOKEN_IS_EMPTY)); // 2084
 
-//   try {
-//     let kakao_profile;
+  try {
+    let kakao_profile;
 
-//     try {
-//       kakao_profile = await axios.get("https://kapi.kakao.com/v2/user/me", {
-//         headers: {
-//           Authorization: `Bearer ${accessToken}`,
-//           "Content-Type": "application/json",
-//         },
-//       });
-//     } catch (err) {
-//       return res.send(errResponse(baseResponse.ACCESS_TOKEN)); // 2053 : 유효하지 않는 엑세스 토큰입니다.
-//     }
+    try {
+      kakao_profile = await axios.get("https://kapi.kakao.com/v2/user/me", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+    } catch (err) {
+      return res.send(errResponse(baseResponse.ACCESS_TOKEN_IS_NOT_VALID)); // 2085
+    }
 
-//     const data = kakao_profile.data.kakao_account;
-//     const name = data.profile.nickname;
-//     const email = data.email;
+    const kakao_data = kakao_profile.data.kakao_account;
+    const kakao_name = kakao_data.profile.nickname;
+    const kakao_email = kakao_data.email;
 
-//     const emailCheckResult = await userProvider.emailCheck(email);
+    const checkEmailExist = await userProvider.checkEmailExist(kakao_email);
 
-//     if (emailCheckResult[0].exist === 1) {
-//       const userInfoRow = await userProvider.getUserInfo(email);
+    if (checkEmailExist === 1) {
+      const selectUserId = await userProvider.selectUserId(kakao_email);
 
-//       let token = await jwt.sign(
-//         {
-//           userIdx: userInfoRow.userIdx,
-//         },
-//         secret_config.jwtsecret,
-//         {
-//           expiresIn: "365d",
-//           subject: "userInfo",
-//         }
-//       );
-//       return res.send(
-//         response(baseResponse.SUCCESS, {
-//           userIdx: userInfoRow.userIdx,
-//           jwt: token,
-//           message: "소셜로그인에 성공하셨습니다.",
-//         })
-//       );
-//     } else {
-//       const result = {
-//         name: name,
-//         email: email,
-//       };
-//       return res.send(
-//         response(baseResponse.SUCCESS, {
-//           message: "회원가입이 가능합니다.",
-//           result,
-//         })
-//       );
-//     }
-//   } catch (err) {
-//     logger.error(
-//       `App - postSignIn Service error\n: ${err.message} \n${JSON.stringify(
-//         err
-//       )}`
-//     );
-//     return errResponse(baseResponse.DB_ERROR);
-//   }
-// };
+      let token = await jwt.sign(
+        {
+          userId: selectUserId,
+        },
+        secret_config.jwtsecret,
+        {
+          expiresIn: "365d",
+          subject: "userInfo",
+        }
+      );
+      return res.send(
+        response(baseResponse.SUCCESS, {
+          userId: selectUserId,
+          jwt: token,
+          message: "소셜로그인에 성공하셨습니다.",
+        })
+      );
+    } else {
+      const result = { name: kakao_name, email: kakao_email };
+
+      return res.send(
+        response(baseResponse.SUCCESS, {
+          message: "회원가입이 가능합니다.",
+          result,
+        })
+      );
+    }
+  } catch (err) {
+    res.send(errResponse(baseResponse.SUCCESS, err));
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};

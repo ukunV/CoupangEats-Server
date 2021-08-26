@@ -22,11 +22,17 @@ exports.createAddresses = async function (req, res) {
   const { type, nickname, buildingName, address, detailAddress, information } =
     req.body;
 
+  const location = await kakaoMap(address);
+
   // Request Error Start
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
   if (!address) return res.send(errResponse(baseResponse.ADDRESS_IS_EMPTY)); // 2015
+
+  if (location.length) {
+    return res.send(errResponse(baseResponse.LOCATION_INFO_IS_NOT_VALID)); // 2076
+  }
 
   if ((type != 1) & (type != 2) & (type != 3))
     return res.send(errResponse(baseResponse.TYPE_IS_NOT_VALID)); // 2021
@@ -40,9 +46,17 @@ exports.createAddresses = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
-  // Response Error End
+  const checkUserBlocked = await addressProvider.checkUserBlocked(userId);
 
-  const { lat, lng } = await kakaoMap(address);
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await addressProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
+  // Response Error End
 
   const result = await addressService.insertAddress(
     userId,
@@ -52,8 +66,8 @@ exports.createAddresses = async function (req, res) {
     address,
     detailAddress,
     information,
-    lat,
-    lng
+    location.lat,
+    location.lng
   );
 
   return res.send(response(baseResponse.SUCCESS, result));
@@ -72,11 +86,17 @@ exports.modifyAddresses = async function (req, res) {
   const { type, nickname, buildingName, address, detailAddress, information } =
     req.body;
 
+  const location = await kakaoMap(address);
+
   // Request Error Start
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
   if (!address) return res.send(errResponse(baseResponse.ADDRESS_IS_EMPTY)); // 2015
+
+  if (location.length) {
+    return res.send(errResponse(baseResponse.LOCATION_INFO_IS_NOT_VALID)); // 2076
+  }
 
   if (!addressId)
     return res.send(errResponse(baseResponse.ADDRESS_ID_IS_EMPTY)); // 2022
@@ -93,6 +113,16 @@ exports.modifyAddresses = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await addressProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await addressProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   const checkAddressExist = await addressProvider.checkAddressExist(addressId);
 
   if (checkAddressExist === 0)
@@ -107,8 +137,6 @@ exports.modifyAddresses = async function (req, res) {
 
   // Response Error End
 
-  const { lat, lng } = await kakaoMap(address);
-
   const result = await addressService.updateAddress(
     userId,
     type,
@@ -117,8 +145,8 @@ exports.modifyAddresses = async function (req, res) {
     address,
     detailAddress,
     information,
-    lat,
-    lng,
+    location.lat,
+    location.lng,
     addressId
   );
 
@@ -151,17 +179,20 @@ exports.deleteAddresses = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await addressProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await addressProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   const checkAddressExist = await addressProvider.checkAddressExist(addressId);
 
   if (checkAddressExist === 0)
     return res.send(errResponse(baseResponse.ADDRESS_IS_NOT_EXIST)); // 3007
-
-  const checkAddressDeleted = await addressProvider.checkAddressDeleted(
-    addressId
-  );
-
-  if (checkAddressDeleted === 0)
-    return res.send(errResponse(baseResponse.ADDRESS_IS_DELETED)); // 3009
 
   // Response Error End
 
@@ -190,6 +221,16 @@ exports.selectAddresses = async function (req, res) {
 
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
+
+  const checkUserBlocked = await addressProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await addressProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
 
   // Response Error End
 
@@ -224,6 +265,16 @@ exports.checkHouseCompany = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await addressProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await addressProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   // Response Error End
 
   const result = await addressProvider.checkHouseCompany(userId, type);
@@ -241,11 +292,17 @@ exports.changeLocation = async function (req, res) {
 
   const { addressId, address } = req.body;
 
+  const location = await kakaoMap(address);
+
   // Request Error Start
 
   if (!userId) return res.send(errResponse(baseResponse.USER_ID_IS_EMPTY)); // 2010
 
   if (!address) return res.send(errResponse(baseResponse.ADDRESS_IS_EMPTY)); // 2015
+
+  if (location.length) {
+    return res.send(errResponse(baseResponse.LOCATION_INFO_IS_NOT_VALID)); // 2076
+  }
 
   if (!addressId)
     return res.send(errResponse(baseResponse.ADDRESS_ID_IS_EMPTY)); // 2022
@@ -259,27 +316,28 @@ exports.changeLocation = async function (req, res) {
   if (checkUserExist === 0)
     return res.send(errResponse(baseResponse.USER_IS_NOT_EXIST)); // 3006
 
+  const checkUserBlocked = await addressProvider.checkUserBlocked(userId);
+
+  if (checkUserBlocked === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_BLOCKED)); // 3998
+
+  const checkUserWithdrawn = await addressProvider.checkUserWithdrawn(userId);
+
+  if (checkUserWithdrawn === 1)
+    return res.send(errResponse(baseResponse.ACCOUNT_IS_WITHDRAWN)); // 3999
+
   const checkAddressExist = await addressProvider.checkAddressExist(addressId);
 
   if (checkAddressExist === 0)
     return res.send(errResponse(baseResponse.ADDRESS_IS_NOT_EXIST)); // 3007
 
-  const checkAddressDeleted = await addressProvider.checkAddressDeleted(
-    addressId
-  );
-
-  if (checkAddressDeleted === 0)
-    return res.send(errResponse(baseResponse.ADDRESS_IS_DELETED)); // 3009
-
   // Response Error End
-
-  const { lat, lng } = await kakaoMap(address);
 
   const result = await addressService.updateLocation(
     addressId,
     userId,
-    lat,
-    lng
+    location.lat,
+    location.lng
   );
 
   return res.send(response(baseResponse.SUCCESS, result));

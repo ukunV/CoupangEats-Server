@@ -1,6 +1,7 @@
 module.exports = function (app) {
   const user = require("./userController");
   const jwtMiddleware = require("../../../config/jwtMiddleware");
+  const passport = require("passport");
 
   // 0. 테스트 API
   // app.get("/app/test", user.getTest);
@@ -43,17 +44,31 @@ module.exports = function (app) {
     user.getNotice
   );
 
-  // // 카카오 로그인 API
-  // app.post("/users/kakao-login", user.kakaoLogin);
-  // app.get("/kakao", passport.authenticate("kakao-login"));
-  // app.get(
-  //   "/auth/kakao/callback",
-  //   passport.authenticate("kakao-login", {
-  //     successRedirect: "/",
-  //     failureRedirect: "/",
-  //   }),
-  //   (req, res) => {
-  //     res.redirect("/");
-  //   }
-  // );
+  // 62. 아이디 찾기 - 인증번호 전송 및 저장 API
+  app.patch("/users/user-account/auth", user.findEmail);
+
+  // 63. 아이디 찾기 - 인증번호 확인 및 이메일 제공 API
+  app.get("/users/user-account", user.getEmail);
+
+  // 64. 비밀번호 찾기 - 인증번호 전송 및 저장 API
+  app.patch("/users/user-password/auth", user.findPassword);
+
+  // 64. 비밀번호 찾기 - 인증번호 전송 및 저장 API
+  app.patch("/users/user-password/reset", user.updatePassword);
+
+  // 65. 카카오 로그인 API
+  // client start
+  app.get("/kakao", passport.authenticate("kakao-login"));
+  app.get(
+    "/auth/kakao/callback",
+    passport.authenticate("kakao-login", {
+      successRedirect: "/",
+      failureRedirect: "/",
+    }),
+    (req, res) => {
+      res.redirect("/");
+    }
+  );
+  // client end
+  app.post("/users/kakao-login", user.kakaoLogin);
 };

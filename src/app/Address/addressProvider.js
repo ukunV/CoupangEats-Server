@@ -70,18 +70,48 @@ exports.checkHouseCompany = async function (userId, type) {
   }
 };
 
-// 주소 삭제 여부 확인
-exports.checkAddressDeleted = async function (addressId) {
+// // 주소 삭제 여부 확인
+// exports.checkAddressDeleted = async function (addressId) {
+//   try {
+//     const connection = await pool.getConnection(async (conn) => conn);
+
+//     const result = await addressDao.checkAddressDeleted(connection, addressId);
+
+//     connection.release();
+
+//     return result;
+//   } catch (err) {
+//     logger.error(`Address-checkAddressDeleted Provider error: ${err.message}`);
+//     return errResponse(baseResponse.DB_ERROR);
+//   }
+// };
+
+// 계정 정지 여부 확인
+exports.checkUserBlocked = async function (userId) {
   try {
     const connection = await pool.getConnection(async (conn) => conn);
 
-    const result = await addressDao.checkAddressDeleted(connection, addressId);
-
+    const result = await addressDao.checkUserBlocked(connection, userId);
     connection.release();
 
     return result;
   } catch (err) {
-    logger.error(`Address-checkAddressDeleted Provider error: ${err.message}`);
+    logger.error(`Address-checkUserBlocked Provider error: ${err.message}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+};
+
+// 계정 탈퇴 여부 확인
+exports.checkUserWithdrawn = async function (userId) {
+  try {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const result = await addressDao.checkUserWithdrawn(connection, userId);
+    connection.release();
+
+    return result;
+  } catch (err) {
+    logger.error(`Address-checkUserWithdrawn Provider error: ${err.message}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 };
