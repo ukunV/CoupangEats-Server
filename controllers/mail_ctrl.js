@@ -6,26 +6,25 @@ const sendMail = async (mail) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
+      port: 587,
+      secure: false,
       auth: {
         user: mailConf.user,
         pass: mailConf.pass,
       },
     });
-    const send = await transporter.sendMail({
-      from: mailConf.from,
+
+    await transporter.sendMail({
       ...mail,
     });
-    console.log(`Mail sent: ${send.messageId}`);
-  } catch (error) {
-    console.error(`Mail Error: ${error}`);
+  } catch (err) {
+    console.error(`Mail Error: ${err}`);
   }
 };
 
 const resetPasswordMail = async (authNum, to) => {
   const mail = {
-    from: mailConf.from,
+    from: "CoupangEats",
     to: to,
     subject: `[쿠팡이츠] 비밀번호 재설정 인증번호 안내 메일입니다.`,
     text: `비밀번호 재설정 인증번호를 확인하세요.`,
